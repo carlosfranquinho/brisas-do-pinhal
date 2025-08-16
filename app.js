@@ -365,8 +365,8 @@ async function loadLive() {
     el.innerHTML = `<span class="label">${label}</span><span class="val">${val}</span>`;
   };
 
-  const tmaxH = j.temp_max_time ? new Date(j.temp_max_time).toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" }) : "";
-  const tminH = j.temp_min_time ? new Date(j.temp_min_time).toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" }) : "";
+  const tmaxH = j.temp_max_time ? new Date(j.temp_max_time).toLocaleTimeString("pt-PT",{hour:"2-digit",minute:"2-digit"}) : "";
+  const tminH = j.temp_min_time ? new Date(j.temp_min_time).toLocaleTimeString("pt-PT",{hour:"2-digit",minute:"2-digit"}) : "";
 
   setText("#temp", fmt(j.temp_c, 1));
   setText("#apparent", fmt(j.apparent_c ?? j.temp_c, 1));

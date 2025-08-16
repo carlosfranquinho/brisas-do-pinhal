@@ -107,27 +107,7 @@ def _json_default(o):
         return o.isoformat()
     return str(o)
 
-def apparent_temperature_c(t_c: float | None, rh_pct: float | None, wind_kmh: float | None) -> float | None:
-    """
-    "Feels like" em °C.
-    - Wind Chill (Canadá) quando T <= 10°C e vento >= 4.8 km/h
-    - Caso contrário, Apparent Temperature (BoM/Austrália)
-    """
-    if t_c is None or rh_pct is None:
-        return None
-    try:
-        v_kmh = float(wind_kmh or 0.0)
-    except Exception:
-        v_kmh = 0.0
 
-    if t_c <= 10.0 and v_kmh >= 4.8:
-        wc = 13.12 + 0.6215 * t_c - 11.37 * (v_kmh ** 0.16) + 0.3965 * t_c * (v_kmh ** 0.16)
-        return round(wc, 1)
-
-    wind_ms = v_kmh / 3.6
-    e = (rh_pct / 100.0) * 6.105 * math.exp(17.27 * t_c / (237.7 + t_c))
-    at = t_c + 0.33 * e - 0.70 * wind_ms - 4.00
-    return round(at, 1)
 
 
 # -------------------- Endpoints --------------------
@@ -245,28 +225,47 @@ async def ecowitt_report(request: Request):
     ts_local = ts_utc.astimezone(tz)
 
     # 4) apparent temperature
+    def apparent_temperature_c(t_c: float | None, rh_pct: float | None, wind_kmh: float | None) -> float | None:
+            """
+            "Feels like" em °C.
+            - Wind Chill (Canadá) quando T <= 10°C e vento >= 4.8 km/h
+            - Caso contrário, Apparent Temperature (BoM/Austrália)
+            """
+            if t_c is None or rh_pct is None:
+                return None
+            try:
+                v_kmh = float(wind_kmh or 0.0)
+            except Exception:
+                v_kmh = 0.0
+
+            if t_c <= 10.0 and v_kmh >= 4.8:
+                wc = 13.12 + 0.6215 * t_c - 11.37 * (v_kmh ** 0.16) + 0.3965 * t_c * (v_kmh ** 0.16)
+                return round(wc, 1)
+
+            wind_ms = v_kmh / 3.6
+            e = (rh_pct / 100.0) * 6.105 * math.exp(17.27 * t_c / (237.7 + t_c))
+            at = t_c + 0.33 * e - 0.70 * wind_ms - 4.00
+            return round(at, 1)
+
     apparent_c = apparent_temperature_c(temp_c, rh_pct, wind_kmh)
 
-    # 5) BD: calcular extremos do dia + inserir esta leitura
+    # 5) BD: calcular extremos do dia + inserir esta leitura + horas dos extremos
     def _insert_and_extremes():
         conn = DB_POOL.get_connection()
-        cur = conn.cursor()
+        cur = conn.cursor(dictionary=True)  # <<-- IMPORTANTE
         try:
-            # extremos já existentes para o dia local
+            # extremos existentes (dia local)
             cur.execute("""
-                SELECT MIN(temp_c), MAX(temp_c)
+                SELECT MIN(temp_c) AS tmin, MAX(temp_c) AS tmax
                 FROM observations
                 WHERE station_id = %s
                   AND DATE(ts_local) = DATE(%s)
             """, ("meteomg", ts_local))
-            row = cur.fetchone() or (None, None)
-            prev_min, prev_max = row
+            row = cur.fetchone() or {}
+            prev_min = float(row["tmin"]) if row.get("tmin") is not None else None
+            prev_max = float(row["tmax"]) if row.get("tmax") is not None else None
 
-            # normalizar possíveis Decimals para float
-            prev_min = float(prev_min) if prev_min is not None else None
-            prev_max = float(prev_max) if prev_max is not None else None
-
-            # incluir a leitura atual
+            # inclui leitura atual
             tmin = prev_min
             tmax = prev_max
             if temp_c is not None:
@@ -297,37 +296,40 @@ async def ecowitt_report(request: Request):
                 pressure_hpa, rain_rate_mmph, rain_day_mm,
                 solar_wm2, apparent_c, uv_index
             ))
-            conn.commit()
-            
-            # hora da MÁX do dia (local)
+
+            # horas dos extremos (ignora linhas com temp_c NULL)
             cur.execute("""
-                SELECT temp_c, ts_local
+                SELECT ts_local
                 FROM observations
-                WHERE station_id = %s AND DATE(ts_local) = DATE(%s)
+                WHERE station_id = %s
+                  AND DATE(ts_local) = DATE(%s)
+                  AND temp_c IS NOT NULL
                 ORDER BY temp_c DESC, ts_local DESC
                 LIMIT 1
             """, ("meteomg", ts_local))
             rmax = cur.fetchone()
             tmax_time = rmax["ts_local"] if rmax else None
 
-            # hora da MÍN do dia (local)
             cur.execute("""
-                SELECT temp_c, ts_local
+                SELECT ts_local
                 FROM observations
-                WHERE station_id = %s AND DATE(ts_local) = DATE(%s)
+                WHERE station_id = %s
+                  AND DATE(ts_local) = DATE(%s)
+                  AND temp_c IS NOT NULL
                 ORDER BY temp_c ASC, ts_local ASC
                 LIMIT 1
             """, ("meteomg", ts_local))
             rmin = cur.fetchone()
             tmin_time = rmin["ts_local"] if rmin else None
-            
+
+            conn.commit()
             return tmin, tmax, tmin_time, tmax_time
         finally:
             try:
                 cur.close()
             finally:
                 conn.close()
-                
+
     try:
         tmin, tmax, tmin_time, tmax_time = await asyncio.to_thread(_insert_and_extremes)
     except Exception as e:
