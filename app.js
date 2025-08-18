@@ -465,7 +465,7 @@ async function loadHistory() {
   chart = new Chart(ctx, {
     type: "bar",
     data: {
-      labels, 
+      labels,
       datasets: [
         {
           type: "line",
@@ -477,8 +477,8 @@ async function loadHistory() {
           tension: 0.25,
           borderWidth: 2,
           pointRadius: 0,
-          spanGaps: true, 
-          hidden: allTempsNull, 
+          spanGaps: true,
+          hidden: allTempsNull,
         },
         {
           type: "bar",
@@ -535,5 +535,18 @@ async function boot() {
     console.error(err);
   }
 }
+
+(function markActiveNav() {
+  const path = location.pathname.replace(/\/+$/, "");
+  const map = { "": "home", "/": "home", "/historico.html": "historico", "/clima.html": "clima" };
+  const route =
+    map[path] ||
+    (location.hash.includes("historico") ? "historico" :
+      location.hash.includes("clima") ? "clima" : "home");
+
+  document.querySelectorAll(".main-nav a").forEach(a => {
+    if (a.dataset.route === route) a.classList.add("active");
+  });
+})();
 
 boot().catch(console.error);

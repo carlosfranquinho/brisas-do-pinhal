@@ -13,11 +13,19 @@
 
 <body>
     <main class="shell">
-        <!-- título + data -->
-        <header class="hero-head">
-            <h1>Brisa Marinha</h1>
-            <p id="nowDate">—</p>
+        <header class="hero-head site-head">
+            <div class="brand">
+                <h1><a href="/">Brisa Marinha</a></h1>
+                <p id="nowDate"></p>
+            </div>
+
+            <nav class="main-nav" aria-label="Secções principais">
+                <a href="/" data-route="home">Início</a>
+                <a href="/historico.html" data-route="historico">Histórico</a>
+                <a href="/clima.html" data-route="clima">Clima</a>
+            </nav>
         </header>
+
 
         <!-- zona superior: ícone + temperatura + métricas -->
         <section class="hero-top">
