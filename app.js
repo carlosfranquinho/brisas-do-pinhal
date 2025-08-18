@@ -359,14 +359,18 @@ async function loadLive() {
   if (!r.ok) throw new Error("live " + r.status);
   const j = await r.json();
 
-  const setExt = (sel, label, val) => {
+  const setExt = (sel, label, val, hhmm) => {
     const el = document.querySelector(sel);
     if (!el) return;
-    el.innerHTML = `<span class="label">${label}</span><span class="val">${val}</span>`;
+    el.innerHTML =
+      `<span class="label">${label}</span>` +
+      `<span class="val">${val}</span>` +
+      (hhmm ? ` <span class="label time">(${hhmm})</span>` : "");
   };
 
-  const tmaxH = j.temp_max_time ? new Date(j.temp_max_time).toLocaleTimeString("pt-PT",{hour:"2-digit",minute:"2-digit"}) : "";
-  const tminH = j.temp_min_time ? new Date(j.temp_min_time).toLocaleTimeString("pt-PT",{hour:"2-digit",minute:"2-digit"}) : "";
+
+  const tmaxH = j.temp_max_time ? new Date(j.temp_max_time).toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" }) : "";
+  const tminH = j.temp_min_time ? new Date(j.temp_min_time).toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" }) : "";
 
   setText("#temp", fmt(j.temp_c, 1));
   setText("#apparent", fmt(j.apparent_c ?? j.temp_c, 1));
@@ -378,8 +382,15 @@ async function loadLive() {
   setText("#press", fmt(j.pressure_hpa, 0));
   setText("#uv", fmt(j.uv_index, 1));
   setText("#solar", fmt(j.solar_wm2, 0));
-  setText("#tmax", `máx ${fmt(j.temp_max_c, 1)}°${tmaxH ? ` (${tmaxH})` : ""}`);
-  setText("#tmin", `min ${fmt(j.temp_min_c, 1)}°${tminH ? ` (${tminH})` : ""}`);
+
+  const hhmm = (s) => {
+    if (!s) return "";
+    const m = s.replace(" ", "T").match(/T(\d{2}:\d{2})/);
+    return m ? m[1] : "";
+  };
+
+  setExt("#tmax", "máx", `${fmt(j.temp_max_c, 1)}°`, hhmm(j.temp_max_time));
+  setExt("#tmin", "min", `${fmt(j.temp_min_c, 1)}°`, hhmm(j.temp_min_time));
 
   if (j.rain_day_mm != null) setText("#rainToday", fmt(j.rain_day_mm, 1));
 
