@@ -465,7 +465,7 @@ async function loadHistory() {
   chart = new Chart(ctx, {
     type: "bar",
     data: {
-      labels, // <- usa as labels já string
+      labels, 
       datasets: [
         {
           type: "line",
@@ -477,8 +477,8 @@ async function loadHistory() {
           tension: 0.25,
           borderWidth: 2,
           pointRadius: 0,
-          spanGaps: true, // <- permite “buracos” sem tentar desenhar
-          hidden: allTempsNull, // <- se tudo null, não mostra a série
+          spanGaps: true, 
+          hidden: allTempsNull, 
         },
         {
           type: "bar",
