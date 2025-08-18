@@ -13,99 +13,112 @@
 
 <body>
     <main class="shell">
-        <header class="hero-head site-head">
-            <div class="brand">
-                <h1><a href="/">Brisa Marinha</a></h1>
-                <p id="nowDate"></p>
-            </div>
+        <header class="site-header">
+            <a class="brand" href="#" data-viewlink="home">Brisa Marinha</a>
 
-            <nav class="main-nav" aria-label="Secções principais">
-                <a href="/" data-route="home">Início</a>
-                <a href="/historico.html" data-route="historico">Histórico</a>
-                <a href="/clima.html" data-route="clima">Clima</a>
+            <nav class="main-nav">
+                <a href="#/" data-viewlink="home" class="active">Agora</a>
+                <a href="#/historico" data-viewlink="historico">Histórico</a>
+                <a href="#/clima" data-viewlink="clima">Clima</a>
             </nav>
         </header>
 
 
         <!-- zona superior: ícone + temperatura + métricas -->
-        <section class="hero-top">
-            <div class="now-left">
-                <div class="now-icon">
-                    <img id="bm-now-ico" class="bm-ico" alt="Estado atual" width="96" height="96" />
-                </div>
+        <main id="views">
+            <section id="view-home" data-view="home">
+                <section class="hero-top">
+                    <div class="now-left">
+                        <div class="now-icon">
+                            <img id="bm-now-ico" class="bm-ico" alt="Estado atual" width="96" height="96" />
+                        </div>
 
-                <div class="now-temp">
-                    <span id="tmax" class="t-ext t-ext--max"></span>
-                    <span id="temp"></span><span class="deg">°C</span>
-                    <span id="tmin" class="t-ext t-ext--min"></span>
-                    <div class="feels">sensação térmica: <span id="apparent">--</span>°C</div>
-                </div>
-            </div>
+                        <div class="now-temp">
+                            <span id="tmax" class="t-ext t-ext--max"></span>
+                            <span id="temp"></span><span class="deg">°C</span>
+                            <span id="tmin" class="t-ext t-ext--min"></span>
+                            <div class="feels">sensação térmica: <span id="apparent">--</span>°C</div>
+                        </div>
+                    </div>
 
-            <div class="now-metrics">
-                <div class="m">
-                    <span>Nascer-do-sol</span><strong id="sunrise">--:--</strong>
-                </div>
-                <div class="m">
-                    <span>Pôr-do-sol</span><strong id="sunset">--:--</strong>
-                </div>
-                <div class="m">
-                    <span>Vento</span>
-                    <strong><span id="wind">--</span> km/h</strong>
-                </div>
-                <div class="m">
-                    <span>Rajada / Direção</span>
-                    <strong>
-                        <span id="gust">—</span><span class="u"> km/h</span> ·
-                        <span id="winddir">—</span>
-                    </strong>
-                </div>
+                    <div class="now-metrics">
+                        <div class="m">
+                            <span>Nascer-do-sol</span><strong id="sunrise">--:--</strong>
+                        </div>
+                        <div class="m">
+                            <span>Pôr-do-sol</span><strong id="sunset">--:--</strong>
+                        </div>
+                        <div class="m">
+                            <span>Vento</span>
+                            <strong><span id="wind">--</span> km/h</strong>
+                        </div>
+                        <div class="m">
+                            <span>Rajada / Direção</span>
+                            <strong>
+                                <span id="gust">—</span><span class="u"> km/h</span> ·
+                                <span id="winddir">—</span>
+                            </strong>
+                        </div>
 
-                <div class="m"><span>Humidade</span><strong id="rh">--</strong></div>
-                <div class="m">
-                    <span>Condensação</span><strong id="dew">--</strong>
-                </div>
+                        <div class="m"><span>Humidade</span><strong id="rh">--</strong></div>
+                        <div class="m">
+                            <span>Condensação</span><strong id="dew">--</strong>
+                        </div>
 
-                <div class="m"><span>UV</span><strong id="uv">--</strong></div>
+                        <div class="m"><span>UV</span><strong id="uv">--</strong></div>
 
-                <div class="m">
-                    <span>Radiação solar</span>
-                    <strong><span id="solar">—</span><span class="u"> W/m²</span></strong>
-                </div>
+                        <div class="m">
+                            <span>Radiação solar</span>
+                            <strong><span id="solar">—</span><span class="u"> W/m²</span></strong>
+                        </div>
 
-                <div class="m">
-                    <span>Chuva (hoje)</span><strong><span id="rainToday">—</span> mm</strong>
-                </div>
+                        <div class="m">
+                            <span>Chuva (hoje)</span><strong><span id="rainToday">—</span> mm</strong>
+                        </div>
 
-                <div class="m">
-                    <span>Chuva (24h)</span><strong><span id="rain24">--</span> mm</strong>
-                </div>
+                        <div class="m">
+                            <span>Chuva (24h)</span><strong><span id="rain24">--</span> mm</strong>
+                        </div>
 
-                <div class="m">
-                    <span>Pressão atmosférica</span><strong><span id="press">--</span> hPa</strong>
-                </div>
+                        <div class="m">
+                            <span>Pressão atmosférica</span><strong><span id="press">--</span> hPa</strong>
+                        </div>
 
-            </div>
-        </section>
+                    </div>
+                </section>
 
-        <!-- parte inferior: previsão 3 dias + gráfico -->
-        <section class="bottom">
-            <aside class="forecast">
-                <h2 class="forecast-title">Previsão</h2>
-                <ul id="forecast" class="days"></ul>
-            </aside>
+                <!-- parte inferior: previsão 3 dias + gráfico -->
+                <section class="bottom">
+                    <aside class="forecast">
+                        <h2 class="forecast-title">Previsão</h2>
+                        <ul id="forecast" class="days"></ul>
+                    </aside>
 
-            <section class="chart">
-                <header class="chart-title">Últimas 24 horas</header>
-                <div class="chart-canvas">
-                    <canvas id="histChart"></canvas>
-                </div>
-                <div class="chart-legend">
-                    <span class="dot t"></span> Temperatura
-                    <span class="dot r"></span> Precipitação
+                    <section class="chart">
+                        <header class="chart-title">Últimas 24 horas</header>
+                        <div class="chart-canvas">
+                            <canvas id="histChart"></canvas>
+                        </div>
+                        <div class="chart-legend">
+                            <span class="dot t"></span> Temperatura
+                            <span class="dot r"></span> Precipitação
+                        </div>
+                    </section>
+                </section>
+            </section>
+            <section id="view-historico" data-view="historico" hidden>
+                <h2>Histórico</h2>
+                <p>Brevemente: análises por intervalo (diário/mensal/anual) de temperatura e precipitação.</p>
+            </section>
+
+            <!-- CLIMA -->
+            <section id="view-clima" data-view="clima" hidden>
+                <h2>Clima <small>— mensal</small></h2>
+                <div id="climateWrap">
+                    <table id="climateTable" class="climate-table"></table>
                 </div>
             </section>
-        </section>
+        </main>
 
         <footer class="foot">
             <span id="staleFlag" class="ok">Estação online</span>

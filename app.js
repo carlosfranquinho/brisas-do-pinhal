@@ -9,6 +9,7 @@ const PUSH_MS = 120000;
 const CSSVARS = getComputedStyle(document.documentElement);
 const ACCENT = (CSSVARS.getPropertyValue("--accent") || "#3b82f6").trim();
 const ACCENT2 = (CSSVARS.getPropertyValue("--accent-2") || "#94a3b8").trim();
+const CLIMATE_URL = `${API_BASE}/climate/monthly`;
 
 /* Icons */
 const ICON_PATHS = {
@@ -41,6 +42,35 @@ const nowIconState = {
   source: "none",
   setAt: 0,
 };
+
+function showView(view) {
+  document.querySelectorAll('section[data-view]').forEach(sec => {
+    sec.hidden = sec.dataset.view !== view;
+  });
+  document.querySelectorAll('[data-viewlink]').forEach(a => {
+    a.classList.toggle('active', a.dataset.viewlink === view);
+  });
+
+  if (view === 'clima') loadClimate().catch(console.warn);
+  if (view === 'historico') loadHistorico?.().catch?.(console.warn); // placeholder
+}
+
+document.addEventListener('click', (ev) => {
+  const a = ev.target.closest('[data-viewlink]');
+  if (!a) return;
+  ev.preventDefault();
+  const v = a.dataset.viewlink;
+  history.replaceState({}, '', `#/${v === 'home' ? '' : v}`);
+  showView(v);
+});
+
+// navegação por hash (reloads/direto)
+(function bootRouter() {
+  const hash = (location.hash || '#/').replace(/^#\//, '');
+  const view = hash || 'home';
+  showView(view);
+})();
+
 
 function setNowIcon(name, source, priority) {
   const img = document.getElementById("bm-now-ico");
@@ -520,6 +550,83 @@ async function loadHistory() {
     },
   });
 }
+
+async function loadClimate() {
+  const r = await fetch(CLIMATE_URL, { cache: 'no-store' });
+  if (!r.ok) throw new Error(`climate ${r.status}`);
+  const j = await r.json();
+  renderClimateTable(j.months || j.data || []); // suporta “months” ou “data”
+}
+
+function renderClimateTable(months) {
+  // garantir 12 meses (1..12)
+  const byM = Array.from({ length: 12 }, (_, i) => months.find(x => +x.month === i + 1) || { month: i + 1 });
+
+  const mNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+
+  const rows = [
+    { label: 'Temperatura — média', key: 't_mean', unit: '°C', dec: 1 },
+    { label: 'Média máx', key: 'tmax_mean', unit: '°C', dec: 1, hot: true },
+    { label: 'Média min', key: 'tmin_mean', unit: '°C', dec: 1, cold: true },
+
+    { label: 'Dias com geada (min<0°)', key: 'frost_days', dec: 1 },
+    { label: 'Dias com gelo (máx<0°)', key: 'ice_days', dec: 1 },
+    { label: 'Dias de verão (máx>25°)', key: 'summer_days', dec: 1 },
+    { label: 'Dias tropicais (máx>30°)', key: 'tropical_days', dec: 1 },
+    { label: 'Noites tropicais (min≥20°)', key: 'tropical_nights', dec: 1 },
+
+    { label: 'Média precipitação (mm)', key: 'precip_mean_mm', unit: ' mm', dec: 1 },
+
+    // Extremos absolutos — valor visível; data em title (tooltip)
+    { label: 'Máximo absoluto', key: 'abs_max', unit: '°C', dec: 1, hot: true, dateKey: 'abs_max_date' },
+    { label: 'Mínimo absoluto', key: 'abs_min', unit: '°C', dec: 1, cold: true, dateKey: 'abs_min_date' },
+  ];
+
+  const tbl = document.getElementById('climateTable');
+  if (!tbl) return;
+
+  // THEAD
+  const thead = document.createElement('thead');
+  const hr = document.createElement('tr');
+  hr.innerHTML = `<th>Mês</th>${mNames.map(n => `<th>${n}</th>`).join('')}`;
+  thead.appendChild(hr);
+
+  // TBODY
+  const tbody = document.createElement('tbody');
+
+  for (const row of rows) {
+    const tr = document.createElement('tr');
+    const th = document.createElement('th');
+    th.textContent = row.label;
+    tr.appendChild(th);
+
+    byM.forEach(m => {
+      const td = document.createElement('td');
+      const v = m[row.key];
+      const txt = (v == null || Number.isNaN(+v)) ? '—' :
+        (row.dec != null ? Number(v).toFixed(row.dec) : String(v)) + (row.unit || '');
+      td.textContent = txt;
+
+      // tooltip com a data (para extremos)
+      if (row.dateKey && m[row.dateKey]) {
+        const dt = new Date(m[row.dateKey]);
+        const hhmm = isNaN(dt) ? String(m[row.dateKey]) :
+          dt.toLocaleString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        td.title = hhmm;
+      }
+
+      if (row.hot) td.classList.add('is-hot');
+      if (row.cold) td.classList.add('is-cold');
+      tr.appendChild(td);
+    });
+
+    tbody.appendChild(tr);
+  }
+
+  // MONTAGEM
+  tbl.replaceChildren(thead, tbody);
+}
+
 
 /* Boot */
 async function boot() {

@@ -9,6 +9,7 @@ import time
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 from decimal import Decimal
+from collections import defaultdict
 
 import mysql.connector
 from mysql.connector import pooling
@@ -425,3 +426,119 @@ def history(hours: int = Query(24, ge=1, le=168)):
     cur.close()
     conn.close()
     return rows
+
+@app.get("/climate/monthly")
+def climate_monthly(station: str = "meteomg"):
+    conn = mysql.connector.connect(**DB_CONFIG)
+    cur = conn.cursor(dictionary=True)
+
+    # 1) Agregado diário (um registo por dia)
+    cur.execute("""
+        SELECT
+          DATE(ts_local)          AS d,
+          YEAR(ts_local)          AS y,
+          MONTH(ts_local)         AS m,
+          MIN(temp_c)             AS tmin,
+          MAX(temp_c)             AS tmax,
+          AVG(temp_c)             AS tmean,
+          MAX(rain_day_mm)        AS rain_mm
+        FROM observations
+        WHERE station_id = %s
+        GROUP BY DATE(ts_local)
+        ORDER BY d ASC
+    """, (station,))
+    daily = cur.fetchall()
+    cur.close(); conn.close()
+
+    # 2) Acumuladores por mês
+    stats = {m: {
+        "days": 0,
+        "tmean_sum": 0.0, "tmax_sum": 0.0, "tmin_sum": 0.0,
+        "abs_max_val": None, "abs_max_date": None,
+        "abs_min_val": None, "abs_min_date": None,
+    } for m in range(1, 13)}
+
+    # contagens por (mês, ano) para médias anuais dos índices
+    counts_by_year = {m: defaultdict(lambda: {
+        "frost": 0, "ice": 0, "summer": 0, "tropical": 0, "tnight": 0, "wet": 0
+    }) for m in range(1, 13)}
+    # precipitação mensal por (mês, ano)
+    rain_by_year = {m: defaultdict(float) for m in range(1, 13)}
+
+    for row in daily:
+        m = int(row["m"]); y = int(row["y"])
+        tmin = row["tmin"]; tmax = row["tmax"]; tmean = row["tmean"]
+        rain = float(row["rain_mm"] or 0.0)
+        d    = row["d"]  # date/datetime -> será serializado depois
+
+        # médias mensais (média de valores diários)
+        if tmean is not None: stats[m]["tmean_sum"] += float(tmean)
+        if tmax  is not None: stats[m]["tmax_sum"]  += float(tmax)
+        if tmin  is not None: stats[m]["tmin_sum"]  += float(tmin)
+        stats[m]["days"] += 1
+
+        # extremos absolutos do mês
+        if tmax is not None and (stats[m]["abs_max_val"] is None or tmax > stats[m]["abs_max_val"]):
+            stats[m]["abs_max_val"]  = float(tmax)
+            stats[m]["abs_max_date"] = d.isoformat() if hasattr(d, "isoformat") else str(d)
+        if tmin is not None and (stats[m]["abs_min_val"] is None or tmin < stats[m]["abs_min_val"]):
+            stats[m]["abs_min_val"]  = float(tmin)
+            stats[m]["abs_min_date"] = d.isoformat() if hasattr(d, "isoformat") else str(d)
+
+        # índices (contagens por ano, para tirar média anual depois)
+        c = counts_by_year[m][y]
+        if tmin is not None and tmin <  0.0: c["frost"]   += 1
+        if tmax is not None and tmax <  0.0: c["ice"]     += 1
+        if tmax is not None and tmax > 25.0: c["summer"]  += 1
+        if tmax is not None and tmax > 30.0: c["tropical"]+= 1
+        if tmin is not None and tmin >=20.0: c["tnight"]  += 1
+        if rain > 0.0:                        c["wet"]     += 1
+
+        # precipitação mensal (somatório dos totais diários)
+        rain_by_year[m][y] += rain
+
+    # 3) Fechar resultados
+    def avg_or_none(soma, n):
+        return round(soma / n, 1) if n else None
+
+    out = []
+    for m in range(1, 13):
+        s = stats[m]
+        n_days = s["days"]
+
+        # médias térmicas
+        t_mean    = avg_or_none(s["tmean_sum"], n_days)
+        tmax_mean = avg_or_none(s["tmax_sum"],  n_days)
+        tmin_mean = avg_or_none(s["tmin_sum"],  n_days)
+
+        # médias anuais dos índices (ex.: média de “dias de geada” por Jan, ao longo dos anos)
+        year_counts = counts_by_year[m]
+        n_years = len(year_counts)
+        def idx_mean(key):
+            if not n_years: return None
+            return round(sum(v[key] for v in year_counts.values()) / n_years, 1)
+
+        # precipitação média mensal (média dos totais mensais ao longo dos anos)
+        monthly_rains = rain_by_year[m].values()
+        precip_mean = round(sum(monthly_rains) / len(monthly_rains), 1) if monthly_rains else None
+
+        out.append({
+            "month": m,
+            "t_mean": t_mean,
+            "tmax_mean": tmax_mean,
+            "tmin_mean": tmin_mean,
+            "frost_days": idx_mean("frost"),
+            "ice_days": idx_mean("ice"),
+            "summer_days": idx_mean("summer"),
+            "tropical_days": idx_mean("tropical"),
+            "tropical_nights": idx_mean("tnight"),
+            "wet_days": idx_mean("wet"),
+            "precip_mean_mm": precip_mean,
+            "abs_max": s["abs_max_val"], "abs_max_date": s["abs_max_date"],
+            "abs_min": s["abs_min_val"], "abs_min_date": s["abs_min_date"],
+        })
+
+    return JSONResponse(
+        content={"station": station, "months": out},
+        headers={"Cache-Control": "no-store"}
+    )

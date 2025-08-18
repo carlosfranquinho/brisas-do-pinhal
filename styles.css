@@ -464,6 +464,105 @@ body {
     color: #fff;
 }
 
+/* Header: título à esquerda, menu à direita */
+.site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.site-header .brand {
+    font-weight: 800;
+    font-size: 1.6rem;
+    text-decoration: none;
+    color: inherit;
+}
+
+.main-nav a {
+    text-decoration: none;
+    margin-left: 16px;
+    font-weight: 600;
+    opacity: .8;
+}
+
+.main-nav a.active {
+    opacity: 1;
+    text-decoration: underline;
+}
+
+/* Vistas */
+[hidden] {
+    display: none !important;
+}
+
+/* Clima: tabela estilo “dashboard” */
+#climateWrap {
+    overflow: auto;
+}
+
+.climate-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    font-variant-numeric: tabular-nums;
+}
+
+.climate-table thead th {
+    position: sticky;
+    top: 0;
+    background: #f3f4f6;
+    z-index: 1;
+    padding: 10px 8px;
+    text-align: center;
+    font-weight: 800;
+}
+
+.climate-table th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    text-align: left;
+    background: #fff;
+    min-width: 220px;
+}
+
+.climate-table tbody th {
+    position: sticky;
+    left: 0;
+    background: #fff;
+    padding: 10px 8px;
+    text-align: left;
+    font-weight: 700;
+}
+
+.climate-table td {
+    padding: 10px 8px;
+    text-align: center;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.climate-table tbody tr:nth-child(odd) td {
+    background: #f9fafb;
+}
+
+.climate-table .is-cold {
+    color: #2563eb;
+    font-weight: 700;
+}
+
+.climate-table .is-hot {
+    color: #ef4444;
+    font-weight: 700;
+}
+
+/* se quiseres espaçar o título do menu sem gap(): */
+.site-header .main-nav a+a {
+    margin-left: 20px;
+}
 
 
 
