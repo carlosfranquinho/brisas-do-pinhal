@@ -10,6 +10,9 @@ const CSSVARS = getComputedStyle(document.documentElement);
 const ACCENT = (CSSVARS.getPropertyValue("--accent") || "#3b82f6").trim();
 const ACCENT2 = (CSSVARS.getPropertyValue("--accent-2") || "#94a3b8").trim();
 const CLIMATE_URL = `${API_BASE}/climate/monthly`;
+const VIEWS = document.querySelectorAll('[data-view]');
+const LINKS = document.querySelectorAll('[data-viewlink]');
+let liveTimer = null;
 
 /* Icons */
 const ICON_PATHS = {
@@ -43,33 +46,41 @@ const nowIconState = {
   setAt: 0,
 };
 
-function showView(view) {
-  document.querySelectorAll('section[data-view]').forEach(sec => {
-    sec.hidden = sec.dataset.view !== view;
-  });
-  document.querySelectorAll('[data-viewlink]').forEach(a => {
-    a.classList.toggle('active', a.dataset.viewlink === view);
-  });
+function showView(name) {
+  VIEWS.forEach(v => v.hidden = v.dataset.view !== name);
+  LINKS.forEach(a => a.classList.toggle('active', a.dataset.viewlink === name));
 
-  if (view === 'clima') loadClimate().catch(console.warn);
-  if (view === 'historico') loadHistorico?.().catch?.(console.warn); // placeholder
+  if (name === 'home') startHome();       // <— garante o carregamento da página “Agora”
+  if (name === 'clima') buildClimateOnce(); // mantém o que já tens para “Clima”
 }
 
-document.addEventListener('click', (ev) => {
-  const a = ev.target.closest('[data-viewlink]');
-  if (!a) return;
-  ev.preventDefault();
-  const v = a.dataset.viewlink;
-  history.replaceState({}, '', `#/${v === 'home' ? '' : v}`);
-  showView(v);
-});
-
-// navegação por hash (reloads/direto)
-(function bootRouter() {
-  const hash = (location.hash || '#/').replace(/^#\//, '');
-  const view = hash || 'home';
+function handleRoute() {
+  const view = (location.hash.replace(/^#\/?/, '') || 'home').split('?')[0];
   showView(view);
-})();
+}
+
+window.addEventListener('hashchange', handleRoute);
+document.addEventListener('DOMContentLoaded', handleRoute);
+
+/* ciclo da home */
+let homeBooted = false;
+async function startHome() {
+  // arranca sempre o live; se já houver timer, renova-o
+  if (!homeBooted) {
+    homeBooted = true;
+    try {
+      await loadLive();              // mete valores no DOM
+      await loadMetarTGFTP();        // ícone atual via METAR
+      await loadForecast();          // previsão 4 dias
+      await loadHistory();           // gráfico 24h
+    } catch (e) { console.error(e); }
+  }
+  if (liveTimer) clearInterval(liveTimer);
+  liveTimer = setInterval(() => loadLive().catch(console.error), PUSH_MS);
+}
+
+/* evita crash se ainda não implementaste o construtor de clima */
+function buildClimateOnce(){ /* no-op se já estiveres a usar outra função */ }
 
 
 function setNowIcon(name, source, priority) {
