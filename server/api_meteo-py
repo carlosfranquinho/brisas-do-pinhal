@@ -427,7 +427,8 @@ def history(hours: int = Query(24, ge=1, le=168)):
     conn.close()
     return rows
 
-@app.get("/#/clima")
+# Endpoint de clima mensal (sem fragmentos de URL)
+@app.get("/climate/monthly")
 def climate_monthly(station: str = "meteomg"):
     conn = mysql.connector.connect(**DB_CONFIG)
     cur = conn.cursor(dictionary=True)
