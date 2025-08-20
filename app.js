@@ -37,6 +37,53 @@ function iconUrl(name) {
   return ICON_PATHS[name] || ICON_PATHS["unknown"];
 }
 
+// --- Router super simples (não mexe em IDs/classes existentes)
+const ROUTES = {
+  "#/": "home",
+  "#/historico": "historico",
+  "#/clima": "clima",
+  "": "home",
+  "#": "home",
+};
+
+function applyRoute() {
+  const key = (location.hash in ROUTES) ? location.hash : "#/";
+  const view = ROUTES[key];
+
+  // Mostra/esconde as sections
+  document.querySelectorAll('#views > section[data-view]')
+    .forEach(sec => { sec.hidden = (sec.dataset.view !== view); });
+
+  // Ativa item do menu
+  document.querySelectorAll('nav.main-nav [data-viewlink]')
+    .forEach(a => a.classList.toggle('active', a.dataset.viewlink === view));
+
+  // Lazy-load por vista
+  if (view === "clima") {
+    const table = document.getElementById('climateTable');
+    if (table && !table.dataset.ready) {
+      if (typeof window.loadClimateMonthly === 'function') {
+        // Usa o teu loader se já existir
+        Promise.resolve(window.loadClimateMonthly()).catch(console.error);
+      } else {
+        // Fallback suave: tenta um endpoint e, se não houver, mostra estado vazio
+        fetch(`${API_BASE}/climate/monthly`, { cache: 'no-store' })
+          .then(r => r.ok ? r.json() : null)
+          .then(data => {
+            if (data) drawClimateMonthly(data);
+            else table.innerHTML = '<tbody><tr><td>Sem dados do clima.</td></tr></tbody>';
+          })
+          .catch(() => (table.innerHTML = '<tbody><tr><td>Sem dados do clima.</td></tr></tbody>'));
+      }
+      table.dataset.ready = "1";
+    }
+  }
+}
+
+window.addEventListener('hashchange', applyRoute);
+document.addEventListener('DOMContentLoaded', applyRoute);
+
+
 /* Now icon state + priorities */
 const NOW_ICON_PRIORITY = { default: 0, ipma: 50, metar: 100 };
 const nowIconState = {
@@ -636,6 +683,25 @@ function renderClimateTable(months) {
 
   // MONTAGEM
   tbl.replaceChildren(thead, tbody);
+}
+
+function drawClimateMonthly(data){
+  const table = document.getElementById('climateTable');
+  if (!table) return;
+  const months = data?.months || [];
+  table.innerHTML = `
+    <thead>
+      <tr><th>Mês</th><th>Máx média</th><th>Mín média</th><th>Chuva</th></tr>
+    </thead>
+    <tbody>
+      ${months.map(m => `
+        <tr>
+          <td>${m.name ?? "—"}</td>
+          <td>${fmt(m.tmax, 1)}°</td>
+          <td>${fmt(m.tmin, 1)}°</td>
+          <td>${fmt(m.rain, 1)} mm</td>
+        </tr>`).join("")}
+    </tbody>`;
 }
 
 
