@@ -9,7 +9,8 @@ const PUSH_MS = 120000;
 const CSSVARS = getComputedStyle(document.documentElement);
 const ACCENT = (CSSVARS.getPropertyValue("--accent") || "#3b82f6").trim();
 const ACCENT2 = (CSSVARS.getPropertyValue("--accent-2") || "#94a3b8").trim();
-const CLIMATE_URL = `${API_BASE}/#/clima`;
+// Endpoint de clima mensal da API
+const CLIMATE_URL = `${API_BASE}/climate/monthly`;
 const VIEWS = document.querySelectorAll('[data-view]');
 const LINKS = document.querySelectorAll('[data-viewlink]');
 let liveTimer = null;
@@ -609,7 +610,8 @@ async function loadHistory() {
   });
 }
 
-async function loadClimate() {
+// Carrega dados climáticos mensais e preenche a tabela
+async function loadClimateMonthly() {
   const r = await fetch(CLIMATE_URL, { cache: 'no-store' });
   if (!r.ok) throw new Error(`climate ${r.status}`);
   const j = await r.json();
