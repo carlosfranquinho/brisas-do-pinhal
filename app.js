@@ -178,6 +178,7 @@ function setNowIcon(name, source, priority) {
 let chart = null;
 let HISTORY_WINDOW_POINTS = 0;
 let chartLastTs = 0;
+let climateChart = null;
 
 /* Helpers */
 const $ = (sel) => document.querySelector(sel);
@@ -630,7 +631,9 @@ async function loadClimateMonthly() {
   const r = await fetch(CLIMATE_URL, { cache: 'no-store' });
   if (!r.ok) throw new Error(`climate ${r.status}`);
   const j = await r.json();
-  renderClimateTable(j.months || j.data || []); // suporta “months” ou “data”
+  const months = j.months || j.data || [];
+  renderClimateTable(months); // suporta “months” ou “data”
+  renderClimateChart(months);
 }
 
 function renderClimateTable(months) {
@@ -702,6 +705,98 @@ function renderClimateTable(months) {
   tbl.replaceChildren(thead, tbody);
 }
 
+function renderClimateChart(months) {
+  const canvas = document.getElementById('climateChart');
+  if (!canvas) return;
+
+  const withMonths = months.map((m, i) => ({ month: m.month ?? i + 1, ...m }));
+  const byM = Array.from({ length: 12 }, (_, i) =>
+    withMonths.find((x) => +x.month === i + 1) || {}
+  );
+  const labels = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+  const toNum = (v) => (v == null ? null : Number(v));
+
+  const tMean = byM.map((m) => {
+    if (m.t_mean != null) return toNum(m.t_mean);
+    if (m.t != null) return toNum(m.t);
+    if (m.tmax_mean != null && m.tmin_mean != null)
+      return (toNum(m.tmax_mean) + toNum(m.tmin_mean)) / 2;
+    if (m.tmax != null && m.tmin != null)
+      return (toNum(m.tmax) + toNum(m.tmin)) / 2;
+    return null;
+  });
+  const tMax = byM.map((m) => toNum(m.abs_max ?? m.tmax));
+  const tMin = byM.map((m) => toNum(m.abs_min ?? m.tmin));
+  const rain = byM.map((m) => toNum(m.precip_mean_mm ?? m.rain));
+
+  if (climateChart) climateChart.destroy();
+  climateChart = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          type: 'bar',
+          label: 'Precipitação (mm)',
+          data: rain,
+          yAxisID: 'yRain',
+          backgroundColor: ACCENT2,
+          borderColor: ACCENT2,
+          order: 0,
+        },
+        {
+          type: 'line',
+          label: 'Temperatura média',
+          data: tMean,
+          yAxisID: 'yTemp',
+          borderColor: ACCENT,
+          backgroundColor: 'rgba(0,0,0,0)',
+          tension: 0.25,
+          spanGaps: true,
+          order: 1,
+        },
+        {
+          type: 'line',
+          label: 'Máximo absoluto',
+          data: tMax,
+          yAxisID: 'yTemp',
+          borderColor: '#ef4444',
+          backgroundColor: 'rgba(0,0,0,0)',
+          tension: 0.25,
+          spanGaps: true,
+          order: 1,
+        },
+        {
+          type: 'line',
+          label: 'Mínimo absoluto',
+          data: tMin,
+          yAxisID: 'yTemp',
+          borderColor: '#2563eb',
+          backgroundColor: 'rgba(0,0,0,0)',
+          tension: 0.25,
+          spanGaps: true,
+          order: 1,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        yTemp: {
+          position: 'left',
+          title: { display: true, text: 'Temperatura (°C)' },
+        },
+        yRain: {
+          position: 'right',
+          title: { display: true, text: 'Precipitação (mm)' },
+          grid: { drawOnChartArea: false },
+        },
+      },
+    },
+  });
+}
+
 function drawClimateMonthly(data){
   const table = document.getElementById('climateTable');
   if (!table) return;
@@ -719,6 +814,7 @@ function drawClimateMonthly(data){
           <td>${fmt(m.rain, 1)} mm</td>
         </tr>`).join("")}
     </tbody>`;
+  renderClimateChart(months);
 }
 
 
