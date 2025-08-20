@@ -590,7 +590,20 @@ async function loadHistory() {
       scales: {
         x: {
           grid: { color: "#00000014" },
-          ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 12 },
+          ticks: {
+            maxRotation: 0,
+            autoSkip: false,
+            callback: function (value, index) {
+              const d = labelDates[index];
+              if (d.getMinutes() === 0 && d.getHours() % 2 === 0) {
+                return d.toLocaleTimeString("pt-PT", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                });
+              }
+              return "";
+            },
+          },
         },
         y1: {
           position: "left",
@@ -598,12 +611,14 @@ async function loadHistory() {
           min: 0,
           max: 43,
           ticks: { stepSize: 5 },
+          title: { display: true, text: "Temperatura (ºC)" },
         },
         y2: {
           position: "right",
           grid: { display: false },
           beginAtZero: true,
           suggestedMax: 10,
+          title: { display: true, text: "Precipitação (mm)" },
         },
       },
     },
