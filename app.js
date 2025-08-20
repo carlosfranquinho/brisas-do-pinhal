@@ -725,8 +725,9 @@ function renderClimateChart(months) {
       return (toNum(m.tmax) + toNum(m.tmin)) / 2;
     return null;
   });
-  const tMax = byM.map((m) => toNum(m.tmax_mean ?? m.tmax));
-  const tMin = byM.map((m) => toNum(m.tmin_mean ?? m.tmin));
+  const tMax = byM.map((m) => toNum(m.abs_max ?? m.tmax));
+  const tMin = byM.map((m) => toNum(m.abs_min ?? m.tmin));
+
   const rain = byM.map((m) => toNum(m.precip_mean_mm ?? m.rain));
 
   if (climateChart) climateChart.destroy();
@@ -742,6 +743,8 @@ function renderClimateChart(months) {
           yAxisID: 'yRain',
           backgroundColor: ACCENT2,
           borderColor: ACCENT2,
+         order: 0,
+
         },
         {
           type: 'line',
@@ -752,26 +755,32 @@ function renderClimateChart(months) {
           backgroundColor: 'rgba(0,0,0,0)',
           tension: 0.25,
           spanGaps: true,
+          order: 1,
         },
         {
           type: 'line',
-          label: 'Máx média',
+          label: 'Máximo absoluto',
+
           data: tMax,
           yAxisID: 'yTemp',
           borderColor: '#ef4444',
           backgroundColor: 'rgba(0,0,0,0)',
           tension: 0.25,
           spanGaps: true,
+          order: 1,
         },
         {
           type: 'line',
-          label: 'Mín média',
+          label: 'Mínimo absoluto',
+
           data: tMin,
           yAxisID: 'yTemp',
           borderColor: '#2563eb',
           backgroundColor: 'rgba(0,0,0,0)',
           tension: 0.25,
           spanGaps: true,
+          order: 1,
+
         },
       ],
     },
