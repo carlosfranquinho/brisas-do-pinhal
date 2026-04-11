@@ -551,8 +551,12 @@ async function loadHistory() {
   });
   const allTempsNull = temps.every((v) => v === null);
 
-  // chuva 24h aprox. (10 min ≈ 1/6 h)
-  const rain24 = rainRate.reduce((a, b) => a + (b ?? 0) / 6, 0);
+  // Acumulado 24h: rate (mm/h) × intervalo real entre leituras consecutivas
+  const rain24 = rainRate.reduce((acc, rate, i) => {
+    if (rate == null || i === 0) return acc;
+    const intervalH = (labelDates[i].getTime() - labelDates[i - 1].getTime()) / 3_600_000;
+    return acc + rate * intervalH;
+  }, 0);
   setText("#rain24", fmt(rain24, 1));
 
   const ctxHTML = document.getElementById("histChart");
