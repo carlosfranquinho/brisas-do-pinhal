@@ -458,7 +458,18 @@ async function loadLive() {
   setExt("#tmax", "máx", `${fmt(j.temp_max_c, 1)}°`, hhmm(j.temp_max_time));
   setExt("#tmin", "min", `${fmt(j.temp_min_c, 1)}°`, hhmm(j.temp_min_time));
 
-  if (j.rain_day_mm != null) setText("#rainToday", fmt(j.rain_day_mm, 1));
+  if (j.rain_day_mm != null) {
+    setText("#rainToday", fmt(j.rain_day_mm, 1));
+    // Bucket de precipitação
+    const rainMm = j.rain_day_mm ?? 0;
+    const NICE_MAXES = [5, 10, 15, 20, 30, 40, 50, 75, 100, 150, 200, 300];
+    const bucketMax = NICE_MAXES.find(v => v > rainMm) ?? Math.ceil(rainMm / 10) * 10 + 10;
+    const pct = Math.min(100, (rainMm / bucketMax) * 100);
+    const fill = document.getElementById('rainFill');
+    const maxLabel = document.getElementById('rainBucketMax');
+    if (fill) fill.style.height = pct + '%';
+    if (maxLabel) maxLabel.textContent = bucketMax + ' mm';
+  }
 
   const ts = localTime(j.ts_local ?? j.ts_utc);
   setSunTimes(ts);
@@ -503,6 +514,25 @@ async function loadHistory() {
   // guarda janela e último timestamp real (para o appendLivePointToChart)
   HISTORY_WINDOW_POINTS = labels.length;
   chartLastTs = labelDates.at(-1)?.getTime() || 0;
+
+  // Pré-calcula quais os índices do eixo X a mostrar:
+  // última hora completa antes do load, depois de 2h em 2h para trás
+  const anchor = new Date();
+  anchor.setMinutes(0, 0, 0); // ex: 15:43 → 15:00
+  const tickTargets = [];
+  for (let i = 0; i < 24; i += 2) {
+    tickTargets.push(anchor.getTime() - i * 3_600_000);
+  }
+  // Para cada alvo, encontrar o índice mais próximo (dentro de 1h)
+  const tickIndices = new Set();
+  for (const targetTs of tickTargets) {
+    let bestIdx = -1, bestDiff = Infinity;
+    labelDates.forEach((d, i) => {
+      const diff = Math.abs(d.getTime() - targetTs);
+      if (diff < bestDiff) { bestDiff = diff; bestIdx = i; }
+    });
+    if (bestIdx >= 0 && bestDiff < 3_600_000) tickIndices.add(bestIdx);
+  }
 
   // datasets
   const rawTemps = rows.map((x) =>
@@ -588,11 +618,8 @@ async function loadHistory() {
             maxRotation: 0,
             autoSkip: false,
             callback: function (value, index) {
-              const d = labelDates[index];
-              if (d.getMinutes() === 0 && d.getHours() % 2 === 0) {
-                return d.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
-              }
-              return "";
+              if (!tickIndices.has(index)) return "";
+              return labelDates[index].toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
             },
           },
         },

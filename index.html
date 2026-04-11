@@ -146,20 +146,29 @@
           <!-- Linha 2: Precipitação + Vento -->
           <div class="row-precip-wind">
 
-            <div class="soft-card metric-box highlight-card">
+            <div class="soft-card metric-box rain-card">
               <div class="mb-top">
                 <span class="m-icon icon-rain"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path><line x1="8" y1="13" x2="8" y2="21"></line><line x1="12" y1="15" x2="12" y2="23"></line><line x1="16" y1="13" x2="16" y2="21"></line></svg></span>
                 <span class="m-label">Precipitação</span>
               </div>
-              <div class="mb-split">
-                <div class="val-group">
-                  <span class="val-label">Hoje</span>
-                  <div class="mb-value"><span id="rainToday">—</span> <span class="m-unit">mm</span></div>
+              <div class="mb-split rain-split">
+                <div class="rain-vals">
+                  <div class="val-group">
+                    <span class="val-label">Hoje</span>
+                    <div class="mb-value"><span id="rainToday">—</span> <span class="m-unit">mm</span></div>
+                  </div>
+                  <div class="val-group">
+                    <span class="val-label">24h Acum.</span>
+                    <div class="mb-value"><span id="rain24">—</span> <span class="m-unit">mm</span></div>
+                  </div>
                 </div>
                 <div class="val-divider"></div>
-                <div class="val-group">
-                  <span class="val-label">24h Acum.</span>
-                  <div class="mb-value"><span id="rain24">—</span> <span class="m-unit">mm</span></div>
+                <div class="bucket-wrapper">
+                  <span class="bucket-max-label" id="rainBucketMax">—</span>
+                  <div class="bucket">
+                    <div class="bucket-fill" id="rainFill"></div>
+                  </div>
+                  <span class="bucket-zero-label">0 mm</span>
                 </div>
               </div>
             </div>
