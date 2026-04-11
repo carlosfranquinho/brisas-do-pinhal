@@ -466,6 +466,10 @@ async function loadLive() {
   setText("#apparent", fmt(j.apparent_c ?? j.temp_c, 1));
   setText("#wind", fmt(j.wind_kmh, 0));
   setText("#winddir", degToDir(j.wind_dir_deg));
+  const arrow = document.getElementById("windArrowContainer");
+  if (arrow && j.wind_dir_deg !== null) {
+    arrow.style.transform = `rotate(${j.wind_dir_deg}deg)`;
+  }
   setText("#gust", fmt(j.gust_kmh, 0));
   setText("#rh", fmt(j.rh_pct, 0) + "%");
   setText("#dew", fmt(j.dewpoint_c, 1) + "°");

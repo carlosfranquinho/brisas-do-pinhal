@@ -138,21 +138,36 @@
               <div class="mb-value" id="dew">—</div>
             </div>
 
-            <div class="soft-card metric-box wide-card">
+            <div class="soft-card metric-box wide-card wind-card">
               <div class="mb-top">
                 <span class="m-icon icon-gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"></path></svg></span>
                 <span class="m-label">Vento & Rajada</span>
                 <span class="m-badge" id="winddir">—</span>
               </div>
-              <div class="mb-split">
-                <div class="val-group">
-                  <span class="val-label">Média</span>
-                  <div class="mb-value"><span id="wind">—</span> <span class="m-unit">km/h</span></div>
+              <div class="mb-split wind-split">
+                <div class="wind-stats">
+                  <div class="val-group">
+                    <span class="val-label">Média</span>
+                    <div class="mb-value"><span id="wind">—</span> <span class="m-unit">km/h</span></div>
+                  </div>
+                  <div class="val-group" style="margin-top: 12px;">
+                    <span class="val-label">Rajada</span>
+                    <div class="mb-value"><span id="gust">—</span> <span class="m-unit">km/h</span></div>
+                  </div>
                 </div>
                 <div class="val-divider"></div>
-                <div class="val-group">
-                  <span class="val-label">Rajada</span>
-                  <div class="mb-value"><span id="gust">—</span> <span class="m-unit">km/h</span></div>
+                <div class="compass-wrapper">
+                  <div class="compass">
+                    <span class="c-dir n">N</span>
+                    <span class="c-dir s">S</span>
+                    <span class="c-dir e">E</span>
+                    <span class="c-dir w">O</span>
+                    <div class="c-arrow-container" id="windArrowContainer">
+                      <div class="c-arrow">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L19 21l-7-4-7 4 7-19z"/></svg>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -173,7 +188,7 @@
               <div class="mb-value" id="uv">—</div>
             </div>
 
-            <div class="soft-card metric-box wide-card highlight-card">
+            <div class="soft-card metric-box wide-card">
               <div class="mb-top">
                 <span class="m-icon icon-rain"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path><line x1="8" y1="13" x2="8" y2="21"></line><line x1="12" y1="15" x2="12" y2="23"></line><line x1="16" y1="13" x2="16" y2="21"></line></svg></span>
                 <span class="m-label">Precipitação</span>
