@@ -1,25 +1,45 @@
 <!DOCTYPE html>
 <html lang="pt">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Brisas do Pinhal</title>
-  <link rel="stylesheet" href="styles.css?v=3" />
+  <meta name="description" content="Dados meteorológicos em tempo real da estação amadora Brisas do Pinhal." />
+  <title>Brisas do Pinhal | Estação Meteorológica</title>
+  
+  <!-- Modern Font: Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="styles.css?v=4" />
   <script src="https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 
 <body>
+  <!-- Ambient background elements -->
+  <div class="ambient-bg shape-1"></div>
+  <div class="ambient-bg shape-2"></div>
+  <div class="ambient-bg shape-3"></div>
 
   <!-- ══════════════ HEADER ══════════════ -->
-  <header class="site-header">
+  <header class="site-header glass">
     <div class="header-inner">
       <div class="brand">
-        <svg class="brand-leaf" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M12 2C6 2 3 7 3 12c0 3.5 1.5 6.5 4 8.5C8.5 22 11 22 12 22s3.5 0 5-1.5c2.5-2 4-5 4-8.5C21 7 18 2 12 2z" fill="currentColor" opacity=".25"/>
-          <path d="M12 2c0 0-5 8-5 13a5 5 0 0 0 10 0C17 10 12 2 12 2z" fill="currentColor"/>
+        <svg class="brand-leaf pulse-slow" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 2C6 2 3 7 3 12c0 3.5 1.5 6.5 4 8.5C8.5 22 11 22 12 22s3.5 0 5-1.5c2.5-2 4-5 4-8.5C21 7 18 2 12 2z" fill="url(#leaf-grad1)" opacity=".8"/>
+          <path d="M12 2c0 0-5 8-5 13a5 5 0 0 0 10 0C17 10 12 2 12 2z" fill="url(#leaf-grad2)"/>
+          <defs>
+            <linearGradient id="leaf-grad1" x1="3" y1="2" x2="21" y2="22" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#38bdf8" />
+              <stop offset="1" stop-color="#818cf8" />
+            </linearGradient>
+            <linearGradient id="leaf-grad2" x1="12" y1="2" x2="12" y2="22" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#38bdf8" />
+              <stop offset="1" stop-color="#6366f1" />
+            </linearGradient>
+          </defs>
         </svg>
         <div class="brand-text">
           <h1>Brisas do Pinhal</h1>
@@ -39,167 +59,193 @@
     <div id="views">
 
       <!-- ── HOME ── -->
-      <section data-view="home">
+      <section data-view="home" class="fade-in">
 
         <!-- Bloco principal: temperatura + nascer/pôr do sol -->
-        <div class="hero-top">
-
+        <div class="hero-top glass-card">
           <div class="now-left">
-            <img id="bm-now-ico" class="now-icon-img sunny"
-                 src="icons/cloudy.svg" alt="condições atuais"
-                 width="108" height="108" />
+            <div class="icon-wrapper">
+              <img id="bm-now-ico" class="now-icon-img sunny float-anim"
+                   src="icons/cloudy.svg" alt="condições atuais"
+                   width="120" height="120" />
+            </div>
+            
             <div class="temp-block">
-              <div class="now-temp">
-                <span id="temp">—</span><span class="deg">°</span>
-                <span class="t-ext t-ext--max" id="tmax"></span>
-                <span class="t-ext t-ext--min" id="tmin"></span>
+              <div class="now-temp-container">
+                <div class="now-temp">
+                  <span id="temp">—</span><span class="deg">°C</span>
+                </div>
+                <div class="t-ext-group">
+                  <div class="t-ext t-ext--max"><span class="arr">▲</span> <span id="tmax"></span></div>
+                  <div class="t-ext t-ext--min"><span class="arr">▼</span> <span id="tmin"></span></div>
+                </div>
               </div>
-              <p class="feels">Sensação&nbsp;<strong id="apparent">—</strong>&thinsp;°C</p>
+              <p class="feels">Sensação térmica <strong id="apparent">—</strong><span class="deg-small">°C</span></p>
             </div>
           </div>
 
           <div class="sun-row">
-            <div class="sun-item">
+            <div class="sun-item glass-pill">
               <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="sun-svg">
                 <circle cx="10" cy="10" r="4" fill="currentColor"/>
                 <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
               </svg>
-              <div>
-                <span class="sun-label">Nascer</span>
+              <div class="sun-text">
+                <span class="sun-label">Nascer do Sol</span>
                 <span class="sun-value" id="sunrise">—</span>
               </div>
             </div>
-            <div class="sun-item">
+            <div class="sun-item glass-pill">
               <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="sun-svg sun-svg--set">
                 <circle cx="10" cy="10" r="4" fill="currentColor" opacity=".4"/>
                 <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".5"/>
               </svg>
-              <div>
-                <span class="sun-label">Pôr</span>
+              <div class="sun-text">
+                <span class="sun-label">Pôr do Sol</span>
                 <span class="sun-value" id="sunset">—</span>
               </div>
             </div>
           </div>
-
         </div>
 
         <!-- Métricas em cards -->
         <div class="metrics-grid">
-
-          <div class="metric-card">
-            <span class="mc-icon" aria-hidden="true">
-              <svg viewBox="0 0 20 20" fill="none"><path d="M10 3a4 4 0 0 1 0 8 4 4 0 0 1 0-8zm0 10c-4 0-7 1.8-7 4h14c0-2.2-3-4-7-4z" fill="currentColor" opacity=".2"/><path d="M10 3c0 0-3 4-3 6a3 3 0 0 0 6 0C13 7 10 3 10 3z" fill="currentColor"/></svg>
-            </span>
-            <span class="mc-label">Humidade</span>
+          
+          <div class="metric-card glass-card hover-lift">
+            <div class="mc-header">
+              <span class="mc-icon">
+                <svg viewBox="0 0 20 20" fill="none"><path d="M10 3a4 4 0 0 1 0 8 4 4 0 0 1 0-8zm0 10c-4 0-7 1.8-7 4h14c0-2.2-3-4-7-4z" fill="currentColor" opacity=".2"/><path d="M10 3c0 0-3 4-3 6a3 3 0 0 0 6 0C13 7 10 3 10 3z" fill="currentColor"/></svg>
+              </span>
+              <span class="mc-label">Humidade</span>
+            </div>
             <span class="mc-value" id="rh">—</span>
           </div>
 
-          <div class="metric-card">
-            <span class="mc-icon" aria-hidden="true">
-              <svg viewBox="0 0 20 20" fill="none"><rect x="8" y="2" width="4" height="10" rx="2" fill="currentColor" opacity=".3"/><circle cx="10" cy="14" r="3" fill="currentColor"/><rect x="9" y="5" width="2" height="7" rx="1" fill="currentColor"/></svg>
-            </span>
-            <span class="mc-label">Ponto de orvalho</span>
+          <div class="metric-card glass-card hover-lift">
+            <div class="mc-header">
+              <span class="mc-icon">
+                <svg viewBox="0 0 20 20" fill="none"><rect x="8" y="2" width="4" height="10" rx="2" fill="currentColor" opacity=".3"/><circle cx="10" cy="14" r="3" fill="currentColor"/><rect x="9" y="5" width="2" height="7" rx="1" fill="currentColor"/></svg>
+              </span>
+              <span class="mc-label">Pto. Orvalho</span>
+            </div>
             <span class="mc-value" id="dew">—</span>
           </div>
 
-          <div class="metric-card">
-            <span class="mc-icon" aria-hidden="true">
-              <svg viewBox="0 0 20 20" fill="none"><path d="M3 10h14M14 6l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </span>
-            <span class="mc-label">Vento <span class="mc-dir" id="winddir">—</span></span>
-            <span class="mc-value"><span id="wind">—</span>&thinsp;<span class="mc-unit">km/h</span></span>
+          <div class="metric-card glass-card hover-lift">
+            <div class="mc-header">
+              <span class="mc-icon">
+                <svg viewBox="0 0 20 20" fill="none"><path d="M3 10h14M14 6l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <span class="mc-label">Vento <span class="mc-dir badge" id="winddir">—</span></span>
+            </div>
+            <span class="mc-value"><span id="wind">—</span> <span class="mc-unit">km/h</span></span>
           </div>
 
-          <div class="metric-card">
-            <span class="mc-icon" aria-hidden="true">
-              <svg viewBox="0 0 20 20" fill="none"><path d="M3 10h14M14 5l4 5-4 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".4"/><path d="M3 10h10M10 6l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </span>
-            <span class="mc-label">Rajada</span>
-            <span class="mc-value"><span id="gust">—</span>&thinsp;<span class="mc-unit">km/h</span></span>
+          <div class="metric-card glass-card hover-lift">
+            <div class="mc-header">
+              <span class="mc-icon">
+                <svg viewBox="0 0 20 20" fill="none"><path d="M3 10h14M14 5l4 5-4 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".4"/><path d="M3 10h10M10 6l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <span class="mc-label">Rajada</span>
+            </div>
+            <span class="mc-value"><span id="gust">—</span> <span class="mc-unit">km/h</span></span>
           </div>
 
-          <div class="metric-card">
-            <span class="mc-icon" aria-hidden="true">
-              <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.8"/><circle cx="10" cy="10" r="2" fill="currentColor"/><path d="M10 5v2M10 13v2M5 10h2M13 10h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-            </span>
-            <span class="mc-label">Pressão</span>
-            <span class="mc-value"><span id="press">—</span>&thinsp;<span class="mc-unit">hPa</span></span>
+          <div class="metric-card glass-card hover-lift">
+            <div class="mc-header">
+              <span class="mc-icon">
+                <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.8"/><circle cx="10" cy="10" r="2" fill="currentColor"/><path d="M10 5v2M10 13v2M5 10h2M13 10h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </span>
+              <span class="mc-label">Pressão</span>
+            </div>
+            <span class="mc-value"><span id="press">—</span> <span class="mc-unit">hPa</span></span>
           </div>
 
-          <div class="metric-card">
-            <span class="mc-icon" aria-hidden="true">
-              <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="5" fill="currentColor" opacity=".25"/><circle cx="10" cy="10" r="3" fill="currentColor"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-            </span>
-            <span class="mc-label">Índice UV</span>
+          <div class="metric-card glass-card hover-lift">
+            <div class="mc-header">
+              <span class="mc-icon">
+                <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="5" fill="currentColor" opacity=".25"/><circle cx="10" cy="10" r="3" fill="currentColor"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </span>
+              <span class="mc-label">Índice UV</span>
+            </div>
             <span class="mc-value" id="uv">—</span>
           </div>
 
-          <div class="metric-card">
-            <span class="mc-icon" aria-hidden="true">
-              <svg viewBox="0 0 20 20" fill="none"><path d="M3 16l4-8 3 5 2-3 5 6H3z" fill="currentColor" opacity=".2"/><path d="M3 16l4-8 3 5 2-3 5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </span>
-            <span class="mc-label">Radiação solar</span>
-            <span class="mc-value"><span id="solar">—</span>&thinsp;<span class="mc-unit">W/m²</span></span>
+          <div class="metric-card glass-card hover-lift col-span-2-mobile">
+            <div class="mc-header">
+              <span class="mc-icon">
+                <svg viewBox="0 0 20 20" fill="none"><path d="M3 16l4-8 3 5 2-3 5 6H3z" fill="currentColor" opacity=".2"/><path d="M3 16l4-8 3 5 2-3 5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <span class="mc-label">Radiação Solar</span>
+            </div>
+            <span class="mc-value"><span id="solar">—</span> <span class="mc-unit">W/m²</span></span>
           </div>
 
-          <div class="metric-card">
-            <span class="mc-icon" aria-hidden="true">
-              <svg viewBox="0 0 20 20" fill="none"><path d="M10 3c0 0-6 5-6 9a6 6 0 0 0 12 0C16 8 10 3 10 3z" fill="currentColor" opacity=".2"/><path d="M10 3c0 0-4 4-4 8a4 4 0 0 0 8 0C14 7 10 3 10 3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-            </span>
-            <span class="mc-label">Chuva hoje</span>
-            <span class="mc-value"><span id="rainToday">—</span>&thinsp;<span class="mc-unit">mm</span></span>
+          <div class="metric-card glass-card hover-lift fill-primary">
+            <div class="mc-header">
+              <span class="mc-icon text-blue">
+                <svg viewBox="0 0 20 20" fill="none"><path d="M10 3c0 0-6 5-6 9a6 6 0 0 0 12 0C16 8 10 3 10 3z" fill="currentColor" opacity=".2"/><path d="M10 3c0 0-4 4-4 8a4 4 0 0 0 8 0C14 7 10 3 10 3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+              </span>
+              <span class="mc-label">Chuva Hoje</span>
+            </div>
+            <span class="mc-value"><span id="rainToday">—</span> <span class="mc-unit">mm</span></span>
           </div>
 
-          <div class="metric-card">
-            <span class="mc-icon" aria-hidden="true">
-              <svg viewBox="0 0 20 20" fill="none"><path d="M4 14c0-3 2-5 6-8 4 3 6 5 6 8a6 6 0 0 1-12 0z" fill="currentColor" opacity=".15"/><path d="M4 14c0-3 2-5 6-8 4 3 6 5 6 8a6 6 0 0 1-12 0z" stroke="currentColor" stroke-width="1.6"/><path d="M10 10v6M7 13l3-3 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </span>
-            <span class="mc-label">Acumulado 24h</span>
-            <span class="mc-value"><span id="rain24">—</span>&thinsp;<span class="mc-unit">mm</span></span>
+          <div class="metric-card glass-card hover-lift">
+            <div class="mc-header">
+              <span class="mc-icon text-blue">
+                <svg viewBox="0 0 20 20" fill="none"><path d="M4 14c0-3 2-5 6-8 4 3 6 5 6 8a6 6 0 0 1-12 0z" fill="currentColor" opacity=".15"/><path d="M4 14c0-3 2-5 6-8 4 3 6 5 6 8a6 6 0 0 1-12 0z" stroke="currentColor" stroke-width="1.6"/><path d="M10 10v6M7 13l3-3 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <span class="mc-label">Acumulado 24h</span>
+            </div>
+            <span class="mc-value"><span id="rain24">—</span> <span class="mc-unit">mm</span></span>
           </div>
 
         </div>
 
         <!-- Previsão + Gráfico -->
         <div class="bottom">
-
-          <div class="section-block">
-            <h2 class="section-title">Previsão</h2>
+          <div class="section-block glass-card">
+            <h2 class="section-title">Previsão IPMA</h2>
             <ul class="days" id="forecast"></ul>
           </div>
 
-          <div class="section-block chart">
-            <h2 class="section-title">Últimas 24 horas</h2>
+          <div class="section-block chart glass-card">
+            <h2 class="section-title">Variação (Últimas 24h)</h2>
             <div class="chart-canvas">
               <canvas id="histChart"></canvas>
             </div>
             <div class="chart-legend">
-              <span><span class="dot t"></span> Temperatura</span>
-              <span><span class="dot r"></span> Precipitação</span>
+              <span class="legend-item"><span class="dot t"></span> Temperatura</span>
+              <span class="legend-item"><span class="dot r"></span> Precipitação</span>
             </div>
           </div>
-
         </div>
 
       </section>
 
       <!-- ── HISTÓRICO ── -->
-      <section data-view="historico" hidden>
-        <div class="section-block">
-          <h2 class="section-title">Histórico</h2>
-          <p class="empty-msg">Análise por intervalo — em desenvolvimento.</p>
+      <section data-view="historico" class="fade-in" hidden>
+        <div class="section-block glass-card fade-in">
+          <div class="wip-container">
+            <svg class="wip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
+            <h2 class="section-title">Histórico Detalhado</h2>
+            <p class="empty-msg">Acesso aos dados históricos em desenvolvimento.<br>Estarão disponíveis consultas personalizadas no futuro.</p>
+          </div>
         </div>
       </section>
 
       <!-- ── CLIMA ── -->
-      <section data-view="clima" hidden>
-        <div class="section-block">
-          <h2 class="section-title">Climatologia mensal</h2>
-          <div id="climateWrap">
-            <table id="climateTable" class="climate-table"></table>
-          </div>
-          <div class="climate-chart">
+      <section data-view="clima" class="fade-in" hidden>
+        <div class="section-block glass-card fade-in">
+          <h2 class="section-title">Climatologia Mensal</h2>
+          
+          <div class="climate-chart-container">
             <canvas id="climateChart"></canvas>
+          </div>
+          
+          <div id="climateWrap" class="custom-scrollbar">
+            <table id="climateTable" class="climate-table"></table>
           </div>
         </div>
       </section>
@@ -209,9 +255,14 @@
 
   <!-- ══════════════ FOOTER ══════════════ -->
   <footer class="site-footer">
-    <span id="staleFlag" class="ok">Estação online</span>
-    <span class="sep" aria-hidden="true">·</span>
-    <span class="foot-refresh">próxima atualização <span id="age">—</span></span>
+    <div class="footer-inner glass-card-sm">
+      <div class="status-indicator">
+        <span class="ping-dot"></span>
+        <span id="staleFlag" class="ok">Estação online</span>
+      </div>
+      <span class="sep" aria-hidden="true">|</span>
+      <span class="foot-refresh">Atualização <span id="age">—</span></span>
+    </div>
   </footer>
 
 </body>
