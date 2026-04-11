@@ -524,14 +524,15 @@ async function loadHistory() {
     tickTargets.push(anchor.getTime() - i * 3_600_000);
   }
   // Para cada alvo, encontrar o índice mais próximo (dentro de 1h)
-  const tickIndices = new Set();
+  // Guarda mapa índice → hora-alvo (para mostrar "17:00" mesmo que o ponto seja "16:59")
+  const tickMap = new Map(); // Map<dataIndex, Date(targetTs)>
   for (const targetTs of tickTargets) {
     let bestIdx = -1, bestDiff = Infinity;
     labelDates.forEach((d, i) => {
       const diff = Math.abs(d.getTime() - targetTs);
       if (diff < bestDiff) { bestDiff = diff; bestIdx = i; }
     });
-    if (bestIdx >= 0 && bestDiff < 3_600_000) tickIndices.add(bestIdx);
+    if (bestIdx >= 0 && bestDiff < 3_600_000) tickMap.set(bestIdx, new Date(targetTs));
   }
 
   // datasets
@@ -618,8 +619,9 @@ async function loadHistory() {
             maxRotation: 0,
             autoSkip: false,
             callback: function (value, index) {
-              if (!tickIndices.has(index)) return "";
-              return labelDates[index].toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
+              const target = tickMap.get(index);
+              if (!target) return "";
+              return target.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
             },
           },
         },
