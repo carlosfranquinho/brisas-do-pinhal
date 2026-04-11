@@ -315,10 +315,6 @@ body {
   .bottom-tab-bar a:hover svg {
     stroke: var(--accent-blue);
   }
-  /* main content clears the tab bar */
-  .main-content {
-    padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
-  }
 }
 
 /* ── MOBILE STATUS ROW (inside brand, mobile only) ── */
@@ -368,6 +364,11 @@ body {
 .main-content {
   padding: clamp(24px, 4vw, 40px);
   width: 100%;
+}
+@media (max-width: 992px) {
+  .main-content {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  }
 }
 
 .soft-card {
