@@ -2,135 +2,217 @@
 <html lang="pt">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Brisas do Pinhal</title>
-    <link rel="stylesheet" href="styles.css?v=2" />
-    <script src="https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
-    <script src="app.js" defer></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Brisas do Pinhal</title>
+  <link rel="stylesheet" href="styles.css?v=3" />
+  <script src="https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <script src="app.js" defer></script>
 </head>
 
 <body>
-    <main class="shell">
-         <header class="hero-head">
-            <h1>Brisas do Pinhal</h1>
-            <p id="nowDate">—</p>
-            <!--<a class="brand" href="#" data-viewlink="home">Brisa Marinha</a>
-            <p id="nowDate">—</p>-->
-            <nav class="main-nav">
-                <a href="#/" data-viewlink="home" class="active">Agora</a>
-                <a href="#/historico" data-viewlink="historico">Histórico</a>
-                <a href="#/clima" data-viewlink="clima">Clima</a>
-            </nav>
-        </header>
 
+  <!-- ══════════════ HEADER ══════════════ -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <svg class="brand-leaf" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 2C6 2 3 7 3 12c0 3.5 1.5 6.5 4 8.5C8.5 22 11 22 12 22s3.5 0 5-1.5c2.5-2 4-5 4-8.5C21 7 18 2 12 2z" fill="currentColor" opacity=".25"/>
+          <path d="M12 2c0 0-5 8-5 13a5 5 0 0 0 10 0C17 10 12 2 12 2z" fill="currentColor"/>
+        </svg>
+        <div class="brand-text">
+          <h1>Brisas do Pinhal</h1>
+          <p id="nowDate" class="header-date">—</p>
+        </div>
+      </div>
+      <nav class="main-nav" aria-label="Secções">
+        <a href="#/" data-viewlink="home" class="active">Agora</a>
+        <a href="#/historico" data-viewlink="historico">Histórico</a>
+        <a href="#/clima" data-viewlink="clima">Clima</a>
+      </nav>
+    </div>
+  </header>
 
-        <!-- zona superior: ícone + temperatura + métricas -->
-        <main id="views">
-            <section id="view-home" data-view="home">
-                <section class="hero-top">
-                    <div class="now-left">
-                        <div class="now-icon">
-                            <img id="bm-now-ico" class="bm-ico" alt="Estado atual" width="96" height="96" />
-                        </div>
+  <!-- ══════════════ CONTEÚDO ══════════════ -->
+  <main class="shell">
+    <div id="views">
 
-                        <div class="now-temp">
-                            <span id="tmax" class="t-ext t-ext--max"></span>
-                            <span id="temp"></span><span class="deg">°C</span>
-                            <span id="tmin" class="t-ext t-ext--min"></span>
-                            <div class="feels">sensação térmica: <span id="apparent">--</span>°C</div>
-                        </div>
-                    </div>
+      <!-- ── HOME ── -->
+      <section data-view="home">
 
-                    <div class="now-metrics">
-                        <div class="m">
-                            <span>Nascer-do-sol</span><strong id="sunrise">--:--</strong>
-                        </div>
-                        <div class="m">
-                            <span>Pôr-do-sol</span><strong id="sunset">--:--</strong>
-                        </div>
-                        <div class="m">
-                            <span>Vento</span>
-                            <strong><span id="wind">--</span> km/h</strong>
-                        </div>
-                        <div class="m">
-                            <span>Rajada / Direção</span>
-                            <strong>
-                                <span id="gust">—</span><span class="u"> km/h</span> ·
-                                <span id="winddir">—</span>
-                            </strong>
-                        </div>
+        <!-- Bloco principal: temperatura + nascer/pôr do sol -->
+        <div class="hero-top">
 
-                        <div class="m"><span>Humidade</span><strong id="rh">--</strong></div>
-                        <div class="m">
-                            <span>Condensação</span><strong id="dew">--</strong>
-                        </div>
+          <div class="now-left">
+            <img id="bm-now-ico" class="now-icon-img sunny"
+                 src="icons/cloudy.svg" alt="condições atuais"
+                 width="108" height="108" />
+            <div class="temp-block">
+              <div class="now-temp">
+                <span id="temp">—</span><span class="deg">°</span>
+                <span class="t-ext t-ext--max" id="tmax"></span>
+                <span class="t-ext t-ext--min" id="tmin"></span>
+              </div>
+              <p class="feels">Sensação&nbsp;<strong id="apparent">—</strong>&thinsp;°C</p>
+            </div>
+          </div>
 
-                        <div class="m"><span>UV</span><strong id="uv">--</strong></div>
+          <div class="sun-row">
+            <div class="sun-item">
+              <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="sun-svg">
+                <circle cx="10" cy="10" r="4" fill="currentColor"/>
+                <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              <div>
+                <span class="sun-label">Nascer</span>
+                <span class="sun-value" id="sunrise">—</span>
+              </div>
+            </div>
+            <div class="sun-item">
+              <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="sun-svg sun-svg--set">
+                <circle cx="10" cy="10" r="4" fill="currentColor" opacity=".4"/>
+                <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".5"/>
+              </svg>
+              <div>
+                <span class="sun-label">Pôr</span>
+                <span class="sun-value" id="sunset">—</span>
+              </div>
+            </div>
+          </div>
 
-                        <div class="m">
-                            <span>Radiação solar</span>
-                            <strong><span id="solar">—</span><span class="u"> W/m²</span></strong>
-                        </div>
+        </div>
 
-                        <div class="m">
-                            <span>Chuva (hoje)</span><strong><span id="rainToday">—</span> mm</strong>
-                        </div>
+        <!-- Métricas em cards -->
+        <div class="metrics-grid">
 
-                        <div class="m">
-                            <span>Chuva (24h)</span><strong><span id="rain24">--</span> mm</strong>
-                        </div>
+          <div class="metric-card">
+            <span class="mc-icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none"><path d="M10 3a4 4 0 0 1 0 8 4 4 0 0 1 0-8zm0 10c-4 0-7 1.8-7 4h14c0-2.2-3-4-7-4z" fill="currentColor" opacity=".2"/><path d="M10 3c0 0-3 4-3 6a3 3 0 0 0 6 0C13 7 10 3 10 3z" fill="currentColor"/></svg>
+            </span>
+            <span class="mc-label">Humidade</span>
+            <span class="mc-value" id="rh">—</span>
+          </div>
 
-                        <div class="m">
-                            <span>Pressão atmosférica</span><strong><span id="press">--</span> hPa</strong>
-                        </div>
+          <div class="metric-card">
+            <span class="mc-icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none"><rect x="8" y="2" width="4" height="10" rx="2" fill="currentColor" opacity=".3"/><circle cx="10" cy="14" r="3" fill="currentColor"/><rect x="9" y="5" width="2" height="7" rx="1" fill="currentColor"/></svg>
+            </span>
+            <span class="mc-label">Ponto de orvalho</span>
+            <span class="mc-value" id="dew">—</span>
+          </div>
 
-                    </div>
-                </section>
+          <div class="metric-card">
+            <span class="mc-icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none"><path d="M3 10h14M14 6l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="mc-label">Vento <span class="mc-dir" id="winddir">—</span></span>
+            <span class="mc-value"><span id="wind">—</span>&thinsp;<span class="mc-unit">km/h</span></span>
+          </div>
 
-                <!-- parte inferior: previsão 3 dias + gráfico -->
-                <section class="bottom">
-                    <aside class="forecast">
-                        <h2 class="forecast-title">Previsão</h2>
-                        <ul id="forecast" class="days"></ul>
-                    </aside>
+          <div class="metric-card">
+            <span class="mc-icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none"><path d="M3 10h14M14 5l4 5-4 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".4"/><path d="M3 10h10M10 6l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="mc-label">Rajada</span>
+            <span class="mc-value"><span id="gust">—</span>&thinsp;<span class="mc-unit">km/h</span></span>
+          </div>
 
-                    <section class="chart">
-                        <header class="chart-title">Últimas 24 horas</header>
-                        <div class="chart-canvas">
-                            <canvas id="histChart"></canvas>
-                        </div>
-                        <div class="chart-legend">
-                            <span class="dot t"></span> Temperatura
-                            <span class="dot r"></span> Precipitação
-                        </div>
-                    </section>
-                </section>
-            </section>
-            <section id="view-historico" data-view="historico" hidden>
-                <h2>Histórico</h2>
-                <p>Brevemente: análises por intervalo (diário/mensal/anual) de temperatura e precipitação.</p>
-            </section>
+          <div class="metric-card">
+            <span class="mc-icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.8"/><circle cx="10" cy="10" r="2" fill="currentColor"/><path d="M10 5v2M10 13v2M5 10h2M13 10h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </span>
+            <span class="mc-label">Pressão</span>
+            <span class="mc-value"><span id="press">—</span>&thinsp;<span class="mc-unit">hPa</span></span>
+          </div>
 
-            <!-- CLIMA -->
-            <section id="view-clima" data-view="clima" hidden>
-                <h2>Clima <small>— mensal</small></h2>
-                <div id="climateWrap">
-                    <table id="climateTable" class="climate-table"></table>
-                </div>
-                <div class="climate-chart">
-                    <canvas id="climateChart"></canvas>
-                </div>
-            </section>
-        </main>
+          <div class="metric-card">
+            <span class="mc-icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="5" fill="currentColor" opacity=".25"/><circle cx="10" cy="10" r="3" fill="currentColor"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </span>
+            <span class="mc-label">Índice UV</span>
+            <span class="mc-value" id="uv">—</span>
+          </div>
 
-        <footer class="foot">
-            <span id="staleFlag" class="ok">Estação online</span>
-            <span class="sep">•</span>
-            <span id="nextRefresh">Próxima atualização <strong id="age">—</strong></span>
-        </footer>
-    </main>
+          <div class="metric-card">
+            <span class="mc-icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none"><path d="M3 16l4-8 3 5 2-3 5 6H3z" fill="currentColor" opacity=".2"/><path d="M3 16l4-8 3 5 2-3 5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="mc-label">Radiação solar</span>
+            <span class="mc-value"><span id="solar">—</span>&thinsp;<span class="mc-unit">W/m²</span></span>
+          </div>
+
+          <div class="metric-card">
+            <span class="mc-icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none"><path d="M10 3c0 0-6 5-6 9a6 6 0 0 0 12 0C16 8 10 3 10 3z" fill="currentColor" opacity=".2"/><path d="M10 3c0 0-4 4-4 8a4 4 0 0 0 8 0C14 7 10 3 10 3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="mc-label">Chuva hoje</span>
+            <span class="mc-value"><span id="rainToday">—</span>&thinsp;<span class="mc-unit">mm</span></span>
+          </div>
+
+          <div class="metric-card">
+            <span class="mc-icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none"><path d="M4 14c0-3 2-5 6-8 4 3 6 5 6 8a6 6 0 0 1-12 0z" fill="currentColor" opacity=".15"/><path d="M4 14c0-3 2-5 6-8 4 3 6 5 6 8a6 6 0 0 1-12 0z" stroke="currentColor" stroke-width="1.6"/><path d="M10 10v6M7 13l3-3 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="mc-label">Acumulado 24h</span>
+            <span class="mc-value"><span id="rain24">—</span>&thinsp;<span class="mc-unit">mm</span></span>
+          </div>
+
+        </div>
+
+        <!-- Previsão + Gráfico -->
+        <div class="bottom">
+
+          <div class="section-block">
+            <h2 class="section-title">Previsão</h2>
+            <ul class="days" id="forecast"></ul>
+          </div>
+
+          <div class="section-block chart">
+            <h2 class="section-title">Últimas 24 horas</h2>
+            <div class="chart-canvas">
+              <canvas id="histChart"></canvas>
+            </div>
+            <div class="chart-legend">
+              <span><span class="dot t"></span> Temperatura</span>
+              <span><span class="dot r"></span> Precipitação</span>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ── HISTÓRICO ── -->
+      <section data-view="historico" hidden>
+        <div class="section-block">
+          <h2 class="section-title">Histórico</h2>
+          <p class="empty-msg">Análise por intervalo — em desenvolvimento.</p>
+        </div>
+      </section>
+
+      <!-- ── CLIMA ── -->
+      <section data-view="clima" hidden>
+        <div class="section-block">
+          <h2 class="section-title">Climatologia mensal</h2>
+          <div id="climateWrap">
+            <table id="climateTable" class="climate-table"></table>
+          </div>
+          <div class="climate-chart">
+            <canvas id="climateChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ══════════════ FOOTER ══════════════ -->
+  <footer class="site-footer">
+    <span id="staleFlag" class="ok">Estação online</span>
+    <span class="sep" aria-hidden="true">·</span>
+    <span class="foot-refresh">próxima atualização <span id="age">—</span></span>
+  </footer>
+
 </body>
-
 </html>
