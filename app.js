@@ -138,7 +138,7 @@ async function startHome() {
 }
 
 /* evita crash se ainda não implementaste o construtor de clima */
-function buildClimateOnce(){ /* no-op se já estiveres a usar outra função */ }
+function buildClimateOnce() { /* no-op se já estiveres a usar outra função */ }
 
 
 function setNowIcon(name, source, priority) {
@@ -564,7 +564,7 @@ async function loadHistory() {
 
   const ctxHTML = document.getElementById("histChart");
   if (!ctxHTML) return;
-  
+
   const ctx2d = ctxHTML.getContext('2d');
   const gradientTemp = ctx2d.createLinearGradient(0, 0, 0, ctxHTML.height || 300);
   gradientTemp.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
@@ -607,8 +607,8 @@ async function loadHistory() {
       responsive: true,
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
-      plugins: { 
-        legend: { display: false }, 
+      plugins: {
+        legend: { display: false },
         tooltip: {
           backgroundColor: 'rgba(255, 255, 255, 0.95)',
           titleColor: '#1e293b', bodyColor: '#475569',
@@ -616,7 +616,7 @@ async function loadHistory() {
           usePointStyle: true,
           titleFont: { family: "'Plus Jakarta Sans', sans-serif", size: 13, weight: '800' },
           bodyFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12 }
-        } 
+        }
       },
       scales: {
         x: {
@@ -878,7 +878,7 @@ function renderClimateChart(months) {
   });
 }
 
-function drawClimateMonthly(data){
+function drawClimateMonthly(data) {
   const table = document.getElementById('climateTable');
   if (!table) return;
   const months = data?.months || [];
@@ -939,7 +939,7 @@ async function loadHistoryRecords() {
     const res = await fetch(`${API_BASE}/history/records`);
     if (!res.ok) return;
     const data = await res.json();
-    
+
     setText('#recHotV', fmt(data.hottest.v, 1));
     setText('#recHotD', data.hottest.d);
 
@@ -973,7 +973,7 @@ async function loadHistoryDaily() {
       return;
     }
     const data = await res.json();
-    
+
     // Stats
     setText('#hTmax', fmt(data.stats.tmax, 1));
     setText('#hTmin', fmt(data.stats.tmin, 1));
@@ -1000,7 +1000,7 @@ function renderDailyHistoryChart(series) {
     const d = new Date(r.ts_local);
     return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
   });
-  
+
   const temps = series.map(r => r.temp_c);
   const rain = series.map(r => r.rain_rate_mmph);
 
