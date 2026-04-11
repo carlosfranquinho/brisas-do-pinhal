@@ -476,17 +476,33 @@ body {
 }
 
 
-/* ── CHARTS & FORECASTS ── */
-.details-grid {
+/* ── LINHA 2: PRECIPITAÇÃO + VENTO ── */
+.row-precip-wind {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: var(--gap);
+  margin-bottom: var(--gap);
 }
-@media (max-width: 992px) {
-  .details-grid { grid-template-columns: 1fr; }
+@media (max-width: 640px) {
+  .row-precip-wind { grid-template-columns: 1fr; }
 }
 
-.chart-container, .forecast-container { padding: 28px; }
+/* ── LINHA 3: 5 MÉTRICAS ── */
+.row-metrics-5 {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--gap);
+  margin-bottom: var(--gap);
+}
+@media (max-width: 900px) {
+  .row-metrics-5 { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 500px) {
+  .row-metrics-5 { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── CHARTS ── */
+.chart-container { padding: 28px; margin-bottom: var(--gap); }
 
 .card-header-clean {
   display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;
@@ -501,15 +517,31 @@ body {
 
 .chart-canvas { height: clamp(260px, 30vh, 360px); width: 100%; }
 
-.forecast-list { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+/* Previsão na sidebar */
+.sidebar-forecast {
+  margin-top: auto;
+  margin-bottom: 20px;
+}
+.sidebar-forecast-header {
+  margin-bottom: 12px;
+}
+.sidebar-forecast-header h2 {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-light);
+}
+
+.forecast-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
 .forecast-list li {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 16px; background: var(--bg-color); border-radius: var(--radius-md);
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+  padding: 10px 14px; background: white; border-radius: var(--radius-sm);
+  border: 1px solid rgba(0,0,0,0.04);
 }
-.forecast-list .d { font-weight: 700; color: var(--text-secondary); width: 60px; text-transform: capitalize; }
-.forecast-list .ic img { width: 36px; height: 36px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.05)); }
-.forecast-list .t { font-weight: 800; display: flex; gap: 12px; }
+.forecast-list .d { font-weight: 700; color: var(--text-secondary); width: 52px; text-transform: capitalize; font-size: 0.85rem; }
+.forecast-list .ic img { width: 32px; height: 32px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.08)); }
+.forecast-list .t { font-weight: 800; display: flex; gap: 10px; font-size: 0.9rem; }
 .forecast-list .hi { color: var(--accent-rose); }
 .forecast-list .lo { color: var(--accent-blue); }
 

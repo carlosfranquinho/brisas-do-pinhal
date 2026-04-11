@@ -70,7 +70,15 @@
         </a>
       </nav>
 
-      <div class="footer-status mt-auto hidden-mobile">
+      <!-- Previsão IPMA (sidebar, desktop apenas) -->
+      <div class="sidebar-forecast mt-auto hidden-mobile">
+        <div class="sidebar-forecast-header">
+          <h2>Previsão IPMA</h2>
+        </div>
+        <ul class="forecast-list" id="forecast"></ul>
+      </div>
+
+      <div class="footer-status hidden-mobile" style="margin-top: 0;">
         <div class="status-indicator">
           <span class="ping-dot"></span>
           <span id="staleFlag" class="ok">Estação online</span>
@@ -135,26 +143,28 @@
             </div>
           </div>
 
-          <!-- Grelha de Métricas Innovadora -->
-          <div class="metrics-masonry">
-            
-            <div class="soft-card metric-box">
+          <!-- Linha 2: Precipitação + Vento -->
+          <div class="row-precip-wind">
+
+            <div class="soft-card metric-box highlight-card">
               <div class="mb-top">
-                <span class="m-icon icon-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg></span>
-                <span class="m-label">Humidade</span>
+                <span class="m-icon icon-rain"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path><line x1="8" y1="13" x2="8" y2="21"></line><line x1="12" y1="15" x2="12" y2="23"></line><line x1="16" y1="13" x2="16" y2="21"></line></svg></span>
+                <span class="m-label">Precipitação</span>
               </div>
-              <div class="mb-value" id="rh">—</div>
+              <div class="mb-split">
+                <div class="val-group">
+                  <span class="val-label">Hoje</span>
+                  <div class="mb-value"><span id="rainToday">—</span> <span class="m-unit">mm</span></div>
+                </div>
+                <div class="val-divider"></div>
+                <div class="val-group">
+                  <span class="val-label">24h Acum.</span>
+                  <div class="mb-value"><span id="rain24">—</span> <span class="m-unit">mm</span></div>
+                </div>
+              </div>
             </div>
 
-            <div class="soft-card metric-box">
-              <div class="mb-top">
-                <span class="m-icon icon-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22a8 8 0 0 0 8-8c0-5.5-8-12-8-12S4 8.5 4 14a8 8 0 0 0 8 8z"></path><circle cx="12" cy="14" r="3"></circle></svg></span>
-                <span class="m-label">Pto. Orvalho</span>
-              </div>
-              <div class="mb-value" id="dew">—</div>
-            </div>
-
-            <div class="soft-card metric-box wide-card wind-card">
+            <div class="soft-card metric-box wind-card">
               <div class="mb-top">
                 <span class="m-icon icon-gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"></path></svg></span>
                 <span class="m-label">Vento & Rajada</span>
@@ -188,6 +198,27 @@
               </div>
             </div>
 
+          </div>
+
+          <!-- Linha 3: 5 métricas secundárias -->
+          <div class="row-metrics-5">
+
+            <div class="soft-card metric-box">
+              <div class="mb-top">
+                <span class="m-icon icon-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg></span>
+                <span class="m-label">Humidade</span>
+              </div>
+              <div class="mb-value" id="rh">—</div>
+            </div>
+
+            <div class="soft-card metric-box">
+              <div class="mb-top">
+                <span class="m-icon icon-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22a8 8 0 0 0 8-8c0-5.5-8-12-8-12S4 8.5 4 14a8 8 0 0 0 8 8z"></path><circle cx="12" cy="14" r="3"></circle></svg></span>
+                <span class="m-label">Pto. Orvalho</span>
+              </div>
+              <div class="mb-value" id="dew">—</div>
+            </div>
+
             <div class="soft-card metric-box">
               <div class="mb-top">
                 <span class="m-icon icon-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4l3 3"></path></svg></span>
@@ -204,24 +235,6 @@
               <div class="mb-value" id="uv">—</div>
             </div>
 
-            <div class="soft-card metric-box wide-card">
-              <div class="mb-top">
-                <span class="m-icon icon-rain"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path><line x1="8" y1="13" x2="8" y2="21"></line><line x1="12" y1="15" x2="12" y2="23"></line><line x1="16" y1="13" x2="16" y2="21"></line></svg></span>
-                <span class="m-label">Precipitação</span>
-              </div>
-               <div class="mb-split">
-                <div class="val-group">
-                  <span class="val-label">Hoje</span>
-                  <div class="mb-value"><span id="rainToday">—</span> <span class="m-unit">mm</span></div>
-                </div>
-                <div class="val-divider"></div>
-                <div class="val-group">
-                  <span class="val-label">24h Acum.</span>
-                  <div class="mb-value"><span id="rain24">—</span> <span class="m-unit">mm</span></div>
-                </div>
-              </div>
-            </div>
-
             <div class="soft-card metric-box">
               <div class="mb-top">
                 <span class="m-icon icon-yellow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></span>
@@ -232,26 +245,17 @@
 
           </div>
 
-          <!-- Bottom: Previsão e Gráfico -->
-          <div class="details-grid">
-            <div class="soft-card chart-container">
-              <div class="card-header-clean">
-                <h2>Variação nas Últimas 24h</h2>
-                <div class="chart-legend-clean">
-                  <span class="l-item"><span class="dot tint-blue"></span> Temp</span>
-                  <span class="l-item"><span class="dot tint-teal"></span> Precip</span>
-                </div>
-              </div>
-              <div class="chart-canvas">
-                <canvas id="histChart"></canvas>
+          <!-- Gráfico — largura total -->
+          <div class="soft-card chart-container">
+            <div class="card-header-clean">
+              <h2>Variação nas Últimas 24h</h2>
+              <div class="chart-legend-clean">
+                <span class="l-item"><span class="dot tint-blue"></span> Temp</span>
+                <span class="l-item"><span class="dot tint-teal"></span> Precip</span>
               </div>
             </div>
-
-            <div class="soft-card forecast-container">
-              <div class="card-header-clean">
-                <h2>Previsão IPMA</h2>
-              </div>
-              <ul class="forecast-list" id="forecast"></ul>
+            <div class="chart-canvas">
+              <canvas id="histChart"></canvas>
             </div>
           </div>
 
