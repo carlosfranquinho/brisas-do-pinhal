@@ -23,76 +23,22 @@ const ICON_PATHS = {
   "partly-cloudy-night": "icons/partly-cloudy-night.svg",
   cloudy: "icons/cloudy.svg",
   overcast: "icons/cloudy.svg",
-  drizzle: "icons/drizzle.svg",
+  drizzle: "icons/drizzle.png",
   rain: "icons/rain.svg",
   "heavy-rain": "icons/heavy-rain.svg",
   thunder: "icons/thunder.svg",
   snow: "icons/snow.svg",
-  sleet: "icons/sleet.svg",
-  "freezing-rain": "icons/freezing-rain.svg",
+  sleet: "icons/rain.svg",
+  "freezing-rain": "icons/freezing-rain.png",
   fog: "icons/fog.svg",
-  wind: "icons/wind.svg",
+  wind: "icons/wind.png",
   unknown: "icons/cloudy.svg",
 };
 function iconUrl(name) {
   return ICON_PATHS[name] || ICON_PATHS["unknown"];
 }
 
-// --- Router super simples (não mexe em IDs/classes existentes)
-const ROUTES = {
-  "#/": "home",
-  "#/historico": "historico",
-  "#/clima": "clima",
-  "": "home",
-  "#": "home",
-};
-
-function applyRoute() {
-  const key = (location.hash in ROUTES) ? location.hash : "#/";
-  const view = ROUTES[key];
-
-  // Mostra/esconde as sections
-  document.querySelectorAll('#views > section[data-view]')
-    .forEach(sec => { sec.hidden = (sec.dataset.view !== view); });
-
-  // Ativa item do menu
-  document.querySelectorAll('nav.main-nav [data-viewlink]')
-    .forEach(a => a.classList.toggle('active', a.dataset.viewlink === view));
-
-  // Lazy-load por vista
-  if (view === "clima") {
-    const table = document.getElementById('climateTable');
-    if (table && !table.dataset.ready) {
-      if (typeof window.loadClimateMonthly === 'function') {
-        // Usa o teu loader se já existir
-        Promise.resolve(window.loadClimateMonthly()).catch(console.error);
-      } else {
-        // Fallback suave: tenta um endpoint e, se não houver, mostra estado vazio
-        fetch(`${API_BASE}/climate/monthly`, { cache: 'no-store' })
-          .then(r => r.ok ? r.json() : null)
-          .then(data => {
-            if (data) drawClimateMonthly(data);
-            else table.innerHTML = '<tbody><tr><td>Sem dados do clima.</td></tr></tbody>';
-          })
-          .catch(() => (table.innerHTML = '<tbody><tr><td>Sem dados do clima.</td></tr></tbody>'));
-      }
-      table.dataset.ready = "1";
-    }
-  }
-
-  if (view === "historico") {
-    const recordsBox = document.getElementById('allTimeRecords');
-    if (recordsBox && !recordsBox.dataset.ready) {
-      if (typeof window.loadHistoryRecords === 'function') {
-        loadHistoryRecords().catch(console.error);
-      }
-      recordsBox.dataset.ready = "1";
-    }
-  }
-}
-
-window.addEventListener('hashchange', applyRoute);
-document.addEventListener('DOMContentLoaded', applyRoute);
+const VALID_VIEWS = new Set(['home', 'historico', 'clima']);
 
 
 /* Now icon state + priorities */
@@ -105,11 +51,29 @@ const nowIconState = {
 };
 
 function showView(name) {
-  VIEWS.forEach(v => v.hidden = v.dataset.view !== name);
-  LINKS.forEach(a => a.classList.toggle('active', a.dataset.viewlink === name));
+  const view = VALID_VIEWS.has(name) ? name : 'home';
+  VIEWS.forEach(v => v.hidden = v.dataset.view !== view);
+  LINKS.forEach(a => a.classList.toggle('active', a.dataset.viewlink === view));
 
-  if (name === 'home') startHome();       // <— garante o carregamento da página “Agora”
-  if (name === 'clima') buildClimateOnce(); // mantém o que já tens para “Clima”
+  if (view === 'home') {
+    startHome();
+  }
+
+  if (view === 'clima') {
+    const table = document.getElementById('climateTable');
+    if (table && !table.dataset.ready) {
+      loadClimateMonthly().catch(console.error);
+      table.dataset.ready = '1';
+    }
+  }
+
+  if (view === 'historico') {
+    const recordsBox = document.getElementById('allTimeRecords');
+    if (recordsBox && !recordsBox.dataset.ready) {
+      loadHistoryRecords().catch(console.error);
+      recordsBox.dataset.ready = '1';
+    }
+  }
 }
 
 function handleRoute() {
@@ -137,8 +101,6 @@ async function startHome() {
   liveTimer = setInterval(() => loadLive().catch(console.error), PUSH_MS);
 }
 
-/* evita crash se ainda não implementaste o construtor de clima */
-function buildClimateOnce() { /* no-op se já estiveres a usar outra função */ }
 
 
 function setNowIcon(name, source, priority) {
@@ -899,35 +861,6 @@ function drawClimateMonthly(data) {
 }
 
 
-/* Boot */
-async function boot() {
-  try {
-    await loadLive(); // garante #sunrise / #sunset
-    await loadMetarTGFTP(); // usa METAR (observado) para o ícone atual
-    await loadForecast(); // agora já há horas reais para o ícone
-    await loadHistory(); // gráfico pode vir por fim
-    setInterval(() => {
-      loadLive().catch(console.error);
-    }, PUSH_MS);
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-(function markActiveNav() {
-  const path = location.pathname.replace(/\/+$/, "");
-  const map = { "": "home", "/": "home", "/historico.html": "historico", "/clima.html": "clima" };
-  const route =
-    map[path] ||
-    (location.hash.includes("historico") ? "historico" :
-      location.hash.includes("clima") ? "clima" : "home");
-
-  document.querySelectorAll(".main-nav a").forEach(a => {
-    if (a.dataset.route === route) a.classList.add("active");
-  });
-})();
-
-boot().catch(console.error);
 
 // --- Lógica Histórico Diário ---
 let historyDailyChartObj = null;
