@@ -422,8 +422,9 @@ body {
   align-items: center;
   gap: 40px;
 }
-@media (max-width: 500px) {
-  .hero-body { flex-direction: column; align-items: flex-start; gap: 24px; }
+@media (max-width: 800px) {
+  .hero-body { flex-direction: column; align-items: center; gap: 20px; }
+  .temp-display { align-items: center; text-align: center; }
 }
 
 .weather-icon-container {

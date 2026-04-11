@@ -160,7 +160,7 @@ function setTrendArrow(id, trend) {
 }
 
 function updateTrends(j) {
-  if (!trendRef) return; // sem referência histórica, não mostrar tendências
+  if (!trendRef) { console.log('[trends] trendRef ainda null'); return; }
   const calc = (key, current) => {
     if (current == null || trendRef[key] == null) return null;
     const delta = +current - trendRef[key];
@@ -169,6 +169,7 @@ function updateTrends(j) {
     if (delta < -thr) return 'down';
     return 'stable';
   };
+  console.log('[trends] trendRef=', trendRef, 'live rh=', j.rh_pct, 'press=', j.pressure_hpa);
   setTrendArrow('trend-rh',    calc('rh',    j.rh_pct));
   setTrendArrow('trend-dew',   calc('dew',   j.dewpoint_c));
   setTrendArrow('trend-press', calc('press', j.pressure_hpa));
@@ -572,6 +573,9 @@ async function loadHistory() {
       uv:    refRow.uv_index     != null ? +refRow.uv_index     : null,
       solar: refRow.solar_wm2    != null ? +refRow.solar_wm2    : null,
     };
+    console.log('[trends] trendRef definido a partir de refRow (diff=' + Math.round(refDiff/60000) + 'min):', trendRef);
+  } else {
+    console.log('[trends] refRow não encontrado — rows.length=', rows.length);
   }
   // trendRef definido — recalcular setas com o último live
   if (lastLiveData) updateTrends(lastLiveData);
