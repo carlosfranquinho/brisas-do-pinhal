@@ -147,40 +147,9 @@ function setNowIcon(name, source, priority) {
 }
 
 // ── TENDÊNCIAS ──────────────────────────────────────────────────
-const TREND_BUFFER = []; // [{ts, rh, dew, press, uv, solar}, ...]
-const TREND_WINDOW_MS  = 30 * 60 * 1000; // janela de comparação: 30 min
+// trendRef: snapshot do ponto mais próximo de 30 min atrás (do histórico)
+let trendRef = null;
 const TREND_THRESHOLDS = { rh: 1.0, dew: 0.3, press: 0.3, uv: 0.2, solar: 10 };
-
-function pushTrend(j) {
-  TREND_BUFFER.push({
-    ts:    Date.now(),
-    rh:    j.rh_pct      != null ? +j.rh_pct      : null,
-    dew:   j.dewpoint_c  != null ? +j.dewpoint_c   : null,
-    press: j.pressure_hpa!= null ? +j.pressure_hpa : null,
-    uv:    j.uv_index    != null ? +j.uv_index     : null,
-    solar: j.solar_wm2   != null ? +j.solar_wm2    : null,
-  });
-  const cutoff = Date.now() - TREND_WINDOW_MS - 5 * 60 * 1000;
-  while (TREND_BUFFER.length > 1 && TREND_BUFFER[0].ts < cutoff) TREND_BUFFER.shift();
-}
-
-function getTrend(key, current) {
-  if (current == null || TREND_BUFFER.length < 2) return null;
-  const now = Date.now();
-  const target = now - TREND_WINDOW_MS;
-  // ponto mais próximo do alvo temporal
-  let ref = TREND_BUFFER[0];
-  for (const r of TREND_BUFFER) {
-    if (Math.abs(r.ts - target) < Math.abs(ref.ts - target)) ref = r;
-  }
-  // só classifica se a referência for antiga o suficiente (>= 5 min atrás)
-  if (ref.ts > now - 5 * 60 * 1000 || ref[key] == null) return null;
-  const delta = current - ref[key];
-  const thr = TREND_THRESHOLDS[key];
-  if (delta >  thr) return 'up';
-  if (delta < -thr) return 'down';
-  return 'stable';
-}
 
 function setTrendArrow(id, trend) {
   const el = document.getElementById(id);
@@ -191,12 +160,20 @@ function setTrendArrow(id, trend) {
 }
 
 function updateTrends(j) {
-  pushTrend(j);
-  setTrendArrow('trend-rh',    getTrend('rh',    j.rh_pct));
-  setTrendArrow('trend-dew',   getTrend('dew',   j.dewpoint_c));
-  setTrendArrow('trend-press', getTrend('press', j.pressure_hpa));
-  setTrendArrow('trend-uv',    getTrend('uv',    j.uv_index));
-  setTrendArrow('trend-solar', getTrend('solar', j.solar_wm2));
+  if (!trendRef) return; // sem referência histórica, não mostrar tendências
+  const calc = (key, current) => {
+    if (current == null || trendRef[key] == null) return null;
+    const delta = +current - trendRef[key];
+    const thr = TREND_THRESHOLDS[key];
+    if (delta >  thr) return 'up';
+    if (delta < -thr) return 'down';
+    return 'stable';
+  };
+  setTrendArrow('trend-rh',    calc('rh',    j.rh_pct));
+  setTrendArrow('trend-dew',   calc('dew',   j.dewpoint_c));
+  setTrendArrow('trend-press', calc('press', j.pressure_hpa));
+  setTrendArrow('trend-uv',    calc('uv',    j.uv_index));
+  setTrendArrow('trend-solar', calc('solar', j.solar_wm2));
 }
 
 // HISTÓRICO/GRÁFICO (globais)
@@ -575,23 +552,23 @@ async function loadHistory() {
   HISTORY_WINDOW_POINTS = labels.length;
   chartLastTs = labelDates.at(-1)?.getTime() || 0;
 
-  // pré-popula buffer de tendências com os últimos 35 min do histórico
-  TREND_BUFFER.length = 0;
-  const trendCutoff = Date.now() - TREND_WINDOW_MS - 5 * 60 * 1000;
+  // define trendRef: ponto do histórico mais próximo de 30 min atrás
+  const refTarget = Date.now() - 30 * 60 * 1000;
+  let refRow = null, refDiff = Infinity;
   rows.forEach((r, i) => {
-    const ts = labelDates[i].getTime();
-    if (ts >= trendCutoff) {
-      TREND_BUFFER.push({
-        ts,
-        rh:    r.rh_pct       != null ? +r.rh_pct       : null,
-        dew:   r.dewpoint_c   != null ? +r.dewpoint_c    : null,
-        press: r.pressure_hpa != null ? +r.pressure_hpa  : null,
-        uv:    r.uv_index     != null ? +r.uv_index      : null,
-        solar: r.solar_wm2    != null ? +r.solar_wm2     : null,
-      });
-    }
+    const diff = Math.abs(labelDates[i].getTime() - refTarget);
+    if (diff < refDiff) { refDiff = diff; refRow = r; }
   });
-  // buffer agora populado — recalcular setas com o último live
+  if (refRow) {
+    trendRef = {
+      rh:    refRow.rh_pct       != null ? +refRow.rh_pct       : null,
+      dew:   refRow.dewpoint_c   != null ? +refRow.dewpoint_c   : null,
+      press: refRow.pressure_hpa != null ? +refRow.pressure_hpa : null,
+      uv:    refRow.uv_index     != null ? +refRow.uv_index     : null,
+      solar: refRow.solar_wm2    != null ? +refRow.solar_wm2    : null,
+    };
+  }
+  // trendRef definido — recalcular setas com o último live
   if (lastLiveData) updateTrends(lastLiveData);
 
   // Pré-calcula quais os índices do eixo X a mostrar:

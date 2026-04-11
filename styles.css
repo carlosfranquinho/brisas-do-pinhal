@@ -244,7 +244,9 @@ body {
 .sidebar-copyright {
   font-size: 0.72rem;
   color: var(--text-light);
+  margin-top: 16px;
   margin-bottom: 12px;
+  text-align: center;
 }
 .sidebar-copyright a {
   color: var(--text-light);
