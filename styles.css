@@ -562,8 +562,8 @@ body {
 }
 
 .compass {
-  width: 90px;
-  height: 90px;
+  width: 110px;
+  height: 110px;
   border-radius: 50%;
   border: 4px solid var(--glass-border);
   background: var(--bg-color);
@@ -581,20 +581,20 @@ body {
 
 .c-dir {
   position: absolute;
-  font-size: 0.6rem;
+  font-size: 0.65rem;
   font-weight: 800;
   color: var(--text-light);
   font-family: inherit;
 }
-.c-dir.n { top: 4px; left: 50%; transform: translateX(-50%); color: var(--accent-rose); font-size: 0.7rem; }
-.c-dir.s { bottom: 4px; left: 50%; transform: translateX(-50%); }
-.c-dir.e { right: 6px; top: 50%; transform: translateY(-50%); }
-.c-dir.w { left: 6px; top: 50%; transform: translateY(-50%); }
+.c-dir.n { top: 6px; left: 50%; transform: translateX(-50%); color: var(--accent-rose); font-size: 0.75rem; }
+.c-dir.s { bottom: 6px; left: 50%; transform: translateX(-50%); }
+.c-dir.e { right: 8px; top: 50%; transform: translateY(-50%); }
+.c-dir.w { left: 8px; top: 50%; transform: translateY(-50%); }
 
-.c-dir.ne { top: 14px; right: 14px; font-size: 0.45rem; opacity: 0.6; }
-.c-dir.nw { top: 14px; left: 14px; font-size: 0.45rem; opacity: 0.6;}
-.c-dir.se { bottom: 14px; right: 14px; font-size: 0.45rem; opacity: 0.6; }
-.c-dir.sw { bottom: 14px; left: 14px; font-size: 0.45rem; opacity: 0.6; }
+.c-dir.ne { top: 16px; right: 16px; font-size: 0.5rem; opacity: 0.6; }
+.c-dir.nw { top: 16px; left: 16px; font-size: 0.5rem; opacity: 0.6;}
+.c-dir.se { bottom: 16px; right: 16px; font-size: 0.5rem; opacity: 0.6; }
+.c-dir.sw { bottom: 16px; left: 16px; font-size: 0.5rem; opacity: 0.6; }
 
 .c-arrow-container {
   position: absolute;
@@ -606,8 +606,8 @@ body {
 }
 
 .c-arrow {
-  width: 14px;
-  height: 56px;
+  width: 8px;
+  height: 80px;
   position: relative;
 }
 
@@ -616,7 +616,7 @@ body {
   position: absolute;
   bottom: 50%; left: 0; right: 0; top: 0;
   background: linear-gradient(to top, #f43f5e, #e11d48);
-  clip-path: polygon(50% 0%, 100% 100%, 50% 88%, 0% 100%);
+  clip-path: polygon(50% 0%, 100% 100%, 50% 90%, 0% 100%);
 }
 
 .c-arrow::after {
@@ -624,7 +624,7 @@ body {
   position: absolute;
   top: 50%; left: 0; right: 0; bottom: 0;
   background: linear-gradient(to bottom, #cbd5e1, #94a3b8);
-  clip-path: polygon(50% 100%, 100% 0%, 50% 12%, 0% 0%);
+  clip-path: polygon(50% 100%, 100% 0%, 50% 10%, 0% 0%);
 }
 
 .c-pivot {

@@ -562,11 +562,16 @@ async function loadHistory() {
   const rain24 = rainRate.reduce((a, b) => a + (b ?? 0) / 6, 0);
   setText("#rain24", fmt(rain24, 1));
 
-  const ctx = $("#histChart");
-  if (!ctx) return;
+  const ctxHTML = document.getElementById("histChart");
+  if (!ctxHTML) return;
+  
+  const ctx2d = ctxHTML.getContext('2d');
+  const gradientTemp = ctx2d.createLinearGradient(0, 0, 0, ctxHTML.height || 300);
+  gradientTemp.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
+  gradientTemp.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
 
   if (chart) chart.destroy();
-  chart = new Chart(ctx, {
+  chart = new Chart(ctxHTML, {
     type: "bar",
     data: {
       labels,
@@ -576,45 +581,54 @@ async function loadHistory() {
           label: "Temperatura (°C)",
           data: temps,
           yAxisID: "y1",
-          borderColor: ACCENT,
-          backgroundColor: "rgba(0,0,0,0)",
-          tension: 0.25,
+          borderColor: '#10b981',
+          backgroundColor: gradientTemp,
+          fill: true,
+          tension: 0.4,
           borderWidth: 2,
           pointRadius: 0,
+          pointHoverRadius: 4,
           spanGaps: true,
           hidden: allTempsNull,
+          order: 1
         },
         {
           type: "bar",
           label: "Precipitação (mm/h)",
           data: rainRate,
           yAxisID: "y2",
-          backgroundColor: ACCENT2,
-          borderColor: ACCENT2,
-          borderWidth: 1,
-          maxBarThickness: 18,
+          backgroundColor: 'rgba(59, 130, 246, 0.6)',
+          borderRadius: 4,
+          order: 2
         },
       ],
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      layout: { padding: { top: 4, right: 8, bottom: 0, left: 4 } },
-      animation: false,
-      plugins: { legend: { display: false }, tooltip: { enabled: true } },
+      interaction: { mode: 'index', intersect: false },
+      plugins: { 
+        legend: { display: false }, 
+        tooltip: {
+          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          titleColor: '#1e293b', bodyColor: '#475569',
+          borderColor: 'rgba(0,0,0,0.05)', borderWidth: 1, padding: 12, boxPadding: 4,
+          usePointStyle: true,
+          titleFont: { family: "'Plus Jakarta Sans', sans-serif", size: 13, weight: '800' },
+          bodyFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12 }
+        } 
+      },
       scales: {
         x: {
-          grid: { color: "#00000014" },
+          grid: { display: false },
           ticks: {
+            font: { family: "'Plus Jakarta Sans', sans-serif" },
             maxRotation: 0,
             autoSkip: false,
             callback: function (value, index) {
               const d = labelDates[index];
               if (d.getMinutes() === 0 && d.getHours() % 2 === 0) {
-                return d.toLocaleTimeString("pt-PT", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                });
+                return d.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
               }
               return "";
             },
@@ -622,18 +636,16 @@ async function loadHistory() {
         },
         y1: {
           position: "left",
-          grid: { color: "#00000014" },
-          min: 0,
-          max: 43,
-          ticks: { stepSize: 5 },
-          title: { display: true, text: "Temperatura (ºC)" },
+          grid: { color: "rgba(0,0,0,0.04)", drawBorder: false },
+          ticks: { font: { family: "'Plus Jakarta Sans', sans-serif" } },
+          title: { display: true, text: "Temperatura (ºC)", font: { family: "'Plus Jakarta Sans', sans-serif", size: 12, weight: '600' } },
         },
         y2: {
           position: "right",
-          grid: { display: false },
+          grid: { display: false, drawBorder: false },
+          ticks: { font: { family: "'Plus Jakarta Sans', sans-serif" } },
           beginAtZero: true,
-          suggestedMax: 10,
-          title: { display: true, text: "Precipitação (mm)" },
+          title: { display: true, text: "Precipitação (mm)", font: { family: "'Plus Jakarta Sans', sans-serif", size: 12, weight: '600' } },
         },
       },
     },
