@@ -906,3 +906,108 @@ async function boot() {
 })();
 
 boot().catch(console.error);
+
+// --- Lógica Histórico Diário ---
+let historyDailyChartObj = null;
+
+document.getElementById('historyBtn')?.addEventListener('click', loadHistoryDaily);
+
+async function loadHistoryDaily() {
+  const dateInput = document.getElementById('historyDateInput').value;
+  if (!dateInput) return alert('Por favor, selecione uma data primeiro.');
+
+  document.getElementById('historyLoading').style.display = 'block';
+  document.getElementById('historyError').style.display = 'none';
+  document.getElementById('historyContent').style.display = 'none';
+
+  try {
+    const res = await fetch(`${API_BASE}/history/daily?date=${dateInput}`);
+    if (!res.ok) {
+      document.getElementById('historyError').textContent = 'Nenhum dado encontrado para a data especificada.';
+      document.getElementById('historyError').style.display = 'block';
+      document.getElementById('historyLoading').style.display = 'none';
+      return;
+    }
+    const data = await res.json();
+    
+    // Stats
+    setText('#hTmax', fmt(data.stats.tmax, 1));
+    setText('#hTmin', fmt(data.stats.tmin, 1));
+    setText('#hTmean', fmt(data.stats.tmean, 1));
+    setText('#hRain', fmt(data.stats.total_rain, 1));
+    setText('#hGust', fmt(data.stats.max_gust, 1));
+
+    renderDailyHistoryChart(data.series);
+
+    document.getElementById('historyLoading').style.display = 'none';
+    document.getElementById('historyContent').style.display = 'flex';
+  } catch (err) {
+    document.getElementById('historyError').textContent = 'Erro ao carregar os dados.';
+    document.getElementById('historyError').style.display = 'block';
+    document.getElementById('historyLoading').style.display = 'none';
+  }
+}
+
+function renderDailyHistoryChart(series) {
+  const canvas = document.getElementById('historyDailyChart');
+  if (!canvas) return;
+
+  const labels = series.map(r => {
+    const d = new Date(r.ts_local);
+    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  });
+  
+  const temps = series.map(r => r.temp_c);
+  const rain = series.map(r => r.rain_rate_mmph);
+
+  const ctx = canvas.getContext('2d');
+  const gradientTemp = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  gradientTemp.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
+  gradientTemp.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+
+  if (historyDailyChartObj) historyDailyChartObj.destroy();
+  historyDailyChartObj = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          type: 'line',
+          label: 'Temperatura (°C)',
+          data: temps,
+          yAxisID: 'yTemp',
+          borderColor: '#10b981',
+          backgroundColor: gradientTemp,
+          borderWidth: 2,
+          fill: true,
+          tension: 0.3,
+          pointRadius: 0,
+          pointHoverRadius: 4,
+          order: 1
+        },
+        {
+          type: 'bar',
+          label: 'Taxa Precipitação (mm/h)',
+          data: rain,
+          yAxisID: 'yRain',
+          backgroundColor: 'rgba(59, 130, 246, 0.6)',
+          borderRadius: 4,
+          order: 2
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { usePointStyle: true, font: { family: "'Plus Jakarta Sans', sans-serif" } } }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { maxTicksLimit: 24, font: { family: "'Plus Jakarta Sans', sans-serif" } } },
+        yTemp: { position: 'left', title: { display: true, text: 'Temperatura (°C)', font: { family: "'Plus Jakarta Sans', sans-serif" } }, grid: { color: 'rgba(0,0,0,0.04)' } },
+        yRain: { position: 'right', title: { display: true, text: 'Precipitação (mm/h)', font: { family: "'Plus Jakarta Sans', sans-serif" } }, min: 0 }
+      }
+    }
+  });
+}

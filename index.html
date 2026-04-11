@@ -243,12 +243,58 @@
 
         <!-- ── HISTÓRICO ── -->
         <section data-view="historico" class="view-section" hidden>
-          <div class="soft-card empty-state-card">
-            <div class="empty-icon-wrap">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          <div class="page-header" style="margin-bottom: 24px;">
+            <h1 class="page-title">Histórico Diário</h1>
+            <p class="page-subtitle">Consulte o arquivo de dados meteorológicos de qualquer dia.</p>
+          </div>
+          
+          <div class="soft-card" style="margin-bottom: 24px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+            <div style="flex-grow: 1;">
+              <span class="m-label" style="display: block; margin-bottom: 8px;">Selecione a Data</span>
+              <input type="date" id="historyDateInput" style="width: 100%; max-width: 300px; padding: 12px; border: 1px solid var(--glass-border); border-radius: 8px; font-family: inherit; font-size: 1rem; color: var(--text-primary); background: transparent;">
             </div>
-            <h2>Página em Construção</h2>
-            <p>O painel de consulta e exportação do histórico avançado estará disponível em breve. Estamos a afinar a base de dados!</p>
+            <button id="historyBtn" style="background: var(--accent-blue); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; font-family: inherit; align-self: flex-end; transition: opacity 0.2s;">
+              Consultar
+            </button>
+          </div>
+
+          <div id="historyLoading" style="display: none; text-align: center; padding: 40px; color: var(--text-light);">A procurar nos arquivos...</div>
+          <div id="historyError" style="display: none; text-align: center; padding: 40px; color: var(--accent-rose); font-weight: bold; background: white; border-radius: 16px;"></div>
+
+          <div id="historyContent" style="display: none; flex-direction: column; gap: 24px;">
+            <!-- Cartões de Resumo -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px;">
+              <div class="soft-card metric-box">
+                <span class="val-label" style="color: var(--accent-rose);">Máxima Diária</span>
+                <div class="mb-value"><span id="hTmax">—</span> <span class="m-unit">°C</span></div>
+              </div>
+              <div class="soft-card metric-box">
+                <span class="val-label" style="color: var(--accent-blue);">Mínima Diária</span>
+                <div class="mb-value"><span id="hTmin">—</span> <span class="m-unit">°C</span></div>
+              </div>
+              <div class="soft-card metric-box">
+                <span class="val-label" style="color: var(--text-primary);">Média Diária</span>
+                <div class="mb-value"><span id="hTmean">—</span> <span class="m-unit">°C</span></div>
+              </div>
+              <div class="soft-card metric-box">
+                <span class="val-label" style="color: var(--accent-blue);">Total de Chuva</span>
+                <div class="mb-value"><span id="hRain">—</span> <span class="m-unit">mm</span></div>
+              </div>
+              <div class="soft-card metric-box">
+                <span class="val-label">Rajada Máx</span>
+                <div class="mb-value"><span id="hGust">—</span> <span class="m-unit">km/h</span></div>
+              </div>
+            </div>
+
+            <!-- Gráfico Intradiário -->
+            <div class="soft-card">
+              <div class="card-header-clean">
+                <h2>Evolução no Dia</h2>
+              </div>
+              <div class="chart-container" style="height: 350px; position: relative; width: 100%;">
+                <canvas id="historyDailyChart"></canvas>
+              </div>
+            </div>
           </div>
         </section>
 

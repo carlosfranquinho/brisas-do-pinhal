@@ -401,6 +401,43 @@ def history(hours: int = Query(24, ge=1, le=168)):
     return rows
 
 
+@app.get("/history/daily")
+def history_daily(date: str = Query(..., description="Date in YYYY-MM-DD format")):
+    conn = get_db()
+    try:
+        cur = conn.cursor()
+        
+        # Obter todos os registos detalhados do dia (para o gráfico)
+        cur.execute("""
+            SELECT ts_local, temp_c, rh_pct, wind_kmh, gust_kmh, wind_dir_deg, pressure_hpa, rain_rate_mmph, rain_day_mm, solar_wm2, uv_index
+            FROM observations
+            WHERE DATE(ts_local) = ?
+            ORDER BY ts_local ASC
+        """, (date,))
+        series = [dict(r) for r in cur.fetchall()]
+        
+        # Obter estatísticas do dia (Mínimos, Máximos)
+        cur.execute("""
+            SELECT 
+                MIN(temp_c) as tmin, MAX(temp_c) as tmax, AVG(temp_c) as tmean,
+                MAX(gust_kmh) as max_gust, MAX(rain_day_mm) as total_rain,
+                MIN(pressure_hpa) as min_press, MAX(pressure_hpa) as max_press
+            FROM observations
+            WHERE DATE(ts_local) = ?
+        """, (date,))
+        stats_row = cur.fetchone()
+        stats = dict(stats_row) if stats_row else {}
+        
+    finally:
+        conn.close()
+        
+    if not series:
+        return JSONResponse(status_code=404, content={"error": "Nenhum dado encontrado para esta data."})
+        
+    return {"date": date, "stats": stats, "series": series}
+
+
+
 @app.get("/climate/monthly")
 def climate_monthly(station: str = "meteomg"):
     conn = get_db()
