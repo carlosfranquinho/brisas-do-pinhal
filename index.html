@@ -244,8 +244,37 @@
         <!-- ── HISTÓRICO ── -->
         <section data-view="historico" class="view-section" hidden>
           <div class="page-header" style="margin-bottom: 24px;">
-            <h1 class="page-title">Histórico Diário</h1>
-            <p class="page-subtitle">Consulte o arquivo de dados meteorológicos de qualquer dia.</p>
+            <h1 class="page-title">Histórico e Recordes</h1>
+            <p class="page-subtitle">Consulte extremos climáticos ou navegue para qualquer dia do arquivo.</p>
+          </div>
+
+          <!-- All Time Records -->
+          <div id="allTimeRecords" class="soft-card" style="margin-bottom: 24px;">
+            <div class="card-header-clean" style="margin-bottom: 16px;">
+              <h2>Recordes Absolutos da Estação</h2>
+            </div>
+            <div class="metrics-grid">
+              <div class="soft-card metric-box" style="background: rgba(244, 63, 94, 0.05); border: 1px solid rgba(244, 63, 94, 0.1);">
+                <span class="val-label" style="color: var(--accent-rose);">Dia mais Quente</span>
+                <div class="mb-value"><span id="recHotV">—</span><span class="m-unit">°C</span></div>
+                <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 4px;" id="recHotD">—</div>
+              </div>
+              <div class="soft-card metric-box" style="background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.1);">
+                <span class="val-label" style="color: var(--accent-blue);">Dia mais Frio</span>
+                <div class="mb-value"><span id="recColdV">—</span><span class="m-unit">°C</span></div>
+                <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 4px;" id="recColdD">—</div>
+              </div>
+              <div class="soft-card metric-box" style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.1);">
+                <span class="val-label" style="color: #10b981;">Mais Chuvoso</span>
+                <div class="mb-value"><span id="recRainV">—</span><span class="m-unit">mm</span></div>
+                <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 4px;" id="recRainD">—</div>
+              </div>
+              <div class="soft-card metric-box" style="background: rgba(148, 163, 184, 0.05); border: 1px solid rgba(148, 163, 184, 0.1);">
+                <span class="val-label" style="color: #64748b;">Rajada Extrema</span>
+                <div class="mb-value"><span id="recGustV">—</span><span class="m-unit">km/h</span></div>
+                <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 4px;" id="recGustD">—</div>
+              </div>
+            </div>
           </div>
           
           <div class="soft-card" style="margin-bottom: 24px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">

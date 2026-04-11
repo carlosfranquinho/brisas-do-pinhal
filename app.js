@@ -79,6 +79,16 @@ function applyRoute() {
       table.dataset.ready = "1";
     }
   }
+
+  if (view === "historico") {
+    const recordsBox = document.getElementById('allTimeRecords');
+    if (recordsBox && !recordsBox.dataset.ready) {
+      if (typeof window.loadHistoryRecords === 'function') {
+        loadHistoryRecords().catch(console.error);
+      }
+      recordsBox.dataset.ready = "1";
+    }
+  }
 }
 
 window.addEventListener('hashchange', applyRoute);
@@ -911,6 +921,28 @@ boot().catch(console.error);
 let historyDailyChartObj = null;
 
 document.getElementById('historyBtn')?.addEventListener('click', loadHistoryDaily);
+
+async function loadHistoryRecords() {
+  try {
+    const res = await fetch(`${API_BASE}/history/records`);
+    if (!res.ok) return;
+    const data = await res.json();
+    
+    setText('#recHotV', fmt(data.hottest.v, 1));
+    setText('#recHotD', data.hottest.d);
+
+    setText('#recColdV', fmt(data.coldest.v, 1));
+    setText('#recColdD', data.coldest.d);
+
+    setText('#recRainV', fmt(data.rainiest.v, 1));
+    setText('#recRainD', data.rainiest.d);
+
+    setText('#recGustV', fmt(data.gustiest.v, 1));
+    setText('#recGustD', data.gustiest.d);
+  } catch (err) {
+    console.error("Erro a carregar records", err);
+  }
+}
 
 async function loadHistoryDaily() {
   const dateInput = document.getElementById('historyDateInput').value;

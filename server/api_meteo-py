@@ -436,7 +436,32 @@ def history_daily(date: str = Query(..., description="Date in YYYY-MM-DD format"
         
     return {"date": date, "stats": stats, "series": series}
 
+@app.get("/history/records")
+def history_records():
+    conn = get_db()
+    try:
+        cur = conn.cursor()
+        
+        cur.execute("SELECT DATE(ts_local) as d, temp_c as v FROM observations WHERE temp_c IS NOT NULL ORDER BY temp_c DESC LIMIT 1")
+        h_day = cur.fetchone()
+        
+        cur.execute("SELECT DATE(ts_local) as d, temp_c as v FROM observations WHERE temp_c IS NOT NULL ORDER BY temp_c ASC LIMIT 1")
+        c_day = cur.fetchone()
 
+        cur.execute("SELECT DATE(ts_local) as d, rain_day_mm as v FROM observations WHERE rain_day_mm IS NOT NULL ORDER BY rain_day_mm DESC LIMIT 1")
+        r_day = cur.fetchone()
+
+        cur.execute("SELECT DATE(ts_local) as d, gust_kmh as v FROM observations WHERE gust_kmh IS NOT NULL ORDER BY gust_kmh DESC LIMIT 1")
+        g_day = cur.fetchone()
+
+        return {
+            "hottest": dict(h_day) if h_day else {"d": "N/A", "v": 0},
+            "coldest": dict(c_day) if c_day else {"d": "N/A", "v": 0},
+            "rainiest": dict(r_day) if r_day else {"d": "N/A", "v": 0},
+            "gustiest": dict(g_day) if g_day else {"d": "N/A", "v": 0}
+        }
+    finally:
+        conn.close()
 
 @app.get("/climate/monthly")
 def climate_monthly(station: str = "meteomg"):
