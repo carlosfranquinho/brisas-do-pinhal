@@ -6,264 +6,282 @@
   <meta name="description" content="Dados meteorológicos em tempo real da estação amadora Brisas do Pinhal." />
   <title>Brisas do Pinhal | Estação Meteorológica</title>
   
-  <!-- Modern Font: Outfit -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="styles.css?v=4" />
+  <link rel="stylesheet" href="styles.css?v=5" />
   <script src="https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 
-<body>
-  <!-- Ambient background elements -->
-  <div class="ambient-bg shape-1"></div>
-  <div class="ambient-bg shape-2"></div>
-  <div class="ambient-bg shape-3"></div>
+<body class="light-breeze-theme">
 
-  <!-- ══════════════ HEADER ══════════════ -->
-  <header class="site-header glass">
-    <div class="header-inner">
+  <!-- Ambient soft graphics -->
+  <div class="ambient-gradient primary-grad"></div>
+  <div class="ambient-gradient secondary-grad"></div>
+
+  <div class="layout-container">
+    
+    <!-- ══════════════ HEADER / SIDE-NAV (Desktop) ══════════════ -->
+    <header class="app-header">
       <div class="brand">
-        <svg class="brand-leaf pulse-slow" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M12 2C6 2 3 7 3 12c0 3.5 1.5 6.5 4 8.5C8.5 22 11 22 12 22s3.5 0 5-1.5c2.5-2 4-5 4-8.5C21 7 18 2 12 2z" fill="url(#leaf-grad1)" opacity=".8"/>
-          <path d="M12 2c0 0-5 8-5 13a5 5 0 0 0 10 0C17 10 12 2 12 2z" fill="url(#leaf-grad2)"/>
-          <defs>
-            <linearGradient id="leaf-grad1" x1="3" y1="2" x2="21" y2="22" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#38bdf8" />
-              <stop offset="1" stop-color="#818cf8" />
-            </linearGradient>
-            <linearGradient id="leaf-grad2" x1="12" y1="2" x2="12" y2="22" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#38bdf8" />
-              <stop offset="1" stop-color="#6366f1" />
-            </linearGradient>
-          </defs>
-        </svg>
+        <div class="brand-icon-wrapper">
+          <svg class="brand-leaf bounce-soft" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 2C6 2 3 7 3 12c0 3.5 1.5 6.5 4 8.5C8.5 22 11 22 12 22s3.5 0 5-1.5c2.5-2 4-5 4-8.5C21 7 18 2 12 2z" fill="currentColor" opacity=".2"/>
+            <path d="M12 2c0 0-5 8-5 13a5 5 0 0 0 10 0C17 10 12 2 12 2z" fill="currentColor"/>
+          </svg>
+        </div>
         <div class="brand-text">
           <h1>Brisas do Pinhal</h1>
           <p id="nowDate" class="header-date">—</p>
         </div>
       </div>
-      <nav class="main-nav" aria-label="Secções">
-        <a href="#/" data-viewlink="home" class="active">Agora</a>
-        <a href="#/historico" data-viewlink="historico">Histórico</a>
-        <a href="#/clima" data-viewlink="clima">Clima</a>
+      
+      <nav class="main-nav" aria-label="Navegação Principal">
+        <a href="#/" data-viewlink="home" class="active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          Agora
+        </a>
+        <a href="#/historico" data-viewlink="historico">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          Histórico
+        </a>
+        <a href="#/clima" data-viewlink="clima">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0z"></path></svg>
+          Clima Mensal
+        </a>
       </nav>
-    </div>
-  </header>
 
-  <!-- ══════════════ CONTEÚDO ══════════════ -->
-  <main class="shell">
-    <div id="views">
+      <div class="footer-status mt-auto hidden-mobile">
+        <div class="status-indicator">
+          <span class="ping-dot"></span>
+          <span id="staleFlag" class="ok">Estação online</span>
+        </div>
+        <div class="foot-refresh">Sync em <span id="age">—</span></div>
+      </div>
+    </header>
 
-      <!-- ── HOME ── -->
-      <section data-view="home" class="fade-in">
+    <!-- ══════════════ CONTEÚDO ══════════════ -->
+    <main class="main-content">
+      <div id="views">
 
-        <!-- Bloco principal: temperatura + nascer/pôr do sol -->
-        <div class="hero-top glass-card">
-          <div class="now-left">
-            <div class="icon-wrapper">
-              <img id="bm-now-ico" class="now-icon-img sunny float-anim"
-                   src="icons/cloudy.svg" alt="condições atuais"
-                   width="120" height="120" />
+        <!-- ── HOME ── -->
+        <section data-view="home" class="view-section">
+          
+          <div class="hero-dashboard">
+            <!-- Coluna Principal (Hero Current) -->
+            <div class="hero-primary soft-card">
+              <div class="hero-header">
+                <span class="tag">Tempo Atual</span>
+              </div>
+              <div class="hero-body">
+                <div class="weather-icon-container">
+                  <img id="bm-now-ico" class="now-icon-img"
+                       src="icons/cloudy.svg" alt="condições atuais" />
+                </div>
+                <div class="temp-display">
+                  <div class="temp-huge">
+                    <span id="temp">—</span><span class="unit">°C</span>
+                  </div>
+                  <div class="temp-extremes">
+                    <div class="ext-pill max-pill"><span class="arr">▲</span> <span id="tmax"></span></div>
+                    <div class="ext-pill min-pill"><span class="arr">▼</span> <span id="tmin"></span></div>
+                  </div>
+                  <div class="feels-like">
+                    Sensação <strong id="apparent">—</strong> °C
+                  </div>
+                </div>
+              </div>
             </div>
+
+            <!-- Mini cards laterais (Sun Info) -->
+            <div class="hero-side">
+              <div class="soft-card sun-card">
+                <div class="card-icon sunrise-bg">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83M12 14a2 2 0 100-4 2 2 0 000 4z"/></svg>
+                </div>
+                <div class="sun-info">
+                  <span class="lbl">Nascer do Sol</span>
+                  <span class="val" id="sunrise">—</span>
+                </div>
+              </div>
+              <div class="soft-card sun-card">
+                <div class="card-icon sunset-bg">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 18a5 5 0 00-10 0M12 2v7M4.22 10.22l1.42 1.42M19.78 10.22l-1.42 1.42M2 22h20M16 2v4M8 2v4"/></svg>
+                </div>
+                <div class="sun-info">
+                  <span class="lbl">Pôr do Sol</span>
+                  <span class="val" id="sunset">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grelha de Métricas Innovadora -->
+          <div class="metrics-masonry">
             
-            <div class="temp-block">
-              <div class="now-temp-container">
-                <div class="now-temp">
-                  <span id="temp">—</span><span class="deg">°C</span>
+            <div class="soft-card metric-box">
+              <div class="mb-top">
+                <span class="m-icon icon-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg></span>
+                <span class="m-label">Humidade</span>
+              </div>
+              <div class="mb-value" id="rh">—</div>
+            </div>
+
+            <div class="soft-card metric-box">
+              <div class="mb-top">
+                <span class="m-icon icon-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22a8 8 0 0 0 8-8c0-5.5-8-12-8-12S4 8.5 4 14a8 8 0 0 0 8 8z"></path><circle cx="12" cy="14" r="3"></circle></svg></span>
+                <span class="m-label">Pto. Orvalho</span>
+              </div>
+              <div class="mb-value" id="dew">—</div>
+            </div>
+
+            <div class="soft-card metric-box wide-card">
+              <div class="mb-top">
+                <span class="m-icon icon-gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"></path></svg></span>
+                <span class="m-label">Vento & Rajada</span>
+                <span class="m-badge" id="winddir">—</span>
+              </div>
+              <div class="mb-split">
+                <div class="val-group">
+                  <span class="val-label">Média</span>
+                  <div class="mb-value"><span id="wind">—</span> <span class="m-unit">km/h</span></div>
                 </div>
-                <div class="t-ext-group">
-                  <div class="t-ext t-ext--max"><span class="arr">▲</span> <span id="tmax"></span></div>
-                  <div class="t-ext t-ext--min"><span class="arr">▼</span> <span id="tmin"></span></div>
+                <div class="val-divider"></div>
+                <div class="val-group">
+                  <span class="val-label">Rajada</span>
+                  <div class="mb-value"><span id="gust">—</span> <span class="m-unit">km/h</span></div>
                 </div>
               </div>
-              <p class="feels">Sensação térmica <strong id="apparent">—</strong><span class="deg-small">°C</span></p>
             </div>
-          </div>
 
-          <div class="sun-row">
-            <div class="sun-item glass-pill">
-              <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="sun-svg">
-                <circle cx="10" cy="10" r="4" fill="currentColor"/>
-                <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              </svg>
-              <div class="sun-text">
-                <span class="sun-label">Nascer do Sol</span>
-                <span class="sun-value" id="sunrise">—</span>
+            <div class="soft-card metric-box">
+              <div class="mb-top">
+                <span class="m-icon icon-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4l3 3"></path></svg></span>
+                <span class="m-label">Pressão</span>
+              </div>
+              <div class="mb-value"><span id="press">—</span> <span class="m-unit">hPa</span></div>
+            </div>
+
+            <div class="soft-card metric-box">
+              <div class="mb-top">
+                <span class="m-icon icon-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg></span>
+                <span class="m-label">Índice UV</span>
+              </div>
+              <div class="mb-value" id="uv">—</div>
+            </div>
+
+            <div class="soft-card metric-box wide-card highlight-card">
+              <div class="mb-top">
+                <span class="m-icon icon-rain"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path><line x1="8" y1="13" x2="8" y2="21"></line><line x1="12" y1="15" x2="12" y2="23"></line><line x1="16" y1="13" x2="16" y2="21"></line></svg></span>
+                <span class="m-label">Precipitação</span>
+              </div>
+               <div class="mb-split">
+                <div class="val-group">
+                  <span class="val-label">Hoje</span>
+                  <div class="mb-value"><span id="rainToday">—</span> <span class="m-unit">mm</span></div>
+                </div>
+                <div class="val-divider"></div>
+                <div class="val-group">
+                  <span class="val-label">24h Acum.</span>
+                  <div class="mb-value"><span id="rain24">—</span> <span class="m-unit">mm</span></div>
+                </div>
               </div>
             </div>
-            <div class="sun-item glass-pill">
-              <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="sun-svg sun-svg--set">
-                <circle cx="10" cy="10" r="4" fill="currentColor" opacity=".4"/>
-                <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".5"/>
-              </svg>
-              <div class="sun-text">
-                <span class="sun-label">Pôr do Sol</span>
-                <span class="sun-value" id="sunset">—</span>
+
+            <div class="soft-card metric-box">
+              <div class="mb-top">
+                <span class="m-icon icon-yellow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></span>
+                <span class="m-label">Rad. Solar</span>
+              </div>
+              <div class="mb-value"><span id="solar">—</span> <span class="m-unit">W/m²</span></div>
+            </div>
+
+          </div>
+
+          <!-- Bottom: Previsão e Gráfico -->
+          <div class="details-grid">
+            <div class="soft-card chart-container">
+              <div class="card-header-clean">
+                <h2>Variação nas Últimas 24h</h2>
+                <div class="chart-legend-clean">
+                  <span class="l-item"><span class="dot tint-blue"></span> Temp</span>
+                  <span class="l-item"><span class="dot tint-teal"></span> Precip</span>
+                </div>
+              </div>
+              <div class="chart-canvas">
+                <canvas id="histChart"></canvas>
               </div>
             </div>
-          </div>
-        </div>
 
-        <!-- Métricas em cards -->
-        <div class="metrics-grid">
-          
-          <div class="metric-card glass-card hover-lift">
-            <div class="mc-header">
-              <span class="mc-icon">
-                <svg viewBox="0 0 20 20" fill="none"><path d="M10 3a4 4 0 0 1 0 8 4 4 0 0 1 0-8zm0 10c-4 0-7 1.8-7 4h14c0-2.2-3-4-7-4z" fill="currentColor" opacity=".2"/><path d="M10 3c0 0-3 4-3 6a3 3 0 0 0 6 0C13 7 10 3 10 3z" fill="currentColor"/></svg>
-              </span>
-              <span class="mc-label">Humidade</span>
-            </div>
-            <span class="mc-value" id="rh">—</span>
-          </div>
-
-          <div class="metric-card glass-card hover-lift">
-            <div class="mc-header">
-              <span class="mc-icon">
-                <svg viewBox="0 0 20 20" fill="none"><rect x="8" y="2" width="4" height="10" rx="2" fill="currentColor" opacity=".3"/><circle cx="10" cy="14" r="3" fill="currentColor"/><rect x="9" y="5" width="2" height="7" rx="1" fill="currentColor"/></svg>
-              </span>
-              <span class="mc-label">Pto. Orvalho</span>
-            </div>
-            <span class="mc-value" id="dew">—</span>
-          </div>
-
-          <div class="metric-card glass-card hover-lift">
-            <div class="mc-header">
-              <span class="mc-icon">
-                <svg viewBox="0 0 20 20" fill="none"><path d="M3 10h14M14 6l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </span>
-              <span class="mc-label">Vento <span class="mc-dir badge" id="winddir">—</span></span>
-            </div>
-            <span class="mc-value"><span id="wind">—</span> <span class="mc-unit">km/h</span></span>
-          </div>
-
-          <div class="metric-card glass-card hover-lift">
-            <div class="mc-header">
-              <span class="mc-icon">
-                <svg viewBox="0 0 20 20" fill="none"><path d="M3 10h14M14 5l4 5-4 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".4"/><path d="M3 10h10M10 6l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </span>
-              <span class="mc-label">Rajada</span>
-            </div>
-            <span class="mc-value"><span id="gust">—</span> <span class="mc-unit">km/h</span></span>
-          </div>
-
-          <div class="metric-card glass-card hover-lift">
-            <div class="mc-header">
-              <span class="mc-icon">
-                <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.8"/><circle cx="10" cy="10" r="2" fill="currentColor"/><path d="M10 5v2M10 13v2M5 10h2M13 10h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-              </span>
-              <span class="mc-label">Pressão</span>
-            </div>
-            <span class="mc-value"><span id="press">—</span> <span class="mc-unit">hPa</span></span>
-          </div>
-
-          <div class="metric-card glass-card hover-lift">
-            <div class="mc-header">
-              <span class="mc-icon">
-                <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="5" fill="currentColor" opacity=".25"/><circle cx="10" cy="10" r="3" fill="currentColor"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-              </span>
-              <span class="mc-label">Índice UV</span>
-            </div>
-            <span class="mc-value" id="uv">—</span>
-          </div>
-
-          <div class="metric-card glass-card hover-lift col-span-2-mobile">
-            <div class="mc-header">
-              <span class="mc-icon">
-                <svg viewBox="0 0 20 20" fill="none"><path d="M3 16l4-8 3 5 2-3 5 6H3z" fill="currentColor" opacity=".2"/><path d="M3 16l4-8 3 5 2-3 5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </span>
-              <span class="mc-label">Radiação Solar</span>
-            </div>
-            <span class="mc-value"><span id="solar">—</span> <span class="mc-unit">W/m²</span></span>
-          </div>
-
-          <div class="metric-card glass-card hover-lift fill-primary">
-            <div class="mc-header">
-              <span class="mc-icon text-blue">
-                <svg viewBox="0 0 20 20" fill="none"><path d="M10 3c0 0-6 5-6 9a6 6 0 0 0 12 0C16 8 10 3 10 3z" fill="currentColor" opacity=".2"/><path d="M10 3c0 0-4 4-4 8a4 4 0 0 0 8 0C14 7 10 3 10 3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-              </span>
-              <span class="mc-label">Chuva Hoje</span>
-            </div>
-            <span class="mc-value"><span id="rainToday">—</span> <span class="mc-unit">mm</span></span>
-          </div>
-
-          <div class="metric-card glass-card hover-lift">
-            <div class="mc-header">
-              <span class="mc-icon text-blue">
-                <svg viewBox="0 0 20 20" fill="none"><path d="M4 14c0-3 2-5 6-8 4 3 6 5 6 8a6 6 0 0 1-12 0z" fill="currentColor" opacity=".15"/><path d="M4 14c0-3 2-5 6-8 4 3 6 5 6 8a6 6 0 0 1-12 0z" stroke="currentColor" stroke-width="1.6"/><path d="M10 10v6M7 13l3-3 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </span>
-              <span class="mc-label">Acumulado 24h</span>
-            </div>
-            <span class="mc-value"><span id="rain24">—</span> <span class="mc-unit">mm</span></span>
-          </div>
-
-        </div>
-
-        <!-- Previsão + Gráfico -->
-        <div class="bottom">
-          <div class="section-block glass-card">
-            <h2 class="section-title">Previsão IPMA</h2>
-            <ul class="days" id="forecast"></ul>
-          </div>
-
-          <div class="section-block chart glass-card">
-            <h2 class="section-title">Variação (Últimas 24h)</h2>
-            <div class="chart-canvas">
-              <canvas id="histChart"></canvas>
-            </div>
-            <div class="chart-legend">
-              <span class="legend-item"><span class="dot t"></span> Temperatura</span>
-              <span class="legend-item"><span class="dot r"></span> Precipitação</span>
+            <div class="soft-card forecast-container">
+              <div class="card-header-clean">
+                <h2>Previsão IPMA</h2>
+              </div>
+              <ul class="forecast-list" id="forecast"></ul>
             </div>
           </div>
-        </div>
 
-      </section>
+        </section>
 
-      <!-- ── HISTÓRICO ── -->
-      <section data-view="historico" class="fade-in" hidden>
-        <div class="section-block glass-card fade-in">
-          <div class="wip-container">
-            <svg class="wip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
-            <h2 class="section-title">Histórico Detalhado</h2>
-            <p class="empty-msg">Acesso aos dados históricos em desenvolvimento.<br>Estarão disponíveis consultas personalizadas no futuro.</p>
+        <!-- ── HISTÓRICO ── -->
+        <section data-view="historico" class="view-section" hidden>
+          <div class="soft-card empty-state-card">
+            <div class="empty-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            </div>
+            <h2>Página em Construção</h2>
+            <p>O painel de consulta e exportação do histórico avançado estará disponível em breve. Estamos a afinar a base de dados!</p>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- ── CLIMA ── -->
-      <section data-view="clima" class="fade-in" hidden>
-        <div class="section-block glass-card fade-in">
-          <h2 class="section-title">Climatologia Mensal</h2>
-          
-          <div class="climate-chart-container">
-            <canvas id="climateChart"></canvas>
+        <!-- ── CLIMA ── -->
+        <section data-view="clima" class="view-section" hidden>
+          <div class="soft-card mb-gap">
+            <div class="card-header-clean">
+              <h2>Evolução Climatológica</h2>
+            </div>
+            <div class="climate-chart">
+              <canvas id="climateChart"></canvas>
+            </div>
           </div>
           
-          <div id="climateWrap" class="custom-scrollbar">
-            <table id="climateTable" class="climate-table"></table>
+          <div class="soft-card table-card">
+            <div class="table-wrapper custom-scroll">
+              <table id="climateTable" class="clean-table"></table>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-    </div>
-  </main>
-
-  <!-- ══════════════ FOOTER ══════════════ -->
-  <footer class="site-footer">
-    <div class="footer-inner glass-card-sm">
+      </div>
+    </main>
+    
+    <!-- Mobile Bottom Footer -->
+    <div class="mobile-footer visible-mobile">
       <div class="status-indicator">
         <span class="ping-dot"></span>
-        <span id="staleFlag" class="ok">Estação online</span>
+        <span id="staleFlag-mobile" class="ok">Online</span>
       </div>
-      <span class="sep" aria-hidden="true">|</span>
-      <span class="foot-refresh">Atualização <span id="age">—</span></span>
+      <div>Sync: <span id="age-mobile">—</span></div>
     </div>
-  </footer>
+  </div>
 
+  <script>
+    // Sync mobile strings with desktop elements
+    setInterval(() => {
+      const age = document.getElementById('age');
+      const ageMob = document.getElementById('age-mobile');
+      if (age && ageMob) ageMob.textContent = age.textContent;
+
+      const flag = document.getElementById('staleFlag');
+      const flagMob = document.getElementById('staleFlag-mobile');
+      if (flag && flagMob) {
+        flagMob.textContent = flag.textContent === 'Estação online' ? 'Online' : 'Desatualizado';
+        flagMob.className = flag.className;
+      }
+    }, 500);
+  </script>
 </body>
 </html>
