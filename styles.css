@@ -120,10 +120,12 @@ body {
 @media (max-width: 992px) {
   .app-header {
     height: auto;
-    position: relative;
+    position: sticky;
+    top: 0;
     border-right: none;
-    border-bottom: 1px solid rgba(0,0,0,0.03);
-    padding: 24px 20px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    padding: 14px 20px;
+    z-index: 40;
   }
 }
 
@@ -136,13 +138,16 @@ body {
   color: inherit;
 }
 @media (max-width: 992px) {
-  .brand { margin-bottom: 24px; }
+  .brand { margin-bottom: 0; }
 }
 
 .brand-icon-wrapper {
   width: 58px;
   height: 58px;
   flex-shrink: 0;
+}
+@media (max-width: 992px) {
+  .brand-icon-wrapper { width: 42px; height: 42px; }
 }
 .brand-logo-icon {
   width: 100%;
@@ -156,11 +161,17 @@ body {
   letter-spacing: -0.02em;
   color: var(--text-primary);
 }
+@media (max-width: 992px) {
+  .brand-text h1 { font-size: 1rem; }
+}
 .header-date {
   font-size: 0.85rem;
   font-weight: 500;
   color: var(--text-secondary);
   margin-top: 2px;
+}
+@media (max-width: 992px) {
+  .header-date { font-size: 0.78rem; margin-top: 1px; }
 }
 
 /* Nav */
@@ -170,12 +181,7 @@ body {
   gap: 12px;
 }
 @media (max-width: 992px) {
-  .main-nav {
-    flex-direction: row;
-    overflow-x: auto;
-    padding-bottom: 4px;
-  }
-  .main-nav::-webkit-scrollbar { display: none; }
+  .main-nav { display: none; }
 }
 
 .main-nav a {
@@ -189,9 +195,6 @@ body {
   padding: 12px 18px;
   border-radius: var(--radius-sm);
   transition: all 0.25s ease;
-}
-@media (max-width: 992px) {
-  .main-nav a { white-space: nowrap; padding: 10px 16px; }
 }
 
 .main-nav a svg { width: 20px; height: 20px; opacity: 0.7; }
@@ -264,6 +267,81 @@ body {
   color: var(--text-light);
 }
 #age, #age-mobile { color: var(--text-secondary); font-weight: 600; }
+
+/* ── BOTTOM TAB BAR (mobile only) ── */
+.bottom-tab-bar {
+  display: none;
+}
+@media (max-width: 992px) {
+  .bottom-tab-bar {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(0,0,0,0.06);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .bottom-tab-bar a {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 10px 8px;
+    text-decoration: none;
+    color: var(--text-light);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    transition: color 0.2s ease;
+  }
+  .bottom-tab-bar a svg {
+    width: 22px;
+    height: 22px;
+    stroke-width: 1.8;
+    transition: stroke 0.2s ease;
+  }
+  .bottom-tab-bar a.active,
+  .bottom-tab-bar a:hover {
+    color: var(--accent-blue);
+  }
+  .bottom-tab-bar a.active svg,
+  .bottom-tab-bar a:hover svg {
+    stroke: var(--accent-blue);
+  }
+  /* main content clears the tab bar */
+  .main-content {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* ── MOBILE STATUS ROW (inside brand, mobile only) ── */
+.mobile-status-row {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 0.72rem;
+  color: var(--text-light);
+  font-weight: 500;
+}
+.mobile-status-row .ping-dot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+}
+.mobile-status-row .mobile-age-sep {
+  opacity: 0.4;
+}
+@media (max-width: 992px) {
+  .mobile-status-row { display: flex; }
+}
 
 .mobile-footer {
   display: none;
@@ -609,6 +687,45 @@ body {
 .forecast-list .t { font-weight: 800; display: flex; gap: 10px; font-size: 0.9rem; }
 .forecast-list .hi { color: var(--accent-rose); }
 .forecast-list .lo { color: var(--accent-blue); }
+
+/* Previsão mobile — card no main content */
+.mobile-forecast-card { display: none; }
+@media (max-width: 992px) {
+  .mobile-forecast-card { display: block; }
+}
+
+.forecast-list--mobile {
+  flex-direction: row !important;
+  gap: 0 !important;
+}
+.forecast-list--mobile li {
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 14px 8px;
+  background: none !important;
+  border: none !important;
+  border-right: 1px solid rgba(0,0,0,0.05) !important;
+}
+.forecast-list--mobile li:last-child {
+  border-right: none !important;
+}
+.forecast-list--mobile .d {
+  width: auto;
+  font-size: 0.72rem;
+  text-align: center;
+  color: var(--text-light);
+}
+.forecast-list--mobile .ic img { width: 36px; height: 36px; }
+.forecast-list--mobile .t {
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.82rem;
+}
+.forecast-list--mobile .sep { display: none; }
 
 /* ── EMPTY STATES & CLIMA TABLE ── */
 .empty-state-card {

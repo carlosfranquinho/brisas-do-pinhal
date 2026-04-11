@@ -352,7 +352,9 @@ async function loadForecast() {
 
     const days = j.data?.slice(0, 4) || [];
     const ul = $("#forecast");
+    const ulMobile = $("#forecast-mobile");
     ul.innerHTML = "";
+    if (ulMobile) ulMobile.innerHTML = "";
 
     days.forEach((d, i) => {
       const day = new Date(d.forecastDate);
@@ -367,13 +369,12 @@ async function loadForecast() {
       const tMax = Number.isFinite(+d.tMax) ? Math.round(d.tMax) : null;
       const tMin = Number.isFinite(+d.tMin) ? Math.round(d.tMin) : null;
 
-      const li = document.createElement("li");
-      li.innerHTML = `
+      const makeItem = () => {
+        const li = document.createElement("li");
+        li.innerHTML = `
   <div class="d">${label}</div>
   <div class="ic">
-    <img class="bm-ico bm-ico--sm" src="${iconUrl(
-        iconName
-      )}" alt="${iconName.replace(/-/g, " ")}" width="48" height="48">
+    <img class="bm-ico bm-ico--sm" src="${iconUrl(iconName)}" alt="${iconName.replace(/-/g, " ")}" width="48" height="48">
   </div>
   <div class="t">
     <span class="hi">${tMax != null ? `${tMax}°` : "—"}</span>
@@ -381,7 +382,11 @@ async function loadForecast() {
     <span class="lo">${tMin != null ? `${tMin}°` : "—"}</span>
   </div>
 `;
-      ul.appendChild(li);
+        return li;
+      };
+
+      ul.appendChild(makeItem());
+      if (ulMobile) ulMobile.appendChild(makeItem());
 
       // continua a usar o 1.º dia para o ícone grande do topo
       if (i === 0) {
