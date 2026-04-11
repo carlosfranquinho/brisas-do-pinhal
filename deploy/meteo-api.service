@@ -1,0 +1,28 @@
+[Unit]
+Description=Brisas do Pinhal — FastAPI weather backend
+After=network.target
+
+[Service]
+Type=simple
+User=carlos
+Group=carlos
+WorkingDirectory=/dados/projetos/brisamar
+EnvironmentFile=/etc/meteo/env
+ExecStart=/dados/projetos/brisamar/.venv/bin/uvicorn \
+    server.api_meteo:app \
+    --host 127.0.0.1 \
+    --port 8000 \
+    --workers 1 \
+    --log-level info
+Restart=on-failure
+RestartSec=5s
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=full
+ReadWritePaths=/var/lib/meteo /home/carlos/meteo_logs
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=meteo-api
+
+[Install]
+WantedBy=multi-user.target

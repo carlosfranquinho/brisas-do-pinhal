@@ -1,5 +1,5 @@
 /* CONFIG */
-const API_BASE = "https://meteomg-tunel.franquinho.info";
+const API_BASE = "https://brisas-api.pinhaldorei.net";
 const LIVE_URL = `${API_BASE}/live`;
 const HIST_URL = `${API_BASE}/history?hours=24`;
 const METAR_URL = `${API_BASE}/metar-tgftp/LPMR`;

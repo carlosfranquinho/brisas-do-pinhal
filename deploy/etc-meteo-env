@@ -1,0 +1,3 @@
+DB_PATH=/var/lib/meteo/meteo.db
+LOG_DIR=/home/carlos/meteo_logs
+LIVE_FILE=/var/lib/meteo/live.json

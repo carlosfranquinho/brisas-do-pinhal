@@ -1,2 +1,6 @@
 old_db/franquin_meteomg.sql
 old_db/franquin_meteomg.sql.gz
+.venv/
+server/api_meteo.py
+__pycache__/
+*.pyc
