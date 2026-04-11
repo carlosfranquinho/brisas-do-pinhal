@@ -200,6 +200,7 @@ function updateTrends(j) {
 }
 
 // HISTÓRICO/GRÁFICO (globais)
+let lastLiveData = null;
 let chart = null;
 let HISTORY_WINDOW_POINTS = 0;
 let chartLastTs = 0;
@@ -541,6 +542,7 @@ async function loadLive() {
     flag.className = "ok";
   }
 
+  lastLiveData = j;
   updateTrends(j);
   startCountdown(PUSH_MS);
   appendLivePointToChart(j);
@@ -589,6 +591,8 @@ async function loadHistory() {
       });
     }
   });
+  // buffer agora populado — recalcular setas com o último live
+  if (lastLiveData) updateTrends(lastLiveData);
 
   // Pré-calcula quais os índices do eixo X a mostrar:
   // última hora completa antes do load, depois de 2h em 2h para trás
