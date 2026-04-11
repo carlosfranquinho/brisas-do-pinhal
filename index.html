@@ -158,15 +158,15 @@
                 <div class="val-divider"></div>
                 <div class="compass-wrapper">
                   <div class="compass">
-                    <span class="c-dir n">N</span>
-                    <span class="c-dir s">S</span>
-                    <span class="c-dir e">E</span>
-                    <span class="c-dir w">O</span>
+                    <div class="c-marker"></div>
+                    <span class="c-dir n">N</span><span class="c-dir ne">NE</span>
+                    <span class="c-dir e">E</span><span class="c-dir se">SE</span>
+                    <span class="c-dir s">S</span><span class="c-dir sw">SO</span>
+                    <span class="c-dir w">O</span><span class="c-dir nw">NO</span>
                     <div class="c-arrow-container" id="windArrowContainer">
-                      <div class="c-arrow">
-                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L19 21l-7-4-7 4 7-19z"/></svg>
-                      </div>
+                      <div class="c-arrow"></div>
                     </div>
+                    <div class="c-pivot"></div>
                   </div>
                 </div>
               </div>
@@ -249,68 +249,68 @@
           </div>
 
           <!-- All Time Records -->
-          <div id="allTimeRecords" class="soft-card" style="margin-bottom: 24px;">
+          <div id="allTimeRecords" style="margin-bottom: 32px;">
             <div class="card-header-clean" style="margin-bottom: 16px;">
-              <h2>Recordes Absolutos da Estação</h2>
+              <h2 style="font-size: 1.25rem;">Recordes Absolutos da Estação</h2>
             </div>
-            <div class="metrics-grid">
+            <div class="metrics-masonry">
               <div class="soft-card metric-box" style="background: rgba(244, 63, 94, 0.05); border: 1px solid rgba(244, 63, 94, 0.1);">
-                <span class="val-label" style="color: var(--accent-rose);">Dia mais Quente</span>
+                <div class="mb-top"><span class="m-label" style="color: var(--accent-rose);">Dia mais Quente</span></div>
                 <div class="mb-value"><span id="recHotV">—</span><span class="m-unit">°C</span></div>
-                <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 4px;" id="recHotD">—</div>
+                <div style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px; font-weight: 600;" id="recHotD">—</div>
               </div>
               <div class="soft-card metric-box" style="background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.1);">
-                <span class="val-label" style="color: var(--accent-blue);">Dia mais Frio</span>
+                <div class="mb-top"><span class="m-label" style="color: var(--accent-blue);">Dia mais Frio</span></div>
                 <div class="mb-value"><span id="recColdV">—</span><span class="m-unit">°C</span></div>
-                <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 4px;" id="recColdD">—</div>
+                <div style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px; font-weight: 600;" id="recColdD">—</div>
               </div>
               <div class="soft-card metric-box" style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.1);">
-                <span class="val-label" style="color: #10b981;">Mais Chuvoso</span>
+                <div class="mb-top"><span class="m-label" style="color: #10b981;">Mais Chuvoso</span></div>
                 <div class="mb-value"><span id="recRainV">—</span><span class="m-unit">mm</span></div>
-                <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 4px;" id="recRainD">—</div>
+                <div style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px; font-weight: 600;" id="recRainD">—</div>
               </div>
               <div class="soft-card metric-box" style="background: rgba(148, 163, 184, 0.05); border: 1px solid rgba(148, 163, 184, 0.1);">
-                <span class="val-label" style="color: #64748b;">Rajada Extrema</span>
+                <div class="mb-top"><span class="m-label" style="color: #64748b;">Rajada Extrema</span></div>
                 <div class="mb-value"><span id="recGustV">—</span><span class="m-unit">km/h</span></div>
-                <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 4px;" id="recGustD">—</div>
+                <div style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px; font-weight: 600;" id="recGustD">—</div>
               </div>
             </div>
           </div>
           
-          <div class="soft-card" style="margin-bottom: 24px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
-            <div style="flex-grow: 1;">
-              <span class="m-label" style="display: block; margin-bottom: 8px;">Selecione a Data</span>
-              <input type="date" id="historyDateInput" style="width: 100%; max-width: 300px; padding: 12px; border: 1px solid var(--glass-border); border-radius: 8px; font-family: inherit; font-size: 1rem; color: var(--text-primary); background: transparent;">
+          <div class="soft-card date-picker-card" style="margin-bottom: 32px; text-align: center; padding: 32px 24px;">
+            <p style="color: var(--text-light); font-weight: 700; margin-bottom: 16px; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase;">Aceder ao Arquivo Diário</p>
+            <div style="display: inline-flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; background: var(--bg-color); padding: 8px; border-radius: 16px; border: 1px solid var(--glass-border);">
+              <input type="date" id="historyDateInput" style="padding: 14px 20px; border: none; border-radius: 12px; font-family: inherit; font-size: 1rem; color: var(--text-primary); background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.05); outline: none; cursor: pointer;">
+              <button id="historyBtn" style="background: var(--accent); color: white; border: none; padding: 14px 28px; border-radius: 12px; cursor: pointer; font-weight: 700; font-family: inherit; font-size: 1rem; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
+                Consultar Data
+              </button>
             </div>
-            <button id="historyBtn" style="background: var(--accent-blue); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; font-family: inherit; align-self: flex-end; transition: opacity 0.2s;">
-              Consultar
-            </button>
           </div>
 
           <div id="historyLoading" style="display: none; text-align: center; padding: 40px; color: var(--text-light);">A procurar nos arquivos...</div>
           <div id="historyError" style="display: none; text-align: center; padding: 40px; color: var(--accent-rose); font-weight: bold; background: white; border-radius: 16px;"></div>
 
           <div id="historyContent" style="display: none; flex-direction: column; gap: 24px;">
-            <!-- Cartões de Resumo -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px;">
+            <!-- Cartões de Resumo do Dia -->
+            <div class="metrics-masonry" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));">
               <div class="soft-card metric-box">
-                <span class="val-label" style="color: var(--accent-rose);">Máxima Diária</span>
+                <div class="mb-top"><span class="m-label" style="color: var(--accent-rose);">Máxima Diária</span></div>
                 <div class="mb-value"><span id="hTmax">—</span> <span class="m-unit">°C</span></div>
               </div>
               <div class="soft-card metric-box">
-                <span class="val-label" style="color: var(--accent-blue);">Mínima Diária</span>
+                <div class="mb-top"><span class="m-label" style="color: var(--accent-blue);">Mínima Diária</span></div>
                 <div class="mb-value"><span id="hTmin">—</span> <span class="m-unit">°C</span></div>
               </div>
               <div class="soft-card metric-box">
-                <span class="val-label" style="color: var(--text-primary);">Média Diária</span>
+                <div class="mb-top"><span class="m-label" style="color: var(--text-primary);">Média Diária</span></div>
                 <div class="mb-value"><span id="hTmean">—</span> <span class="m-unit">°C</span></div>
               </div>
               <div class="soft-card metric-box">
-                <span class="val-label" style="color: var(--accent-blue);">Total de Chuva</span>
+                <div class="mb-top"><span class="m-label" style="color: var(--accent-teal);">Total de Chuva</span></div>
                 <div class="mb-value"><span id="hRain">—</span> <span class="m-unit">mm</span></div>
               </div>
               <div class="soft-card metric-box">
-                <span class="val-label">Rajada Máx</span>
+                <div class="mb-top"><span class="m-label">Rajada Máxima</span></div>
                 <div class="mb-value"><span id="hGust">—</span> <span class="m-unit">km/h</span></div>
               </div>
             </div>

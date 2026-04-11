@@ -4,3 +4,8 @@ old_db/franquin_meteomg.sql.gz
 server/api_meteo.py
 __pycache__/
 *.pyc
+
+# Ficheiros e logs da recuperação/auditoria de dados
+dias_em_falha.txt
+server/recover_wunderground.py
+server/recover_wunderground*.log
