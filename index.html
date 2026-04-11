@@ -42,7 +42,7 @@
     
     <!-- ══════════════ HEADER / SIDE-NAV (Desktop) ══════════════ -->
     <header class="app-header">
-      <div class="brand">
+      <a href="#/" class="brand" aria-label="Brisas do Pinhal — página inicial">
         <div class="brand-icon-wrapper">
           <img src="brisas-logo.svg" alt="" class="brand-logo-icon" aria-hidden="true" />
         </div>
@@ -50,7 +50,7 @@
           <h1>Brisas do Pinhal</h1>
           <p id="nowDate" class="header-date">—</p>
         </div>
-      </div>
+      </a>
       
       <nav class="main-nav" aria-label="Navegação Principal">
         <a href="#/" data-viewlink="home" class="active">
@@ -73,6 +73,10 @@
           <h2>Previsão IPMA</h2>
         </div>
         <ul class="forecast-list" id="forecast"></ul>
+      </div>
+
+      <div class="sidebar-copyright hidden-mobile">
+        © <a href="https://carlos.franquinho.info" target="_blank" rel="noopener">Carlos Franquinho</a>, <span id="copyrightYear"></span>
       </div>
 
       <div class="footer-status hidden-mobile" style="margin-top: 0;">
@@ -214,7 +218,10 @@
                 <span class="m-icon icon-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg></span>
                 <span class="m-label">Humidade</span>
               </div>
-              <div class="mb-value" id="rh">—</div>
+              <div class="mb-row">
+                <div class="mb-value" id="rh">—</div>
+                <span class="trend-badge" id="trend-rh"></span>
+              </div>
             </div>
 
             <div class="soft-card metric-box">
@@ -222,7 +229,10 @@
                 <span class="m-icon icon-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22a8 8 0 0 0 8-8c0-5.5-8-12-8-12S4 8.5 4 14a8 8 0 0 0 8 8z"></path><circle cx="12" cy="14" r="3"></circle></svg></span>
                 <span class="m-label">Pto. Orvalho</span>
               </div>
-              <div class="mb-value" id="dew">—</div>
+              <div class="mb-row">
+                <div class="mb-value" id="dew">—</div>
+                <span class="trend-badge" id="trend-dew"></span>
+              </div>
             </div>
 
             <div class="soft-card metric-box">
@@ -230,7 +240,10 @@
                 <span class="m-icon icon-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4l3 3"></path></svg></span>
                 <span class="m-label">Pressão</span>
               </div>
-              <div class="mb-value"><span id="press">—</span> <span class="m-unit">hPa</span></div>
+              <div class="mb-row">
+                <div class="mb-value"><span id="press">—</span> <span class="m-unit">hPa</span></div>
+                <span class="trend-badge" id="trend-press"></span>
+              </div>
             </div>
 
             <div class="soft-card metric-box">
@@ -238,7 +251,10 @@
                 <span class="m-icon icon-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg></span>
                 <span class="m-label">Índice UV</span>
               </div>
-              <div class="mb-value" id="uv">—</div>
+              <div class="mb-row">
+                <div class="mb-value" id="uv">—</div>
+                <span class="trend-badge" id="trend-uv"></span>
+              </div>
             </div>
 
             <div class="soft-card metric-box">
@@ -246,7 +262,10 @@
                 <span class="m-icon icon-yellow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></span>
                 <span class="m-label">Rad. Solar</span>
               </div>
-              <div class="mb-value"><span id="solar">—</span> <span class="m-unit">W/m²</span></div>
+              <div class="mb-row">
+                <div class="mb-value"><span id="solar">—</span> <span class="m-unit">W/m²</span></div>
+                <span class="trend-badge" id="trend-solar"></span>
+              </div>
             </div>
 
           </div>

@@ -132,14 +132,16 @@ body {
   align-items: center;
   gap: 16px;
   margin-bottom: 48px;
+  text-decoration: none;
+  color: inherit;
 }
 @media (max-width: 992px) {
   .brand { margin-bottom: 24px; }
 }
 
 .brand-icon-wrapper {
-  width: 48px;
-  height: 48px;
+  width: 58px;
+  height: 58px;
   flex-shrink: 0;
 }
 .brand-logo-icon {
@@ -237,6 +239,20 @@ body {
 }
 @keyframes ping-pulse {
   75%, 100% { transform: scale(2.5); opacity: 0; }
+}
+
+.sidebar-copyright {
+  font-size: 0.72rem;
+  color: var(--text-light);
+  margin-bottom: 12px;
+}
+.sidebar-copyright a {
+  color: var(--text-light);
+  text-decoration: none;
+  font-weight: 600;
+}
+.sidebar-copyright a:hover {
+  color: var(--accent-blue);
 }
 
 .foot-refresh {
@@ -452,6 +468,22 @@ body {
   display: flex; align-items: baseline; gap: 4px;
 }
 .m-unit { font-size: 1rem; font-weight: 600; color: var(--text-light); }
+
+.mb-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+.trend-badge {
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1;
+  padding-bottom: 4px; /* alinha com baseline do valor */
+  transition: color 0.3s ease;
+}
+.trend-up    { color: var(--accent-rose); }
+.trend-down  { color: var(--accent-blue); }
+.trend-stable { color: var(--text-light); }
 
 /* Double value layout */
 .mb-split { display: flex; gap: 24px; align-items: stretch; }
