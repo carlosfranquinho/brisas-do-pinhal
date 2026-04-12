@@ -6,6 +6,7 @@ const METAR_URL = `${API_BASE}/metar-tgftp/LPMR`;
 const IPMA_GLOBAL_ID = 1100900;
 const IPMA_FORECAST = `https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/${IPMA_GLOBAL_ID}.json`;
 const PUSH_MS = 120000;
+const MAX_LIVE_MS = 30 * 60 * 1000; // 30 min → pausa automática
 const CSSVARS = getComputedStyle(document.documentElement);
 const ACCENT = (CSSVARS.getPropertyValue("--accent") || "#3b82f6").trim();
 const ACCENT2 = (CSSVARS.getPropertyValue("--accent-2") || "#94a3b8").trim();
@@ -14,6 +15,7 @@ const CLIMATE_URL = `${API_BASE}/climate/monthly`;
 const VIEWS = document.querySelectorAll('[data-view]');
 const LINKS = document.querySelectorAll('[data-viewlink]');
 let liveTimer = null;
+let liveStartedAt = 0;
 
 /* Lazy script loader */
 const _scripts = {};
@@ -129,6 +131,20 @@ function handleRoute() {
 window.addEventListener('hashchange', handleRoute);
 document.addEventListener('DOMContentLoaded', handleRoute);
 
+/* pausa automática após MAX_LIVE_MS */
+function pauseLive() {
+  if (liveTimer)     { clearInterval(liveTimer);     liveTimer     = null; }
+  if (countdownTimer){ clearInterval(countdownTimer); countdownTimer = null; }
+  ['staleFlag', 'staleFlag-mobile'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = id.includes('mobile') ? 'Pausado' : 'Pausado — atualize a página para retomar'; el.className = 'stale'; }
+  });
+  ['age', 'age-mobile'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = '—';
+  });
+}
+
 /* ciclo da home */
 let homeBooted = false;
 async function startHome() {
@@ -142,8 +158,12 @@ async function startHome() {
       await loadHistory();           // gráfico 24h
     } catch (e) { console.error(e); }
   }
+  liveStartedAt = Date.now();
   if (liveTimer) clearInterval(liveTimer);
-  liveTimer = setInterval(() => loadLive().catch(console.error), PUSH_MS);
+  liveTimer = setInterval(() => {
+    if (Date.now() - liveStartedAt >= MAX_LIVE_MS) { pauseLive(); return; }
+    loadLive().catch(console.error);
+  }, PUSH_MS);
 }
 
 
