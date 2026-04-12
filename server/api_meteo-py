@@ -584,9 +584,23 @@ def analysis_precipitation():
             GROUP BY year ORDER BY total DESC LIMIT 10
         """)
         top_years = [dict(r) for r in cur.fetchall()]
+
+        # Top 10 intensidades de precipitação (rain rate mm/h)
+        cur.execute("""
+            SELECT ts_local AS date, ROUND(rain_rate_mmph, 1) AS value
+            FROM observations
+            WHERE rain_rate_mmph IS NOT NULL AND rain_rate_mmph > 0
+            ORDER BY rain_rate_mmph DESC LIMIT 10
+        """)
+        top_rate = [dict(r) for r in cur.fetchall()]
     finally:
         conn.close()
-    return {"by_year_month": by_year_month, "top_rain": top_rain, "top_years": top_years}
+    return {
+        "by_year_month": by_year_month,
+        "top_rain": top_rain,
+        "top_years": top_years,
+        "top_rate": top_rate,
+    }
 
 
 @app.get("/history/year/{year}")

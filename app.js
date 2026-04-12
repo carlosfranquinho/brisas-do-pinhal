@@ -1192,19 +1192,22 @@ const ANALISE_PALETTE = [
   '#ec4899','#6366f1','#14b8a6','#ef4444',
 ];
 
-let analiseChartObj = null;
+let analiseChartObj  = null;
+let analiseCumulObj  = null;
 
 async function loadAnalise(type) {
   const isTemp  = type === 'temperatura';
   const titleEl = document.getElementById('analiseTitle');
   const ctEl    = document.getElementById('analiseChartTitle');
   const top10El = document.getElementById('analiseTop10');
+  const cumulCard = document.getElementById('analiseCumulCard');
 
   titleEl.textContent = isTemp ? 'Temperatura' : 'Precipitação';
   ctEl.textContent    = isTemp
     ? 'Temperatura média mensal por ano'
-    : 'Precipitação total mensal por ano';
+    : 'Total mensal de precipitação por ano';
   top10El.innerHTML   = '<p style="color:var(--text-light);padding:8px 0">A carregar…</p>';
+  if (cumulCard) cumulCard.style.display = 'none';
 
   const url = `${API_BASE}/history/analysis/${isTemp ? 'temperature' : 'precipitation'}`;
   try {
@@ -1213,6 +1216,7 @@ async function loadAnalise(type) {
     const d = await res.json();
 
     renderAnaliseChart(d, isTemp);
+    if (!isTemp) renderAnaliseCumul(d);
     renderAnaliseTop10(d, isTemp);
   } catch (err) {
     top10El.innerHTML = '<p style="color:var(--accent-rose)">Erro ao carregar análise.</p>';
@@ -1225,33 +1229,103 @@ function renderAnaliseChart(d, isTemp) {
   if (!canvas) return;
   if (analiseChartObj) { analiseChartObj.destroy(); analiseChartObj = null; }
 
-  // agrupa dados por ano
   const yearSet = [...new Set(d.by_year_month.map(r => r.year))].sort();
   const labels  = MONTH_NAMES;
+
+  // Para barras agrupadas, ajustar largura mínima do canvas
+  const inner = document.getElementById('analiseChartInner');
+  if (inner && !isTemp) {
+    const minW = Math.max(600, yearSet.length * 40 * 12);
+    inner.style.minWidth = minW + 'px';
+  } else if (inner) {
+    inner.style.minWidth = '';
+  }
 
   const datasets = yearSet.map((year, idx) => {
     const color = ANALISE_PALETTE[idx % ANALISE_PALETTE.length];
     const vals  = Array.from({ length: 12 }, (_, mi) => {
       const row = d.by_year_month.find(r => r.year === year && r.month === mi + 1);
-      if (!row) return null;
-      return isTemp ? row.avg_temp : row.total;
+      return row ? (isTemp ? row.avg_temp : row.total) : null;
+    });
+
+    if (isTemp) {
+      return {
+        type: 'line', label: String(year), data: vals,
+        borderColor: color, backgroundColor: 'transparent',
+        borderWidth: 2, pointRadius: 3, pointHoverRadius: 5,
+        tension: 0.3, spanGaps: true,
+      };
+    } else {
+      return {
+        type: 'bar', label: String(year), data: vals,
+        backgroundColor: color + 'aa',  // ~67% opacidade
+        borderColor: color,
+        borderWidth: 1, borderRadius: 3,
+        barPercentage: 0.85, categoryPercentage: 0.9,
+      };
+    }
+  });
+
+  const unit = isTemp ? '°C' : ' mm';
+  analiseChartObj = new Chart(canvas, {
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: isTemp ? 'index' : 'nearest', intersect: !isTemp },
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 14, padding: 12 } },
+        tooltip: { callbacks: {
+          label: ctx => {
+            const v = ctx.parsed.y;
+            return v != null ? `${ctx.dataset.label}: ${v}${unit}` : null;
+          }
+        }}
+      },
+      scales: {
+        y: {
+          grid: { color: 'rgba(0,0,0,0.05)' },
+          ticks: { callback: v => v + (isTemp ? '°' : ' mm'), font: { size: 11 } },
+          min: isTemp ? undefined : 0,
+        },
+        x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+      },
+    },
+  });
+}
+
+function renderAnaliseCumul(d) {
+  const cumulCard = document.getElementById('analiseCumulCard');
+  const canvas    = document.getElementById('analiseCumulChart');
+  if (!cumulCard || !canvas) return;
+  if (analiseCumulObj) { analiseCumulObj.destroy(); analiseCumulObj = null; }
+  cumulCard.style.display = 'block';
+
+  const yearSet = [...new Set(d.by_year_month.map(r => r.year))].sort();
+
+  const datasets = yearSet.map((year, idx) => {
+    const color = ANALISE_PALETTE[idx % ANALISE_PALETTE.length];
+    let cum = 0;
+    const vals = Array.from({ length: 12 }, (_, mi) => {
+      const row = d.by_year_month.find(r => r.year === year && r.month === mi + 1);
+      if (row?.total != null) cum += row.total;
+      // se não há dados para este mês e ano (ainda não chegou), retorna null
+      // detecta se o mês ainda está no futuro para o ano corrente
+      const now = new Date();
+      const isFuture = year === now.getFullYear() && mi + 1 > now.getMonth() + 1;
+      return isFuture ? null : +cum.toFixed(1);
     });
     return {
-      type: 'line',
-      label: String(year),
-      data: vals,
-      borderColor: color,
-      backgroundColor: 'transparent',
-      borderWidth: 2,
-      pointRadius: 3,
-      pointHoverRadius: 5,
-      tension: 0.3,
-      spanGaps: true,
+      label: String(year), data: vals,
+      borderColor: color, backgroundColor: 'transparent',
+      borderWidth: 2, pointRadius: 3, pointHoverRadius: 5,
+      tension: 0.2, spanGaps: false,
     };
   });
 
-  analiseChartObj = new Chart(canvas, {
-    data: { labels, datasets },
+  analiseCumulObj = new Chart(canvas, {
+    type: 'line',
+    data: { labels: MONTH_NAMES, datasets },
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -1261,15 +1335,15 @@ function renderAnaliseChart(d, isTemp) {
         tooltip: { callbacks: {
           label: ctx => {
             const v = ctx.parsed.y;
-            if (v == null) return null;
-            return `${ctx.dataset.label}: ${v}${isTemp ? '°C' : ' mm'}`;
+            return v != null ? `${ctx.dataset.label}: ${v} mm` : null;
           }
         }}
       },
       scales: {
         y: {
           grid: { color: 'rgba(0,0,0,0.05)' },
-          ticks: { callback: v => v + (isTemp ? '°' : ' mm'), font: { size: 11 } },
+          ticks: { callback: v => v + ' mm', font: { size: 11 } },
+          min: 0,
         },
         x: { grid: { display: false }, ticks: { font: { size: 11 } } },
       },
@@ -1300,13 +1374,20 @@ function renderAnaliseTop10(d, isTemp) {
   };
 
   if (isTemp) {
+    el.className = 'analise-top10-grid';
     el.innerHTML =
-      makeTable('🌡️ Top 10 dias mais quentes', d.top_hot,  '°C', 'is-hot')  +
-      makeTable('❄️ Top 10 dias mais frios',   d.top_cold, '°C', 'is-cold');
+      makeTable('Top 10 — Dias mais quentes', d.top_hot,  '°C', 'is-hot') +
+      makeTable('Top 10 — Dias mais frios',   d.top_cold, '°C', 'is-cold');
   } else {
+    el.className = 'analise-top10-grid analise-top10-grid--3';
+    const rateRows = (d.top_rate || []).map(r => ({
+      date: r.date?.replace('T', ' ').slice(0, 16) ?? r.date,
+      value: r.value,
+    }));
     el.innerHTML =
-      makeTable('🌧️ Top 10 dias mais chuvosos', d.top_rain,  ' mm', 'is-teal') +
-      makeTable('📅 Anos com mais chuva',        d.top_years.map(r => ({ date: String(r.year), value: r.total })), ' mm', 'is-teal');
+      makeTable('Top 10 — Dias mais chuvosos',    d.top_rain,  ' mm', 'is-teal') +
+      makeTable('Top 10 — Anos mais chuvosos',    d.top_years.map(r => ({ date: String(r.year), value: r.total })), ' mm', 'is-teal') +
+      makeTable('Top 10 — Intensidade de chuva',  rateRows, ' mm/h', 'is-teal');
   }
 }
 

@@ -945,8 +945,15 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: var(--gap);
 }
+.analise-top10-grid--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+@media (max-width: 900px) {
+  .analise-top10-grid--3 { grid-template-columns: 1fr 1fr; }
+}
 @media (max-width: 700px) {
-  .analise-top10-grid { grid-template-columns: 1fr; }
+  .analise-top10-grid,
+  .analise-top10-grid--3 { grid-template-columns: 1fr; }
 }
 .top10-card { padding: 24px; }
 .top10-table {
