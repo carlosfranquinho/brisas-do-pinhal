@@ -464,6 +464,127 @@ def history_records():
     finally:
         conn.close()
 
+@app.get("/history/years")
+def history_years():
+    conn = get_db()
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT
+                CAST(strftime('%Y', ts_local) AS INTEGER) AS year,
+                COUNT(DISTINCT DATE(ts_local))            AS days_with_data,
+                COUNT(DISTINCT strftime('%m', ts_local))  AS months_with_data,
+                ROUND(MIN(temp_c), 1) AS temp_min,
+                ROUND(MAX(temp_c), 1) AS temp_max,
+                ROUND(AVG(temp_c), 1) AS temp_avg,
+                ROUND(MAX(gust_kmh), 1) AS gust_max
+            FROM observations
+            WHERE temp_c IS NOT NULL
+            GROUP BY year
+            ORDER BY year DESC
+        """)
+        rows = [dict(r) for r in cur.fetchall()]
+
+        # Chuva anual total: soma do máximo diário de rain_day_mm por dia
+        cur.execute("""
+            SELECT
+                CAST(strftime('%Y', ts_local) AS INTEGER) AS year,
+                ROUND(SUM(max_day), 1) AS rain_total
+            FROM (
+                SELECT DATE(ts_local) AS d,
+                       strftime('%Y', ts_local) AS yr,
+                       CAST(strftime('%Y', ts_local) AS INTEGER) AS year,
+                       MAX(rain_day_mm) AS max_day
+                FROM observations
+                WHERE rain_day_mm IS NOT NULL
+                GROUP BY d
+            )
+            GROUP BY year
+        """)
+        rain_by_year = {r["year"]: r["rain_total"] for r in cur.fetchall()}
+
+        for row in rows:
+            row["rain_total"] = rain_by_year.get(row["year"])
+    finally:
+        conn.close()
+    return rows
+
+
+@app.get("/history/year/{year}")
+def history_year(year: int):
+    conn = get_db()
+    try:
+        cur = conn.cursor()
+        yr = str(year)
+
+        # Resumo anual
+        cur.execute("""
+            SELECT
+                ROUND(MIN(temp_c), 1) AS temp_min,
+                ROUND(MAX(temp_c), 1) AS temp_max,
+                ROUND(AVG(temp_c), 1) AS temp_avg,
+                ROUND(MAX(gust_kmh), 1) AS gust_max,
+                COUNT(DISTINCT DATE(ts_local)) AS days_with_data
+            FROM observations
+            WHERE strftime('%Y', ts_local) = ? AND temp_c IS NOT NULL
+        """, (yr,))
+        summary = dict(cur.fetchone() or {})
+
+        cur.execute("""
+            SELECT ROUND(SUM(max_day), 1) AS rain_total
+            FROM (
+                SELECT DATE(ts_local) AS d, MAX(rain_day_mm) AS max_day
+                FROM observations
+                WHERE strftime('%Y', ts_local) = ? AND rain_day_mm IS NOT NULL
+                GROUP BY d
+            )
+        """, (yr,))
+        rr = cur.fetchone()
+        summary["rain_total"] = dict(rr)["rain_total"] if rr else None
+
+        # Detalhe mensal — temperatura
+        cur.execute("""
+            SELECT
+                CAST(strftime('%m', ts_local) AS INTEGER) AS month,
+                COUNT(DISTINCT DATE(ts_local)) AS days_with_data,
+                ROUND(MIN(temp_c), 1) AS temp_min,
+                ROUND(MAX(temp_c), 1) AS temp_max,
+                ROUND(AVG(temp_c), 1) AS temp_avg,
+                ROUND(MAX(gust_kmh), 1) AS gust_max
+            FROM observations
+            WHERE strftime('%Y', ts_local) = ? AND temp_c IS NOT NULL
+            GROUP BY month ORDER BY month
+        """, (yr,))
+        months_raw = {r["month"]: dict(r) for r in cur.fetchall()}
+
+        # Chuva mensal
+        cur.execute("""
+            SELECT
+                CAST(strftime('%m', ts_local) AS INTEGER) AS month,
+                ROUND(SUM(max_day), 1) AS rain_total
+            FROM (
+                SELECT DATE(ts_local) AS d,
+                       CAST(strftime('%m', ts_local) AS INTEGER) AS month,
+                       MAX(rain_day_mm) AS max_day
+                FROM observations
+                WHERE strftime('%Y', ts_local) = ? AND rain_day_mm IS NOT NULL
+                GROUP BY d
+            )
+            GROUP BY month ORDER BY month
+        """, (yr,))
+        for r in cur.fetchall():
+            m = r["month"]
+            months_raw.setdefault(m, {"month": m})["rain_total"] = r["rain_total"]
+
+        months = [months_raw.get(m) for m in range(1, 13)]
+    finally:
+        conn.close()
+
+    if not summary.get("days_with_data"):
+        return JSONResponse(status_code=404, content={"error": "Ano sem dados."})
+    return {"year": year, "summary": summary, "months": months}
+
+
 @app.get("/climate/monthly")
 def climate_monthly(station: str = "meteomg"):
     conn = get_db()

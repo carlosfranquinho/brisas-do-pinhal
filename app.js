@@ -51,7 +51,12 @@ const nowIconState = {
 };
 
 function showView(name) {
-  const view = VALID_VIEWS.has(name) ? name : 'home';
+  // suporte a sub-rotas: "historico/2024"
+  const parts = name.split('/');
+  const base  = parts[0];
+  const sub   = parts[1] || null;
+
+  const view = VALID_VIEWS.has(base) ? base : 'home';
   VIEWS.forEach(v => v.hidden = v.dataset.view !== view);
   LINKS.forEach(a => a.classList.toggle('active', a.dataset.viewlink === view));
 
@@ -68,16 +73,29 @@ function showView(name) {
   }
 
   if (view === 'historico') {
+    // carregar records e years (uma só vez)
     const recordsBox = document.getElementById('allTimeRecords');
     if (recordsBox && !recordsBox.dataset.ready) {
       loadHistoryRecords().catch(console.error);
       recordsBox.dataset.ready = '1';
     }
+    const yearCards = document.getElementById('yearCards');
+    if (yearCards && !yearCards.dataset.ready) {
+      loadYearCards().catch(console.error);
+      yearCards.dataset.ready = '1';
+    }
+
+    // mostrar main vs detalhe de ano
+    const yearNum = sub && /^\d{4}$/.test(sub) ? +sub : null;
+    document.getElementById('historicoMain').hidden = !!yearNum;
+    document.getElementById('yearDetail').hidden    = !yearNum;
+    if (yearNum) loadYearDetail(yearNum).catch(console.error);
   }
 }
 
 function handleRoute() {
-  const view = (location.hash.replace(/^#\/?/, '') || 'home').split('?')[0];
+  const raw  = location.hash.replace(/^#\/?/, '') || 'home';
+  const view = raw.split('?')[0];
   showView(view);
 }
 
@@ -985,6 +1003,214 @@ async function loadHistoryRecords() {
   } catch (err) {
     console.error("Erro a carregar records", err);
   }
+}
+
+// ── ARQUIVO POR ANO ─────────────────────────────────────────────
+
+const MONTH_NAMES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const MONTH_FULL  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                     'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+async function loadYearCards() {
+  const container = document.getElementById('yearCards');
+  try {
+    const res = await fetch(`${API_BASE}/history/years`);
+    if (!res.ok) throw new Error(res.status);
+    const years = await res.json();
+
+    if (!years.length) {
+      container.innerHTML = '<p style="color:var(--text-light);padding:16px 0">Sem dados históricos.</p>';
+      return;
+    }
+
+    container.innerHTML = years.map(y => `
+      <a href="#/historico/${y.year}" class="year-card soft-card">
+        <div class="yc-year">${y.year}</div>
+        <div class="yc-temps">
+          <span class="yc-max">▲ ${y.temp_max != null ? y.temp_max + '°' : '—'}</span>
+          <span class="yc-min">▼ ${y.temp_min != null ? y.temp_min + '°' : '—'}</span>
+        </div>
+        <div class="yc-rain">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/><line x1="8" y1="13" x2="8" y2="21"/><line x1="12" y1="15" x2="12" y2="23"/><line x1="16" y1="13" x2="16" y2="21"/></svg>
+          ${y.rain_total != null ? y.rain_total + ' mm' : '—'}
+        </div>
+        <div class="yc-meta">${y.months_with_data} ${y.months_with_data === 1 ? 'mês' : 'meses'} · ${y.days_with_data} dias</div>
+      </a>
+    `).join('');
+  } catch (err) {
+    container.innerHTML = '<p style="color:var(--accent-rose);padding:16px 0">Erro ao carregar anos.</p>';
+    console.error(err);
+  }
+}
+
+let yearChartObj = null;
+
+async function loadYearDetail(year) {
+  const titleEl    = document.getElementById('yearDetailTitle');
+  const summaryEl  = document.getElementById('yearSummaryCards');
+  const monthsEl   = document.getElementById('monthCards');
+
+  titleEl.textContent  = year;
+  summaryEl.innerHTML  = '<div style="color:var(--text-light);padding:8px 0">A carregar…</div>';
+  monthsEl.innerHTML   = '';
+
+  try {
+    const res = await fetch(`${API_BASE}/history/year/${year}`);
+    if (!res.ok) throw new Error(res.status);
+    const d = await res.json();
+    const s = d.summary;
+
+    // Resumo anual
+    summaryEl.innerHTML = `
+      <div class="soft-card metric-box" style="background:rgba(244,63,94,.05);border:1px solid rgba(244,63,94,.12)">
+        <div class="mb-top"><span class="m-label" style="color:var(--accent-rose)">Máx. Absoluta</span></div>
+        <div class="mb-value">${s.temp_max != null ? s.temp_max : '—'}<span class="m-unit">°C</span></div>
+      </div>
+      <div class="soft-card metric-box" style="background:rgba(59,130,246,.05);border:1px solid rgba(59,130,246,.12)">
+        <div class="mb-top"><span class="m-label" style="color:var(--accent-blue)">Mín. Absoluta</span></div>
+        <div class="mb-value">${s.temp_min != null ? s.temp_min : '—'}<span class="m-unit">°C</span></div>
+      </div>
+      <div class="soft-card metric-box">
+        <div class="mb-top"><span class="m-label">Temp. Média</span></div>
+        <div class="mb-value">${s.temp_avg != null ? s.temp_avg : '—'}<span class="m-unit">°C</span></div>
+      </div>
+      <div class="soft-card metric-box" style="background:rgba(20,184,166,.05);border:1px solid rgba(20,184,166,.12)">
+        <div class="mb-top"><span class="m-label" style="color:var(--accent-teal)">Precipitação Total</span></div>
+        <div class="mb-value">${s.rain_total != null ? s.rain_total : '—'}<span class="m-unit">mm</span></div>
+      </div>
+      <div class="soft-card metric-box">
+        <div class="mb-top"><span class="m-label">Rajada Máx.</span></div>
+        <div class="mb-value">${s.gust_max != null ? s.gust_max : '—'}<span class="m-unit">km/h</span></div>
+      </div>
+    `;
+
+    // Cards dos 12 meses
+    monthsEl.innerHTML = d.months.map((m, i) => {
+      if (!m) return `
+        <div class="month-card month-card--empty">
+          <div class="mc-name">${MONTH_FULL[i]}</div>
+          <div class="mc-nodata">sem dados</div>
+        </div>`;
+      return `
+        <div class="month-card soft-card">
+          <div class="mc-name">${MONTH_FULL[i]}</div>
+          <div class="mc-temps">
+            <span class="mc-max">▲ ${m.temp_max != null ? m.temp_max + '°' : '—'}</span>
+            <span class="mc-min">▼ ${m.temp_min != null ? m.temp_min + '°' : '—'}</span>
+          </div>
+          <div class="mc-avg">${m.temp_avg != null ? '⌀ ' + m.temp_avg + '°C' : ''}</div>
+          <div class="mc-rain">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/><line x1="8" y1="13" x2="8" y2="21"/><line x1="12" y1="15" x2="12" y2="23"/><line x1="16" y1="13" x2="16" y2="21"/></svg>
+            ${m.rain_total != null ? m.rain_total + ' mm' : '—'}
+          </div>
+          <div class="mc-days">${m.days_with_data || '?'} dias</div>
+        </div>`;
+    }).join('');
+
+    // Gráfico mensal
+    renderYearChart(d.months);
+
+  } catch (err) {
+    summaryEl.innerHTML = '<p style="color:var(--accent-rose)">Erro ao carregar dados do ano.</p>';
+    console.error(err);
+  }
+}
+
+function renderYearChart(months) {
+  const canvas = document.getElementById('yearChart');
+  if (!canvas) return;
+  if (yearChartObj) { yearChartObj.destroy(); yearChartObj = null; }
+
+  const labels   = MONTH_NAMES;
+  const tempMax  = months.map(m => m?.temp_max  ?? null);
+  const tempMin  = months.map(m => m?.temp_min  ?? null);
+  const tempAvg  = months.map(m => m?.temp_avg  ?? null);
+  const rain     = months.map(m => m?.rain_total ?? null);
+
+  yearChartObj = new Chart(canvas, {
+    data: {
+      labels,
+      datasets: [
+        {
+          type: 'bar',
+          label: 'Precipitação (mm)',
+          data: rain,
+          backgroundColor: 'rgba(20,184,166,0.25)',
+          borderColor: 'rgba(20,184,166,0.7)',
+          borderWidth: 1,
+          borderRadius: 4,
+          yAxisID: 'yRain',
+          order: 2,
+        },
+        {
+          type: 'line',
+          label: 'Temp. Máx.',
+          data: tempMax,
+          borderColor: 'rgba(244,63,94,0.8)',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          pointRadius: 3,
+          tension: 0.3,
+          yAxisID: 'yTemp',
+          order: 1,
+        },
+        {
+          type: 'line',
+          label: 'Temp. Mín.',
+          data: tempMin,
+          borderColor: 'rgba(59,130,246,0.8)',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          pointRadius: 3,
+          tension: 0.3,
+          yAxisID: 'yTemp',
+          order: 1,
+        },
+        {
+          type: 'line',
+          label: 'Temp. Média',
+          data: tempAvg,
+          borderColor: 'rgba(100,116,139,0.7)',
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          borderDash: [4, 4],
+          pointRadius: 2,
+          tension: 0.3,
+          yAxisID: 'yTemp',
+          order: 1,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 14, padding: 16 } },
+        tooltip: { callbacks: {
+          label: ctx => {
+            const v = ctx.parsed.y;
+            if (v == null) return null;
+            return ctx.dataset.yAxisID === 'yRain' ? `${ctx.dataset.label}: ${v} mm` : `${ctx.dataset.label}: ${v}°C`;
+          }
+        }}
+      },
+      scales: {
+        yTemp: {
+          type: 'linear', position: 'left',
+          grid: { color: 'rgba(0,0,0,0.05)' },
+          ticks: { callback: v => v + '°', font: { size: 11 } },
+        },
+        yRain: {
+          type: 'linear', position: 'right',
+          grid: { drawOnChartArea: false },
+          ticks: { callback: v => v + ' mm', font: { size: 11 } },
+          min: 0,
+        },
+        x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+      },
+    },
+  });
 }
 
 async function loadHistoryDaily() {

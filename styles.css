@@ -733,6 +733,157 @@ body {
 }
 .forecast-list--mobile .sep { display: none; }
 
+/* ── ARQUIVO POR ANO ── */
+.year-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--gap);
+  margin-bottom: 32px;
+}
+.year-cards-loading {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  padding: 8px 0;
+}
+
+.year-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px 18px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+.year-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+}
+.yc-year {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.yc-temps {
+  display: flex;
+  gap: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.yc-max { color: var(--accent-rose); }
+.yc-min { color: var(--accent-blue); }
+.yc-rain {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--accent-teal);
+}
+.yc-rain svg { flex-shrink: 0; stroke: var(--accent-teal); }
+.yc-meta {
+  font-size: 0.72rem;
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+/* Detalhe de ano */
+.year-detail-nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent-blue);
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  background: rgba(59,130,246,0.07);
+  transition: background 0.2s ease;
+  flex-shrink: 0;
+}
+.back-link:hover { background: rgba(59,130,246,0.14); }
+.year-detail-title {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--text-primary);
+}
+
+/* Grid dos 12 meses */
+.month-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+@media (max-width: 800px) {
+  .month-cards-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 500px) {
+  .month-cards-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.month-card {
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.month-card--empty {
+  background: rgba(0,0,0,0.02);
+  border: 1px dashed rgba(0,0,0,0.08);
+  border-radius: var(--radius-sm);
+  opacity: 0.5;
+}
+.mc-name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+}
+.mc-nodata {
+  font-size: 0.75rem;
+  color: var(--text-light);
+  font-style: italic;
+}
+.mc-temps {
+  display: flex;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+.mc-max { color: var(--accent-rose); }
+.mc-min { color: var(--accent-blue); }
+.mc-avg {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+.mc-rain {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent-teal);
+}
+.mc-rain svg { stroke: var(--accent-teal); flex-shrink: 0; }
+.mc-days {
+  font-size: 0.68rem;
+  color: var(--text-light);
+  font-weight: 500;
+}
+
 /* ── EMPTY STATES & CLIMA TABLE ── */
 .empty-state-card {
   padding: 80px 20px;
