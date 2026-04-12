@@ -911,9 +911,9 @@ async function renderClimateChart(months) {
           type: 'line',
           label: 'Temp. média',
           data: tMean,
-          borderColor: 'rgba(100,116,139,0.7)',
+          borderColor: 'rgba(15,23,42,0.70)',
           backgroundColor: 'transparent',
-          borderWidth: 1.5,
+          borderWidth: 2,
           borderDash: [4, 4],
           pointRadius: 2,
           tension: 0.3,
@@ -1181,9 +1181,9 @@ async function renderYearChart(months) {
           type: 'line',
           label: 'Temp. Média',
           data: tempAvg,
-          borderColor: 'rgba(100,116,139,0.7)',
+          borderColor: 'rgba(15,23,42,0.70)',
           backgroundColor: 'transparent',
-          borderWidth: 1.5,
+          borderWidth: 2,
           borderDash: [4, 4],
           pointRadius: 2,
           tension: 0.3,
@@ -1250,7 +1250,7 @@ const ANALISE_PALETTE = [
 // Normais climatológicas (1981–2010 ou similar)
 const NORMALS_RAIN = [112.6, 81.7, 74.1, 83.2, 61.8, 18.8, 7.5, 12.7, 38.1, 102.5, 127.8, 104.4];
 const NORMALS_TEMP = [9.7, 10.4, 12.7, 14.0, 16.3, 18.9, 20.5, 20.9, 19.4, 16.7, 12.5, 10.6];
-const NORMAL_LINE  = { borderColor: 'rgba(15,23,42,0.65)', backgroundColor: 'transparent', borderWidth: 2, borderDash: [6, 4], pointRadius: 0, pointHoverRadius: 4, tension: 0.3, spanGaps: false };
+const NORMAL_LINE  = { borderColor: 'rgba(100,116,139,0.55)', backgroundColor: 'transparent', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, pointHoverRadius: 4, tension: 0.3, spanGaps: false };
 
 let analiseChartObj  = null;
 let analiseCumulObj  = null;
@@ -1299,12 +1299,23 @@ async function renderAnaliseChart(d, isTemp) {
       const row = d.by_year_month.find(r => r.year === year && r.month === mi + 1);
       return row ? (isTemp ? row.avg_temp : row.total) : null;
     });
-    return {
-      type: 'line', label: String(year), data: vals,
-      borderColor: color, backgroundColor: 'transparent',
-      borderWidth: 2, pointRadius: 3, pointHoverRadius: 5,
-      tension: 0.3, spanGaps: true,
-    };
+    if (isTemp) {
+      return {
+        type: 'line', label: String(year), data: vals,
+        borderColor: color, backgroundColor: 'transparent',
+        borderWidth: 2, pointRadius: 3, pointHoverRadius: 5,
+        tension: 0.3, spanGaps: true,
+      };
+    } else {
+      return {
+        type: 'bar', label: String(year), data: vals,
+        backgroundColor: color + 'aa',  // ~67% opacity via hex
+        borderColor: color,
+        borderWidth: 1,
+        borderRadius: 2,
+        maxBarThickness: 7,
+      };
+    }
   });
 
   const normalData = isTemp ? NORMALS_TEMP : NORMALS_RAIN;
