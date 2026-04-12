@@ -1,9 +1,5 @@
 /* app-views.js — Carregado lazily quando o utilizador acede a Histórico ou Clima */
-
-/* Redeclarações de constantes partilhadas */
-const API_BASE    = "https://brisas-api.pinhaldorei.net";
-const CLIMATE_URL = `${API_BASE}/climate/monthly`;
-const fmt = (n, d = 0) => (n == null || isNaN(n) ? "—" : Number(n).toFixed(d));
+/* API_BASE, CLIMATE_URL, fmt, setText, ensureChartJs vêm do scope global de app.js */
 
 /* Chart objects (exclusivos das views) */
 let climateChart         = null;
