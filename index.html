@@ -26,7 +26,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="styles.css?v=9" />
+  <link rel="stylesheet" href="styles.css?v=10" />
   <script src="https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
   <script src="app.js?v=3" defer></script>
@@ -342,7 +342,17 @@
               </div>
             </div>
           </div>
-          
+
+          <!-- Arquivo por ano -->
+          <div id="yearsList" style="margin-bottom: 32px;">
+            <div class="card-header-clean" style="margin-bottom: 16px;">
+              <h2 style="font-size: 1.25rem;">Arquivo por Ano</h2>
+            </div>
+            <div id="yearCards" class="year-cards-grid">
+              <div class="year-cards-loading">A carregar anos…</div>
+            </div>
+          </div>
+
           <div class="soft-card date-picker-card" style="margin-bottom: 32px; text-align: center; padding: 32px 24px;">
             <p style="color: var(--text-light); font-weight: 700; margin-bottom: 16px; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase;">Aceder ao Arquivo Diário</p>
             <div style="display: inline-flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; background: var(--bg-color); padding: 8px; border-radius: 16px; border: 1px solid var(--glass-border);">
@@ -393,16 +403,6 @@
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <!-- Arquivo por ano -->
-          <div id="yearsList" style="margin-top: 16px;">
-            <div class="card-header-clean" style="margin-bottom: 16px;">
-              <h2 style="font-size: 1.25rem;">Arquivo por Ano</h2>
-            </div>
-            <div id="yearCards" class="year-cards-grid">
-              <div class="year-cards-loading">A carregar anos…</div>
             </div>
           </div>
 

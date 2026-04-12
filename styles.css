@@ -736,9 +736,12 @@ body {
 /* ── ARQUIVO POR ANO ── */
 .year-cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--gap);
   margin-bottom: 32px;
+}
+@media (max-width: 600px) {
+  .year-cards-grid { grid-template-columns: repeat(2, 1fr); }
 }
 .year-cards-loading {
   color: var(--text-light);
@@ -788,6 +791,17 @@ body {
   font-size: 0.72rem;
   color: var(--text-light);
   font-weight: 500;
+}
+
+/* 5 cards de resumo do ano numa linha */
+.year-summary-grid {
+  grid-template-columns: repeat(5, 1fr) !important;
+}
+@media (max-width: 900px) {
+  .year-summary-grid { grid-template-columns: repeat(3, 1fr) !important; }
+}
+@media (max-width: 500px) {
+  .year-summary-grid { grid-template-columns: repeat(2, 1fr) !important; }
 }
 
 /* Detalhe de ano */
