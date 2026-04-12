@@ -898,6 +898,83 @@ body {
   font-weight: 500;
 }
 
+/* ── ANÁLISE DETALHADA ── */
+.analise-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap);
+  margin-bottom: 8px;
+}
+@media (max-width: 600px) {
+  .analise-cards-grid { grid-template-columns: 1fr; }
+}
+
+.analise-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px 20px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.analise-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+.ac-icon {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.ac-icon svg { width: 24px; height: 24px; }
+.ac-icon--rose  { background: rgba(244,63,94,.1);  color: var(--accent-rose); }
+.ac-icon--rose svg  { stroke: var(--accent-rose); }
+.ac-icon--teal  { background: rgba(20,184,166,.1); color: var(--accent-teal); }
+.ac-icon--teal svg  { stroke: var(--accent-teal); }
+.ac-body { flex: 1; min-width: 0; }
+.ac-body h3 { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+.ac-body p  { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; }
+.ac-arrow { flex-shrink: 0; width: 20px; height: 20px; stroke: var(--text-light); }
+.analise-card:hover .ac-arrow { stroke: var(--accent-blue); }
+
+/* Top 10 */
+.analise-top10-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap);
+}
+@media (max-width: 700px) {
+  .analise-top10-grid { grid-template-columns: 1fr; }
+}
+.top10-card { padding: 24px; }
+.top10-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+.top10-table thead tr {
+  border-bottom: 2px solid rgba(0,0,0,0.06);
+}
+.top10-table th {
+  text-align: left;
+  padding: 0 8px 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-light);
+}
+.top10-table td { padding: 9px 8px; border-bottom: 1px solid rgba(0,0,0,0.04); }
+.top10-table tr:last-child td { border-bottom: none; }
+.top10-rank { font-weight: 700; color: var(--text-light); width: 28px; }
+.top10-date { color: var(--text-secondary); font-weight: 500; }
+.top10-val  { font-weight: 800; text-align: right; }
+.top10-val.is-hot  { color: var(--accent-rose); }
+.top10-val.is-cold { color: var(--accent-blue); }
+.top10-val.is-teal { color: var(--accent-teal); }
+
 /* ── EMPTY STATES & CLIMA TABLE ── */
 .empty-state-card {
   padding: 80px 20px;

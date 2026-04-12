@@ -51,10 +51,11 @@ const nowIconState = {
 };
 
 function showView(name) {
-  // suporte a sub-rotas: "historico/2024"
+  // suporte a sub-rotas: "historico/2024", "historico/analise/temperatura"
   const parts = name.split('/');
   const base  = parts[0];
   const sub   = parts[1] || null;
+  const sub2  = parts[2] || null;
 
   const view = VALID_VIEWS.has(base) ? base : 'home';
   VIEWS.forEach(v => v.hidden = v.dataset.view !== view);
@@ -85,11 +86,15 @@ function showView(name) {
       yearCards.dataset.ready = '1';
     }
 
-    // mostrar main vs detalhe de ano
-    const yearNum = sub && /^\d{4}$/.test(sub) ? +sub : null;
-    document.getElementById('historicoMain').hidden = !!yearNum;
+    const yearNum   = sub && /^\d{4}$/.test(sub) ? +sub : null;
+    const isAnalise = sub === 'analise' && !!sub2;
+
+    document.getElementById('historicoMain').hidden = !!(yearNum || isAnalise);
     document.getElementById('yearDetail').hidden    = !yearNum;
-    if (yearNum) loadYearDetail(yearNum).catch(console.error);
+    document.getElementById('analiseDetail').hidden = !isAnalise;
+
+    if (yearNum)   loadYearDetail(yearNum).catch(console.error);
+    if (isAnalise) loadAnalise(sub2).catch(console.error);
   }
 }
 
@@ -1177,6 +1182,132 @@ function renderYearChart(months) {
       },
     },
   });
+}
+
+// ── ANÁLISE DETALHADA ───────────────────────────────────────────
+
+const ANALISE_PALETTE = [
+  '#3b82f6','#f43f5e','#10b981','#f59e0b',
+  '#8b5cf6','#06b6d4','#f97316','#84cc16',
+  '#ec4899','#6366f1','#14b8a6','#ef4444',
+];
+
+let analiseChartObj = null;
+
+async function loadAnalise(type) {
+  const isTemp  = type === 'temperatura';
+  const titleEl = document.getElementById('analiseTitle');
+  const ctEl    = document.getElementById('analiseChartTitle');
+  const top10El = document.getElementById('analiseTop10');
+
+  titleEl.textContent = isTemp ? 'Temperatura' : 'Precipitação';
+  ctEl.textContent    = isTemp
+    ? 'Temperatura média mensal por ano'
+    : 'Precipitação total mensal por ano';
+  top10El.innerHTML   = '<p style="color:var(--text-light);padding:8px 0">A carregar…</p>';
+
+  const url = `${API_BASE}/history/analysis/${isTemp ? 'temperature' : 'precipitation'}`;
+  try {
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) throw new Error(res.status);
+    const d = await res.json();
+
+    renderAnaliseChart(d, isTemp);
+    renderAnaliseTop10(d, isTemp);
+  } catch (err) {
+    top10El.innerHTML = '<p style="color:var(--accent-rose)">Erro ao carregar análise.</p>';
+    console.error(err);
+  }
+}
+
+function renderAnaliseChart(d, isTemp) {
+  const canvas = document.getElementById('analiseChart');
+  if (!canvas) return;
+  if (analiseChartObj) { analiseChartObj.destroy(); analiseChartObj = null; }
+
+  // agrupa dados por ano
+  const yearSet = [...new Set(d.by_year_month.map(r => r.year))].sort();
+  const labels  = MONTH_NAMES;
+
+  const datasets = yearSet.map((year, idx) => {
+    const color = ANALISE_PALETTE[idx % ANALISE_PALETTE.length];
+    const vals  = Array.from({ length: 12 }, (_, mi) => {
+      const row = d.by_year_month.find(r => r.year === year && r.month === mi + 1);
+      if (!row) return null;
+      return isTemp ? row.avg_temp : row.total;
+    });
+    return {
+      type: 'line',
+      label: String(year),
+      data: vals,
+      borderColor: color,
+      backgroundColor: 'transparent',
+      borderWidth: 2,
+      pointRadius: 3,
+      pointHoverRadius: 5,
+      tension: 0.3,
+      spanGaps: true,
+    };
+  });
+
+  analiseChartObj = new Chart(canvas, {
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 14, padding: 12 } },
+        tooltip: { callbacks: {
+          label: ctx => {
+            const v = ctx.parsed.y;
+            if (v == null) return null;
+            return `${ctx.dataset.label}: ${v}${isTemp ? '°C' : ' mm'}`;
+          }
+        }}
+      },
+      scales: {
+        y: {
+          grid: { color: 'rgba(0,0,0,0.05)' },
+          ticks: { callback: v => v + (isTemp ? '°' : ' mm'), font: { size: 11 } },
+        },
+        x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+      },
+    },
+  });
+}
+
+function renderAnaliseTop10(d, isTemp) {
+  const el = document.getElementById('analiseTop10');
+
+  const makeTable = (title, rows, unit, accentClass) => {
+    const trs = rows.map((r, i) => `
+      <tr>
+        <td class="top10-rank">${i + 1}</td>
+        <td class="top10-date">${r.date}</td>
+        <td class="top10-val ${accentClass}">${r.value != null ? r.value + unit : '—'}</td>
+      </tr>`).join('');
+    return `
+      <div class="soft-card top10-card">
+        <div class="card-header-clean" style="margin-bottom: 16px;">
+          <h2 style="font-size: 1rem;">${title}</h2>
+        </div>
+        <table class="top10-table">
+          <thead><tr><th>#</th><th>Data</th><th>Valor</th></tr></thead>
+          <tbody>${trs}</tbody>
+        </table>
+      </div>`;
+  };
+
+  if (isTemp) {
+    el.innerHTML =
+      makeTable('🌡️ Top 10 dias mais quentes', d.top_hot,  '°C', 'is-hot')  +
+      makeTable('❄️ Top 10 dias mais frios',   d.top_cold, '°C', 'is-cold');
+  } else {
+    el.innerHTML =
+      makeTable('🌧️ Top 10 dias mais chuvosos', d.top_rain,  ' mm', 'is-teal') +
+      makeTable('📅 Anos com mais chuva',        d.top_years.map(r => ({ date: String(r.year), value: r.total })), ' mm', 'is-teal');
+  }
 }
 
 async function loadHistoryDaily() {

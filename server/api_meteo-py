@@ -508,6 +508,87 @@ def history_years():
     return rows
 
 
+@app.get("/history/analysis/temperature")
+def analysis_temperature():
+    conn = get_db()
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT
+                CAST(strftime('%Y', ts_local) AS INTEGER) AS year,
+                CAST(strftime('%m', ts_local) AS INTEGER) AS month,
+                ROUND(AVG(temp_c), 1) AS avg_temp,
+                ROUND(MAX(temp_c), 1) AS max_temp,
+                ROUND(MIN(temp_c), 1) AS min_temp
+            FROM observations
+            WHERE temp_c IS NOT NULL
+            GROUP BY year, month
+            ORDER BY year, month
+        """)
+        by_year_month = [dict(r) for r in cur.fetchall()]
+
+        cur.execute("""
+            SELECT DATE(ts_local) AS date, ROUND(MAX(temp_c), 1) AS value
+            FROM observations WHERE temp_c IS NOT NULL
+            GROUP BY DATE(ts_local) ORDER BY value DESC LIMIT 10
+        """)
+        top_hot = [dict(r) for r in cur.fetchall()]
+
+        cur.execute("""
+            SELECT DATE(ts_local) AS date, ROUND(MIN(temp_c), 1) AS value
+            FROM observations WHERE temp_c IS NOT NULL
+            GROUP BY DATE(ts_local) ORDER BY value ASC LIMIT 10
+        """)
+        top_cold = [dict(r) for r in cur.fetchall()]
+    finally:
+        conn.close()
+    return {"by_year_month": by_year_month, "top_hot": top_hot, "top_cold": top_cold}
+
+
+@app.get("/history/analysis/precipitation")
+def analysis_precipitation():
+    conn = get_db()
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT year, month, ROUND(SUM(max_day), 1) AS total
+            FROM (
+                SELECT
+                    CAST(strftime('%Y', ts_local) AS INTEGER) AS year,
+                    CAST(strftime('%m', ts_local) AS INTEGER) AS month,
+                    MAX(rain_day_mm) AS max_day
+                FROM observations
+                WHERE rain_day_mm IS NOT NULL
+                GROUP BY DATE(ts_local)
+            )
+            GROUP BY year, month ORDER BY year, month
+        """)
+        by_year_month = [dict(r) for r in cur.fetchall()]
+
+        cur.execute("""
+            SELECT DATE(ts_local) AS date, ROUND(MAX(rain_day_mm), 1) AS value
+            FROM observations WHERE rain_day_mm IS NOT NULL
+            GROUP BY DATE(ts_local) ORDER BY value DESC LIMIT 10
+        """)
+        top_rain = [dict(r) for r in cur.fetchall()]
+
+        # Anos mais chuvosos (total anual)
+        cur.execute("""
+            SELECT year, ROUND(SUM(max_day), 1) AS total
+            FROM (
+                SELECT CAST(strftime('%Y', ts_local) AS INTEGER) AS year,
+                       MAX(rain_day_mm) AS max_day
+                FROM observations WHERE rain_day_mm IS NOT NULL
+                GROUP BY DATE(ts_local)
+            )
+            GROUP BY year ORDER BY total DESC LIMIT 10
+        """)
+        top_years = [dict(r) for r in cur.fetchall()]
+    finally:
+        conn.close()
+    return {"by_year_month": by_year_month, "top_rain": top_rain, "top_years": top_years}
+
+
 @app.get("/history/year/{year}")
 def history_year(year: int):
     conn = get_db()
