@@ -488,16 +488,14 @@ def history_years():
         # Chuva anual total: soma do máximo diário de rain_day_mm por dia
         cur.execute("""
             SELECT
-                CAST(strftime('%Y', ts_local) AS INTEGER) AS year,
+                year,
                 ROUND(SUM(max_day), 1) AS rain_total
             FROM (
-                SELECT DATE(ts_local) AS d,
-                       strftime('%Y', ts_local) AS yr,
-                       CAST(strftime('%Y', ts_local) AS INTEGER) AS year,
+                SELECT CAST(strftime('%Y', ts_local) AS INTEGER) AS year,
                        MAX(rain_day_mm) AS max_day
                 FROM observations
                 WHERE rain_day_mm IS NOT NULL
-                GROUP BY d
+                GROUP BY DATE(ts_local)
             )
             GROUP BY year
         """)
@@ -560,15 +558,14 @@ def history_year(year: int):
         # Chuva mensal
         cur.execute("""
             SELECT
-                CAST(strftime('%m', ts_local) AS INTEGER) AS month,
+                month,
                 ROUND(SUM(max_day), 1) AS rain_total
             FROM (
-                SELECT DATE(ts_local) AS d,
-                       CAST(strftime('%m', ts_local) AS INTEGER) AS month,
+                SELECT CAST(strftime('%m', ts_local) AS INTEGER) AS month,
                        MAX(rain_day_mm) AS max_day
                 FROM observations
                 WHERE strftime('%Y', ts_local) = ? AND rain_day_mm IS NOT NULL
-                GROUP BY d
+                GROUP BY DATE(ts_local)
             )
             GROUP BY month ORDER BY month
         """, (yr,))
