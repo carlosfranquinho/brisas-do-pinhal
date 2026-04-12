@@ -610,23 +610,22 @@ async function loadHistory() {
       uv:    refRow.uv_index     != null ? +refRow.uv_index     : null,
       solar: refRow.solar_wm2    != null ? +refRow.solar_wm2    : null,
     };
-    console.log('[trends] trendRef definido a partir de refRow (diff=' + Math.round(refDiff/60000) + 'min):', trendRef);
-  } else {
-    console.log('[trends] refRow não encontrado — rows.length=', rows.length);
   }
   // trendRef definido — recalcular setas com o último live
   if (lastLiveData) updateTrends(lastLiveData);
 
   // Pré-calcula quais os índices do eixo X a mostrar:
-  // última hora completa antes do load, depois de 2h em 2h para trás
+  // de 2h em 2h, desde a hora cheia antes do instante atual até ao início dos dados
   const anchor = new Date();
-  anchor.setMinutes(0, 0, 0); // ex: 15:43 → 15:00
+  anchor.setMinutes(0, 0, 0); // ex: 21:51 → 21:00
+
+  const dataStartTs = labelDates[0]?.getTime() ?? (anchor.getTime() - 24 * 3_600_000);
   const tickTargets = [];
-  for (let i = 0; i < 24; i += 2) {
-    tickTargets.push(anchor.getTime() - i * 3_600_000);
+  for (let ts = anchor.getTime(); ts >= dataStartTs - 3_600_000; ts -= 2 * 3_600_000) {
+    tickTargets.push(ts);
   }
+
   // Para cada alvo, encontrar o índice mais próximo (dentro de 1h)
-  // Guarda mapa índice → hora-alvo (para mostrar "17:00" mesmo que o ponto seja "16:59")
   const tickMap = new Map(); // Map<dataIndex, Date(targetTs)>
   for (const targetTs of tickTargets) {
     let bestIdx = -1, bestDiff = Infinity;
