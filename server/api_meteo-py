@@ -635,6 +635,16 @@ def history_year(year: int):
         rr = cur.fetchone()
         summary["rain_total"] = dict(rr)["rain_total"] if rr else None
 
+        # Datas dos extremos
+        cur.execute("SELECT DATE(ts_local) AS d FROM observations WHERE strftime('%Y', ts_local) = ? AND temp_c IS NOT NULL ORDER BY temp_c DESC LIMIT 1", (yr,))
+        r = cur.fetchone(); summary["temp_max_date"] = r["d"] if r else None
+
+        cur.execute("SELECT DATE(ts_local) AS d FROM observations WHERE strftime('%Y', ts_local) = ? AND temp_c IS NOT NULL ORDER BY temp_c ASC LIMIT 1", (yr,))
+        r = cur.fetchone(); summary["temp_min_date"] = r["d"] if r else None
+
+        cur.execute("SELECT DATE(ts_local) AS d FROM observations WHERE strftime('%Y', ts_local) = ? AND gust_kmh IS NOT NULL ORDER BY gust_kmh DESC LIMIT 1", (yr,))
+        r = cur.fetchone(); summary["gust_max_date"] = r["d"] if r else None
+
         # Detalhe mensal — temperatura
         cur.execute("""
             SELECT

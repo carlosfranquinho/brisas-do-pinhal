@@ -550,6 +550,7 @@ body {
   display: flex; align-items: baseline; gap: 4px;
 }
 .m-unit { font-size: 1rem; font-weight: 600; color: var(--text-light); }
+.rec-date { font-size: 0.8rem; font-weight: 600; color: var(--text-light); margin-top: 6px; }
 
 .mb-row {
   display: flex;

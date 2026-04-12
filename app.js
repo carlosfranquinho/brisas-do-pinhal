@@ -1070,15 +1070,27 @@ async function loadYearDetail(year) {
     const d = await res.json();
     const s = d.summary;
 
+    // Formata "2024-07-15" → "15 jul"
+    const fmtRecDate = iso => iso
+      ? new Date(iso + 'T12:00:00').toLocaleDateString('pt-PT', { day: 'numeric', month: 'short' })
+      : null;
+
+    const recDateEl = (iso) => {
+      const txt = fmtRecDate(iso);
+      return txt ? `<div class="rec-date">${txt}</div>` : '';
+    };
+
     // Resumo anual
     summaryEl.innerHTML = `
       <div class="soft-card metric-box" style="background:rgba(244,63,94,.05);border:1px solid rgba(244,63,94,.12)">
         <div class="mb-top"><span class="m-label" style="color:var(--accent-rose)">Máx. Absoluta</span></div>
         <div class="mb-value">${s.temp_max != null ? s.temp_max : '—'}<span class="m-unit">°C</span></div>
+        ${recDateEl(s.temp_max_date)}
       </div>
       <div class="soft-card metric-box" style="background:rgba(59,130,246,.05);border:1px solid rgba(59,130,246,.12)">
         <div class="mb-top"><span class="m-label" style="color:var(--accent-blue)">Mín. Absoluta</span></div>
         <div class="mb-value">${s.temp_min != null ? s.temp_min : '—'}<span class="m-unit">°C</span></div>
+        ${recDateEl(s.temp_min_date)}
       </div>
       <div class="soft-card metric-box">
         <div class="mb-top"><span class="m-label">Temp. Média</span></div>
@@ -1091,6 +1103,7 @@ async function loadYearDetail(year) {
       <div class="soft-card metric-box">
         <div class="mb-top"><span class="m-label">Rajada Máx.</span></div>
         <div class="mb-value">${s.gust_max != null ? s.gust_max : '—'}<span class="m-unit">km/h</span></div>
+        ${recDateEl(s.gust_max_date)}
       </div>
     `;
 
