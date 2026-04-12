@@ -1232,38 +1232,18 @@ function renderAnaliseChart(d, isTemp) {
   const yearSet = [...new Set(d.by_year_month.map(r => r.year))].sort();
   const labels  = MONTH_NAMES;
 
-  // Para barras agrupadas, ajustar largura mínima do canvas
-  const inner = document.getElementById('analiseChartInner');
-  if (inner && !isTemp) {
-    const minW = Math.max(600, yearSet.length * 40 * 12);
-    inner.style.minWidth = minW + 'px';
-  } else if (inner) {
-    inner.style.minWidth = '';
-  }
-
   const datasets = yearSet.map((year, idx) => {
     const color = ANALISE_PALETTE[idx % ANALISE_PALETTE.length];
     const vals  = Array.from({ length: 12 }, (_, mi) => {
       const row = d.by_year_month.find(r => r.year === year && r.month === mi + 1);
       return row ? (isTemp ? row.avg_temp : row.total) : null;
     });
-
-    if (isTemp) {
-      return {
-        type: 'line', label: String(year), data: vals,
-        borderColor: color, backgroundColor: 'transparent',
-        borderWidth: 2, pointRadius: 3, pointHoverRadius: 5,
-        tension: 0.3, spanGaps: true,
-      };
-    } else {
-      return {
-        type: 'bar', label: String(year), data: vals,
-        backgroundColor: color + 'aa',  // ~67% opacidade
-        borderColor: color,
-        borderWidth: 1, borderRadius: 3,
-        barPercentage: 0.85, categoryPercentage: 0.9,
-      };
-    }
+    return {
+      type: 'line', label: String(year), data: vals,
+      borderColor: color, backgroundColor: 'transparent',
+      borderWidth: 2, pointRadius: 3, pointHoverRadius: 5,
+      tension: 0.3, spanGaps: true,
+    };
   });
 
   const unit = isTemp ? '°C' : ' mm';
@@ -1272,7 +1252,7 @@ function renderAnaliseChart(d, isTemp) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      interaction: { mode: isTemp ? 'index' : 'nearest', intersect: !isTemp },
+      interaction: { mode: 'index', intersect: false },
       plugins: {
         legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 14, padding: 12 } },
         tooltip: { callbacks: {
@@ -1380,10 +1360,14 @@ function renderAnaliseTop10(d, isTemp) {
       makeTable('Top 10 — Dias mais frios',   d.top_cold, '°C', 'is-cold');
   } else {
     el.className = 'analise-top10-grid analise-top10-grid--3';
-    const rateRows = (d.top_rate || []).map(r => ({
-      date: r.date?.replace('T', ' ').slice(0, 16) ?? r.date,
-      value: r.value,
-    }));
+    const rateRows = (d.top_rate || []).map(r => {
+      let label = r.date ?? '—';
+      try {
+        const dt = new Date(r.date);
+        label = dt.toLocaleString('pt-PT', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+      } catch(_) {}
+      return { date: label, value: r.value };
+    });
     el.innerHTML =
       makeTable('Top 10 — Dias mais chuvosos',    d.top_rain,  ' mm', 'is-teal') +
       makeTable('Top 10 — Anos mais chuvosos',    d.top_years.map(r => ({ date: String(r.year), value: r.total })), ' mm', 'is-teal') +
