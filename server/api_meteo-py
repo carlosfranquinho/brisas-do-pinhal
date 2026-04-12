@@ -393,7 +393,7 @@ def history(hours: int = Query(24, ge=1, le=168)):
             SELECT ts_local, ts_utc, temp_c, rain_day_mm, rain_rate_mmph,
                    rh_pct, dewpoint_c, pressure_hpa, uv_index, solar_wm2
             FROM observations
-            WHERE ts_utc >= datetime('now', '-' || ? || ' hours')
+            WHERE datetime(ts_utc) >= datetime('now', '-' || ? || ' hours')
             ORDER BY ts_local ASC
         """, (hours,))
         rows = [dict(r) for r in cur.fetchall()]

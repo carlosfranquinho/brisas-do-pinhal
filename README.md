@@ -1,94 +1,123 @@
-# Brisas do Pinhal Weather Station
+# Brisas do Pinhal — Estação Meteorológica
 
-Brisas do Pinhal is a hobby weather station that collects data from an Ecowitt device and
-publishes live conditions on a small web page.  The project contains a Python
-backend that ingests the station's readings and a very simple HTML/JavaScript
-frontend that displays the latest values.
+Dashboard web de uma estação meteorológica pessoal baseada num dispositivo Ecowitt.
+Apresenta condições em tempo real, histórico detalhado por ano, análises climatológicas
+e comparação com normais climatológicas de referência.
 
-## Project Structure
+## Estrutura do projeto
 
 ```
 .
-├── app.js          # Front‑end logic for fetching and rendering data
-├── index.html      # Static web page
+├── index.html          # Página única (SPA com hash routing)
+├── app.js              # Lógica core: routing, página inicial, lazy loading
+├── app-views.js        # Lógica das vistas Histórico e Clima (carregado sob pedido)
+├── styles.css          # Estilos
+├── favicon.svg         # Ícone do site
+├── brisas-logo.svg     # Logo da marca
+├── icons/              # Ícones meteorológicos SVG
+├── CNAME               # Domínio para GitHub Pages
 ├── server/
-│   └── api_meteo-py  # FastAPI application that receives and serves data
+│   ├── api_meteo-py    # Aplicação FastAPI (ficheiro principal)
+│   └── api_meteo.py    # Symlink → api_meteo-py (necessário para uvicorn)
 ├── sql/
-│   ├── init_schema.sql      # SQLite schema
-│   └── migrate_old_data.py  # One-time migration from old MySQL dump
-├── requirements.txt
-└── styles.css      # Basic styling
+│   ├── init_schema.sql      # Schema SQLite
+│   └── migrate_old_data.py  # Migração única do dump MySQL antigo
+└── requirements.txt
 ```
 
-## Architecture
+## Arquitetura
 
 ```
-Ecowitt device (LAN)  →  FastAPI + SQLite + uvicorn (local, port 8000)
-                                    │
-                          Cloudflare Tunnel
-                                    │
-                       api.brisas.pinhaldorei.net  (API pública)
+Dispositivo Ecowitt (LAN)
+        │ POST /api
+        ▼
+┌─────────────────────────────┐
+│  FastAPI + SQLite + uvicorn │  porta 8000 (local)
+└─────────────────────────────┘
+        │ Cloudflare Tunnel
+        ▼
+api.brisas.pinhaldorei.net     ← API pública
 
-Browser  →  brisas.pinhaldorei.net  (GitHub Pages, frontend estático)
+Browser
+        │ fetch(API)
+        ▼
+brisas.pinhaldorei.net         ← GitHub Pages (frontend estático)
 ```
-
-## Backend
-
-The backend is a FastAPI application (SQLite database) that exposes:
-
-- `POST /api` – receives measurements from the Ecowitt station, stores in SQLite and updates `live.json`
-- `GET /live` – returns the most recent observation stored in `live.json`
-- `GET /latest` – fetches the latest observation directly from the database
-- `GET /history?hours=N` – returns observations for the last _N_ hours (default 24)
-- `GET /metar-tgftp/{icao}` – retrieves and caches METAR data from NOAA
-- `GET /climate/monthly` – monthly climate statistics aggregated from all observations
-- `GET /health` – simple health check endpoint
-
-Configuration is read from environment variables (see `/etc/meteo/env`).
-Logs are written under `/home/carlos/meteo_logs`, current conditions at `/var/lib/meteo/live.json`,
-and the database at `/var/lib/meteo/meteo.db`.
-
-### Running the server
-
-1. Install dependencies:
-
-   ```bash
-   python3 -m venv .venv
-   .venv/bin/pip install -r requirements.txt
-   ```
-
-2. Create the symlink (needed because uvicorn can't import files with hyphens):
-
-   ```bash
-   ln -s server/api_meteo-py server/api_meteo.py
-   ```
-
-3. Start the application:
-
-   ```bash
-   .venv/bin/uvicorn server.api_meteo:app --host 127.0.0.1 --port 8000
-   ```
-
-In production, the service is managed by systemd (`meteo-api.service`) and exposed
-via Cloudflare Tunnel.
 
 ## Frontend
 
-The frontend is a single page (`index.html`) enhanced by `app.js`.  It polls the
-backend API every 2 minutes to update the displayed conditions.
+Single-page app com routing por hash (`#/`, `#/historico`, `#/clima`, `#/historico/2024`, etc.).
 
-It is hosted on **GitHub Pages** at `brisas.pinhaldorei.net`.
+**Páginas:**
+- **Início** — condições em tempo real (temperatura, humidade, vento, pressão, UV, solar, chuva), gráfico das últimas 24h, tendências, previsão IPMA e METAR do aeroporto mais próximo
+- **Histórico** — recordes absolutos, cards por ano, detalhe por ano (gráfico mensal + extremos), arquivo diário, análises de temperatura e precipitação com comparação a normais climatológicas
+- **Clima** — tabela e gráfico de médias mensais agregadas de toda a série histórica
 
-## Development
+O frontend atualiza automaticamente a cada 2 minutos. `app-views.js` (28 KB) é carregado de forma lazy apenas quando o utilizador navega para Histórico ou Clima, reduzindo o tempo de bloqueio inicial.
 
-Run the following checks before committing changes:
+## Backend — API
+
+Endpoints disponíveis:
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| `POST/GET` | `/api` | Recebe medições do dispositivo Ecowitt; guarda em SQLite e em `live.json` |
+| `GET` | `/live` | Última observação (lida de `live.json`, sem tocar na BD) |
+| `GET` | `/latest` | Última observação direto da base de dados |
+| `GET` | `/health` | Health check |
+| `GET` | `/history?hours=N` | Observações das últimas N horas (padrão: 24) |
+| `GET` | `/history/daily?date=YYYY-MM-DD` | Observações de um dia específico |
+| `GET` | `/history/records` | Recordes absolutos de toda a série |
+| `GET` | `/history/years` | Resumo anual (totais e extremos por ano) |
+| `GET` | `/history/year/{year}` | Detalhe mensal de um ano (com datas dos recordes) |
+| `GET` | `/history/analysis/temperature` | Análise mensal de temperatura (todos os anos) |
+| `GET` | `/history/analysis/precipitation` | Análise mensal de precipitação (todos os anos) |
+| `GET` | `/climate/monthly` | Médias mensais de toda a série histórica |
+| `GET` | `/metar-tgftp/{icao}` | Leitura METAR via NOAA (com cache) |
+
+A configuração é lida de variáveis de ambiente (ficheiro `/etc/meteo/env`).
+
+Dados em runtime:
+- Base de dados: `/var/lib/meteo/meteo.db`
+- Condições actuais: `/var/lib/meteo/live.json`
+- Logs: `/home/carlos/meteo_logs/`
+
+## Configuração e instalação
+
+### Dependências Python
+
+```bash
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+```
+
+### Symlink (necessário porque uvicorn não importa ficheiros com hífen)
+
+```bash
+ln -s server/api_meteo-py server/api_meteo.py
+```
+
+### Base de dados
+
+```bash
+sudo mkdir -p /var/lib/meteo
+sqlite3 /var/lib/meteo/meteo.db < sql/init_schema.sql
+```
+
+### Arrancar manualmente
+
+```bash
+.venv/bin/uvicorn server.api_meteo:app --host 127.0.0.1 --port 8000
+```
+
+Em produção o serviço é gerido pelo systemd (`meteo-api.service`) e exposto via Cloudflare Tunnel em `api.brisas.pinhaldorei.net`.
+
+## Desenvolvimento
+
+Verificações antes de fazer commit:
 
 ```bash
 python -m py_compile server/api_meteo-py
 node --check app.js
+node --check app-views.js
 ```
-
-## License
-
-This project is intended for personal use and does not currently specify a
-formal license.  Use at your own risk.
