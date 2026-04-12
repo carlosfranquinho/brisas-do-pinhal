@@ -15,6 +15,24 @@ const VIEWS = document.querySelectorAll('[data-view]');
 const LINKS = document.querySelectorAll('[data-viewlink]');
 let liveTimer = null;
 
+/* Lazy script loader */
+const _scripts = {};
+function loadScript(url) {
+  if (_scripts[url]) return _scripts[url];
+  _scripts[url] = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = url;
+    s.onload = resolve;
+    s.onerror = () => reject(new Error('Script load failed: ' + url));
+    document.head.appendChild(s);
+  });
+  return _scripts[url];
+}
+const CHARTJS_URL = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js';
+const SUNCALC_URL = 'https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.min.js';
+function ensureChartJs()  { return window.Chart   ? Promise.resolve() : loadScript(CHARTJS_URL); }
+function ensureSunCalc()  { return window.SunCalc  ? Promise.resolve() : loadScript(SUNCALC_URL); }
+
 /* Icons */
 const ICON_PATHS = {
   "clear-day": "icons/clear-day.svg",
@@ -183,7 +201,7 @@ function setTrendArrow(id, trend) {
 }
 
 function updateTrends(j) {
-  if (!trendRef) { console.log('[trends] trendRef ainda null'); return; }
+  if (!trendRef) return;
   const calc = (key, current) => {
     if (current == null || trendRef[key] == null) return null;
     const delta = +current - trendRef[key];
@@ -192,7 +210,6 @@ function updateTrends(j) {
     if (delta < -thr) return 'down';
     return 'stable';
   };
-  console.log('[trends] trendRef=', trendRef, 'live rh=', j.rh_pct, 'press=', j.pressure_hpa);
   setTrendArrow('trend-rh',    calc('rh',    j.rh_pct));
   setTrendArrow('trend-dew',   calc('dew',   j.dewpoint_c));
   setTrendArrow('trend-press', calc('press', j.pressure_hpa));
@@ -357,12 +374,8 @@ function renderNowIcon(ipmaCode, sunriseHHMM, sunsetHHMM) {
 /* Sun times */
 const LAT = 39.75,
   LON = -8.94;
-function setSunTimes(date = new Date()) {
-  if (typeof SunCalc === "undefined") {
-    $("#sunrise").textContent = "—";
-    $("#sunset").textContent = "—";
-    return;
-  }
+async function setSunTimes(date = new Date()) {
+  await ensureSunCalc();
   const t = SunCalc.getTimes(date, LAT, LON);
   const opt = { hour: "2-digit", minute: "2-digit" };
   $("#sunrise").textContent = t.sunrise.toLocaleTimeString("pt-PT", opt);
@@ -655,6 +668,7 @@ async function loadHistory() {
   gradientTemp.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
   gradientTemp.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
 
+  await ensureChartJs();
   if (chart) chart.destroy();
   chart = new Chart(ctxHTML, {
     type: "bar",
@@ -742,7 +756,7 @@ async function loadClimateMonthly() {
   const j = await r.json();
   const months = j.months || j.data || [];
   renderClimateTable(months); // suporta “months” ou “data”
-  renderClimateChart(months);
+  await renderClimateChart(months);
 }
 
 function renderClimateTable(months) {
@@ -814,7 +828,7 @@ function renderClimateTable(months) {
   tbl.replaceChildren(thead, tbody);
 }
 
-function renderClimateChart(months) {
+async function renderClimateChart(months) {
   const canvas = document.getElementById('climateChart');
   if (!canvas) return;
 
@@ -835,6 +849,7 @@ function renderClimateChart(months) {
   const tMin = byM.map((m) => toNum(m.abs_min ?? m.tmin_mean));
   const rain = byM.map((m) => toNum(m.precip_mean_mm ?? m.rain));
 
+  await ensureChartJs();
   if (climateChart) climateChart.destroy();
   climateChart = new Chart(canvas, {
     data: {
@@ -1079,7 +1094,7 @@ async function loadYearDetail(year) {
     }).join('');
 
     // Gráfico mensal
-    renderYearChart(d.months);
+    await renderYearChart(d.months);
 
   } catch (err) {
     summaryEl.innerHTML = '<p style="color:var(--accent-rose)">Erro ao carregar dados do ano.</p>';
@@ -1087,9 +1102,10 @@ async function loadYearDetail(year) {
   }
 }
 
-function renderYearChart(months) {
+async function renderYearChart(months) {
   const canvas = document.getElementById('yearChart');
   if (!canvas) return;
+  await ensureChartJs();
   if (yearChartObj) { yearChartObj.destroy(); yearChartObj = null; }
 
   const labels   = MONTH_NAMES;
@@ -1215,8 +1231,8 @@ async function loadAnalise(type) {
     if (!res.ok) throw new Error(res.status);
     const d = await res.json();
 
-    renderAnaliseChart(d, isTemp);
-    if (!isTemp) renderAnaliseCumul(d);
+    await renderAnaliseChart(d, isTemp);
+    if (!isTemp) await renderAnaliseCumul(d);
     renderAnaliseTop10(d, isTemp);
   } catch (err) {
     top10El.innerHTML = '<p style="color:var(--accent-rose)">Erro ao carregar análise.</p>';
@@ -1224,9 +1240,10 @@ async function loadAnalise(type) {
   }
 }
 
-function renderAnaliseChart(d, isTemp) {
+async function renderAnaliseChart(d, isTemp) {
   const canvas = document.getElementById('analiseChart');
   if (!canvas) return;
+  await ensureChartJs();
   if (analiseChartObj) { analiseChartObj.destroy(); analiseChartObj = null; }
 
   const yearSet = [...new Set(d.by_year_month.map(r => r.year))].sort();
@@ -1274,10 +1291,11 @@ function renderAnaliseChart(d, isTemp) {
   });
 }
 
-function renderAnaliseCumul(d) {
+async function renderAnaliseCumul(d) {
   const cumulCard = document.getElementById('analiseCumulCard');
   const canvas    = document.getElementById('analiseCumulChart');
   if (!cumulCard || !canvas) return;
+  await ensureChartJs();
   if (analiseCumulObj) { analiseCumulObj.destroy(); analiseCumulObj = null; }
   cumulCard.style.display = 'block';
 
@@ -1400,7 +1418,7 @@ async function loadHistoryDaily() {
     setText('#hRain', fmt(data.stats.total_rain, 1));
     setText('#hGust', fmt(data.stats.max_gust, 1));
 
-    renderDailyHistoryChart(data.series);
+    await renderDailyHistoryChart(data.series);
 
     document.getElementById('historyLoading').style.display = 'none';
     document.getElementById('historyContent').style.display = 'flex';
@@ -1411,9 +1429,10 @@ async function loadHistoryDaily() {
   }
 }
 
-function renderDailyHistoryChart(series) {
+async function renderDailyHistoryChart(series) {
   const canvas = document.getElementById('historyDailyChart');
   if (!canvas) return;
+  await ensureChartJs();
 
   const labels = series.map(r => {
     const d = new Date(r.ts_local);
