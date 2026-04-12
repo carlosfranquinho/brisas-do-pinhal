@@ -1166,6 +1166,8 @@ async function renderYearChart(months) {
           yAxisID: 'yTemp',
           order: 1,
         },
+        { type: 'line', label: 'Normal Temp.', data: NORMALS_TEMP, ...NORMAL_LINE, yAxisID: 'yTemp', order: 0 },
+        { type: 'line', label: 'Normal Prec.', data: NORMALS_RAIN, ...NORMAL_LINE, yAxisID: 'yRain', order: 0 },
       ],
     },
     options: {
@@ -1207,6 +1209,11 @@ const ANALISE_PALETTE = [
   '#8b5cf6','#06b6d4','#f97316','#84cc16',
   '#ec4899','#6366f1','#14b8a6','#ef4444',
 ];
+
+// Normais climatológicas (1981–2010 ou similar)
+const NORMALS_RAIN = [112.6, 81.7, 74.1, 83.2, 61.8, 18.8, 7.5, 12.7, 38.1, 102.5, 127.8, 104.4];
+const NORMALS_TEMP = [9.7, 10.4, 12.7, 14.0, 16.3, 18.9, 20.5, 20.9, 19.4, 16.7, 12.5, 10.6];
+const NORMAL_LINE  = { borderColor: 'rgba(15,23,42,0.65)', backgroundColor: 'transparent', borderWidth: 2, borderDash: [6, 4], pointRadius: 0, pointHoverRadius: 4, tension: 0.3, spanGaps: false };
 
 let analiseChartObj  = null;
 let analiseCumulObj  = null;
@@ -1262,6 +1269,9 @@ async function renderAnaliseChart(d, isTemp) {
       tension: 0.3, spanGaps: true,
     };
   });
+
+  const normalData = isTemp ? NORMALS_TEMP : NORMALS_RAIN;
+  datasets.push({ type: 'line', label: 'Normal', data: normalData, ...NORMAL_LINE });
 
   const unit = isTemp ? '°C' : ' mm';
   analiseChartObj = new Chart(canvas, {
@@ -1320,6 +1330,11 @@ async function renderAnaliseCumul(d) {
       tension: 0.2, spanGaps: false,
     };
   });
+
+  // Normal acumulada
+  let cumulNormal = 0;
+  const normalCumulData = NORMALS_RAIN.map(v => +(cumulNormal += v).toFixed(1));
+  datasets.push({ label: 'Normal acum.', data: normalCumulData, ...NORMAL_LINE });
 
   analiseCumulObj = new Chart(canvas, {
     type: 'line',

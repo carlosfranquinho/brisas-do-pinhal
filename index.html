@@ -34,7 +34,7 @@
 
   <link rel="stylesheet" href="styles.css?v=12" />
   <!-- Chart.js e SunCalc carregados sob pedido por app.js -->
-  <script src="app.js?v=9" defer></script>
+  <script src="app.js?v=10" defer></script>
 </head>
 
 <body class="light-breeze-theme">
@@ -358,59 +358,6 @@
             </div>
           </div>
 
-          <div class="soft-card date-picker-card" style="margin-bottom: 32px; text-align: center; padding: 32px 24px;">
-            <p style="color: var(--text-light); font-weight: 700; margin-bottom: 16px; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase;">Aceder ao Arquivo Diário</p>
-            <div style="display: inline-flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; background: var(--bg-color); padding: 8px; border-radius: 16px; border: 1px solid var(--glass-border);">
-              <input type="date" id="historyDateInput" style="padding: 14px 20px; border: none; border-radius: 12px; font-family: inherit; font-size: 1rem; color: var(--text-primary); background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.05); outline: none; cursor: pointer;">
-              <button id="historyBtn" style="background: var(--accent); color: white; border: none; padding: 14px 28px; border-radius: 12px; cursor: pointer; font-weight: 700; font-family: inherit; font-size: 1rem; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
-                Consultar Data
-              </button>
-            </div>
-          </div>
-
-          <div id="historyLoading" style="display: none; text-align: center; padding: 40px; color: var(--text-light);">A procurar nos arquivos...</div>
-          <div id="historyError" style="display: none; text-align: center; padding: 40px; color: var(--accent-rose); font-weight: bold; background: white; border-radius: 16px;"></div>
-
-          <div id="historyContent" style="display: none; flex-direction: column; gap: 24px;">
-            <!-- Cartões de Resumo do Dia -->
-            <div class="metrics-masonry" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));">
-              <div class="soft-card metric-box">
-                <div class="mb-top"><span class="m-label" style="color: var(--accent-rose);">Máxima Diária</span></div>
-                <div class="mb-value"><span id="hTmax">—</span> <span class="m-unit">°C</span></div>
-              </div>
-              <div class="soft-card metric-box">
-                <div class="mb-top"><span class="m-label" style="color: var(--accent-blue);">Mínima Diária</span></div>
-                <div class="mb-value"><span id="hTmin">—</span> <span class="m-unit">°C</span></div>
-              </div>
-              <div class="soft-card metric-box">
-                <div class="mb-top"><span class="m-label" style="color: var(--text-primary);">Média Diária</span></div>
-                <div class="mb-value"><span id="hTmean">—</span> <span class="m-unit">°C</span></div>
-              </div>
-              <div class="soft-card metric-box">
-                <div class="mb-top"><span class="m-label" style="color: var(--accent-teal);">Total de Chuva</span></div>
-                <div class="mb-value"><span id="hRain">—</span> <span class="m-unit">mm</span></div>
-              </div>
-              <div class="soft-card metric-box">
-                <div class="mb-top"><span class="m-label">Rajada Máxima</span></div>
-                <div class="mb-value"><span id="hGust">—</span> <span class="m-unit">km/h</span></div>
-              </div>
-            </div>
-
-            <!-- Gráfico Intradiário -->
-            <div class="soft-card">
-              <div class="card-header-clean">
-                <h2>Evolução no Dia</h2>
-              </div>
-              <div class="chart-container" style="height: 350px; position: relative; width: 100%;">
-                <div class="chart-scroll-wrapper">
-                  <div class="chart-scroll-inner">
-                    <canvas id="historyDailyChart"></canvas>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
           <!-- Análise Detalhada -->
           <div style="margin-top: 8px;">
             <div class="card-header-clean" style="margin-bottom: 16px;">
@@ -437,6 +384,65 @@
                 </div>
                 <svg class="ac-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
               </a>
+            </div>
+          </div>
+
+          <!-- Arquivo Diário -->
+          <div style="margin-top: 32px;">
+            <div class="card-header-clean" style="margin-bottom: 16px;">
+              <h2 style="font-size: 1.25rem;">Arquivo Diário</h2>
+            </div>
+            <div class="soft-card date-picker-card" style="margin-bottom: 24px; text-align: center; padding: 32px 24px;">
+              <p style="color: var(--text-light); font-weight: 700; margin-bottom: 16px; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase;">Aceder ao Arquivo Diário</p>
+              <div style="display: inline-flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; background: var(--bg-color); padding: 8px; border-radius: 16px; border: 1px solid var(--glass-border);">
+                <input type="date" id="historyDateInput" style="padding: 14px 20px; border: none; border-radius: 12px; font-family: inherit; font-size: 1rem; color: var(--text-primary); background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.05); outline: none; cursor: pointer;">
+                <button id="historyBtn" style="background: var(--accent); color: white; border: none; padding: 14px 28px; border-radius: 12px; cursor: pointer; font-weight: 700; font-family: inherit; font-size: 1rem; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
+                  Consultar Data
+                </button>
+              </div>
+            </div>
+
+            <div id="historyLoading" style="display: none; text-align: center; padding: 40px; color: var(--text-light);">A procurar nos arquivos...</div>
+            <div id="historyError" style="display: none; text-align: center; padding: 40px; color: var(--accent-rose); font-weight: bold; background: white; border-radius: 16px;"></div>
+
+            <div id="historyContent" style="display: none; flex-direction: column; gap: 24px;">
+              <!-- Cartões de Resumo do Dia -->
+              <div class="metrics-masonry" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));">
+                <div class="soft-card metric-box">
+                  <div class="mb-top"><span class="m-label" style="color: var(--accent-rose);">Máxima Diária</span></div>
+                  <div class="mb-value"><span id="hTmax">—</span> <span class="m-unit">°C</span></div>
+                </div>
+                <div class="soft-card metric-box">
+                  <div class="mb-top"><span class="m-label" style="color: var(--accent-blue);">Mínima Diária</span></div>
+                  <div class="mb-value"><span id="hTmin">—</span> <span class="m-unit">°C</span></div>
+                </div>
+                <div class="soft-card metric-box">
+                  <div class="mb-top"><span class="m-label" style="color: var(--text-primary);">Média Diária</span></div>
+                  <div class="mb-value"><span id="hTmean">—</span> <span class="m-unit">°C</span></div>
+                </div>
+                <div class="soft-card metric-box">
+                  <div class="mb-top"><span class="m-label" style="color: var(--accent-teal);">Total de Chuva</span></div>
+                  <div class="mb-value"><span id="hRain">—</span> <span class="m-unit">mm</span></div>
+                </div>
+                <div class="soft-card metric-box">
+                  <div class="mb-top"><span class="m-label">Rajada Máxima</span></div>
+                  <div class="mb-value"><span id="hGust">—</span> <span class="m-unit">km/h</span></div>
+                </div>
+              </div>
+
+              <!-- Gráfico Intradiário -->
+              <div class="soft-card">
+                <div class="card-header-clean">
+                  <h2>Evolução no Dia</h2>
+                </div>
+                <div class="chart-container" style="height: 350px; position: relative; width: 100%;">
+                  <div class="chart-scroll-wrapper">
+                    <div class="chart-scroll-inner">
+                      <canvas id="historyDailyChart"></canvas>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
