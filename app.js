@@ -1320,17 +1320,35 @@ async function renderAnaliseChart(d, isTemp) {
     } else {
       return {
         type: 'bar', label: String(year), data: vals,
-        backgroundColor: color + 'aa',  // ~67% opacity via hex
+        backgroundColor: color + 'bb',
         borderColor: color,
         borderWidth: 1,
         borderRadius: 2,
         maxBarThickness: 7,
+        order: 1,
       };
     }
   });
 
-  const normalData = isTemp ? NORMALS_TEMP : NORMALS_RAIN;
-  datasets.push({ type: 'line', label: 'Normal', data: normalData, ...NORMAL_LINE });
+  if (!isTemp) {
+    // Normal como barra larga de fundo — não participa no agrupamento (grouped:false),
+    // os anos ficam centrados dentro dela como barras estreitas
+    datasets.unshift({
+      type: 'bar',
+      label: 'Normal',
+      data: NORMALS_RAIN,
+      backgroundColor: 'rgba(20,184,166,0.12)',
+      borderColor: 'rgba(20,184,166,0.45)',
+      borderWidth: 1,
+      borderRadius: 4,
+      grouped: false,
+      barPercentage: 0.85,
+      categoryPercentage: 0.9,
+      order: 2,
+    });
+  } else {
+    datasets.push({ type: 'line', label: 'Normal', data: NORMALS_TEMP, ...NORMAL_LINE });
+  }
 
   const unit = isTemp ? '°C' : ' mm';
   analiseChartObj = new Chart(canvas, {
