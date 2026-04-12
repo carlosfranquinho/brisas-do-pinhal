@@ -1342,8 +1342,8 @@ async function renderAnaliseChart(d, isTemp) {
       borderWidth: 1,
       borderRadius: 4,
       grouped: false,
-      barPercentage: 0.85,
-      categoryPercentage: 0.9,
+      barPercentage: 1.0,
+      categoryPercentage: 0.95,
       order: 2,
     });
   } else {
