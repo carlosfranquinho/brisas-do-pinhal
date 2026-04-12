@@ -813,11 +813,6 @@ function renderClimateChart(months) {
   const canvas = document.getElementById('climateChart');
   if (!canvas) return;
 
-  const ctx = canvas.getContext('2d');
-  const gradientTemp = ctx.createLinearGradient(0, 0, 0, canvas.height);
-  gradientTemp.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
-  gradientTemp.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
-
   const withMonths = months.map((m, i) => ({ month: m.month ?? i + 1, ...m }));
   const byM = Array.from({ length: 12 }, (_, i) =>
     withMonths.find((x) => +x.month === i + 1) || {}
@@ -827,130 +822,101 @@ function renderClimateChart(months) {
 
   const tMean = byM.map((m) => {
     if (m.t_mean != null) return toNum(m.t_mean);
-    if (m.t != null) return toNum(m.t);
     if (m.tmax_mean != null && m.tmin_mean != null)
-      return (toNum(m.tmax_mean) + toNum(m.tmin_mean)) / 2;
-    if (m.tmax != null && m.tmin != null)
-      return (toNum(m.tmax) + toNum(m.tmin)) / 2;
+      return +((toNum(m.tmax_mean) + toNum(m.tmin_mean)) / 2).toFixed(1);
     return null;
   });
-  const tMax = byM.map((m) => toNum(m.abs_max ?? m.tmax));
-  const tMin = byM.map((m) => toNum(m.abs_min ?? m.tmin));
-
+  const tMax = byM.map((m) => toNum(m.abs_max ?? m.tmax_mean));
+  const tMin = byM.map((m) => toNum(m.abs_min ?? m.tmin_mean));
   const rain = byM.map((m) => toNum(m.precip_mean_mm ?? m.rain));
 
   if (climateChart) climateChart.destroy();
   climateChart = new Chart(canvas, {
-    type: 'bar',
     data: {
       labels,
       datasets: [
         {
-          type: 'line',
-          label: 'Temperatura média',
-          data: tMean,
-          yAxisID: 'yTemp',
-          borderColor: '#10b981', // Verde Esmeralda
-          backgroundColor: gradientTemp,
-          borderWidth: 3,
-          fill: true,
-          tension: 0.4, // Curva super suave
-          pointBackgroundColor: '#fff',
-          pointBorderColor: '#10b981',
-          pointBorderWidth: 2,
-          pointRadius: 4,
-          pointHoverRadius: 6,
-          spanGaps: true,
-          order: 1, // Z-index Alto (na frente)
-        },
-        {
-          type: 'line',
-          label: 'Máximo absoluto',
-          data: tMax,
-          yAxisID: 'yTemp',
-          borderColor: '#fda4af', // Rosa pastel
-          backgroundColor: '#fda4af',
-          borderDash: [5, 5],
-          borderWidth: 2,
-          tension: 0.4,
-          pointRadius: 0,
-          pointHoverRadius: 4,
-          spanGaps: true,
-          order: 2,
-        },
-        {
-          type: 'line',
-          label: 'Mínimo absoluto',
-          data: tMin,
-          yAxisID: 'yTemp',
-          borderColor: '#93c5fd', // Azul pastel
-          backgroundColor: '#93c5fd',
-          borderDash: [5, 5],
-          borderWidth: 2,
-          tension: 0.4,
-          pointRadius: 0,
-          pointHoverRadius: 4,
-          spanGaps: true,
-          order: 2,
-        },
-        {
           type: 'bar',
-          label: 'Precipitação (mm)',
+          label: 'Precipitação média (mm)',
           data: rain,
+          backgroundColor: 'rgba(20,184,166,0.25)',
+          borderColor: 'rgba(20,184,166,0.7)',
+          borderWidth: 1,
+          borderRadius: 4,
           yAxisID: 'yRain',
-          backgroundColor: 'rgba(59, 130, 246, 0.4)', // Azul translúcido
-          hoverBackgroundColor: 'rgba(59, 130, 246, 0.7)',
-          borderRadius: 8, // Barras arrendondadas e modernas!
-          borderSkipped: false,
-          order: 4, // Z-index Baixo (escondido atrás das linhas)
-        }
+          order: 2,
+        },
+        {
+          type: 'line',
+          label: 'Máx. absoluta',
+          data: tMax,
+          borderColor: 'rgba(244,63,94,0.8)',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          pointRadius: 3,
+          tension: 0.3,
+          spanGaps: true,
+          yAxisID: 'yTemp',
+          order: 1,
+        },
+        {
+          type: 'line',
+          label: 'Mín. absoluta',
+          data: tMin,
+          borderColor: 'rgba(59,130,246,0.8)',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          pointRadius: 3,
+          tension: 0.3,
+          spanGaps: true,
+          yAxisID: 'yTemp',
+          order: 1,
+        },
+        {
+          type: 'line',
+          label: 'Temp. média',
+          data: tMean,
+          borderColor: 'rgba(100,116,139,0.7)',
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          borderDash: [4, 4],
+          pointRadius: 2,
+          tension: 0.3,
+          spanGaps: true,
+          yAxisID: 'yTemp',
+          order: 1,
+        },
       ],
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      interaction: {
-        mode: 'index',
-        intersect: false,
-      },
+      interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: {
-          position: 'top',
-          labels: {
-            usePointStyle: true,
-            padding: 20,
-            font: { family: "'Plus Jakarta Sans', sans-serif", size: 12, weight: '500' }
+        legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 14, padding: 16 } },
+        tooltip: { callbacks: {
+          label: ctx => {
+            const v = ctx.parsed.y;
+            if (v == null) return null;
+            return ctx.dataset.yAxisID === 'yRain'
+              ? `${ctx.dataset.label}: ${v} mm`
+              : `${ctx.dataset.label}: ${v}°C`;
           }
-        },
-        tooltip: {
-          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-          titleColor: '#1e293b',
-          bodyColor: '#475569',
-          borderColor: 'rgba(0,0,0,0.05)',
-          borderWidth: 1,
-          padding: 12,
-          boxPadding: 4,
-          usePointStyle: true,
-          titleFont: { family: "'Plus Jakarta Sans', sans-serif", size: 13, weight: '800' },
-          bodyFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12 }
-        }
+        }}
       },
       scales: {
-        x: {
-          grid: { display: false, drawBorder: false },
-          ticks: { font: { family: "'Plus Jakarta Sans', sans-serif" } }
-        },
         yTemp: {
-          position: 'left',
-          title: { display: true, text: 'Temperatura (°C)', font: { family: "'Plus Jakarta Sans', sans-serif", size: 12, weight: '600' } },
-          grid: { color: 'rgba(0, 0, 0, 0.04)', drawBorder: false },
+          type: 'linear', position: 'left',
+          grid: { color: 'rgba(0,0,0,0.05)' },
+          ticks: { callback: v => v + '°', font: { size: 11 } },
         },
         yRain: {
-          position: 'right',
-          title: { display: true, text: 'Precipitação (mm)', font: { family: "'Plus Jakarta Sans', sans-serif", size: 12, weight: '600' } },
-          grid: { display: false, drawBorder: false },
-          beginAtZero: true
+          type: 'linear', position: 'right',
+          grid: { drawOnChartArea: false },
+          ticks: { callback: v => v + ' mm', font: { size: 11 } },
+          min: 0,
         },
+        x: { grid: { display: false }, ticks: { font: { size: 11 } } },
       },
     },
   });
