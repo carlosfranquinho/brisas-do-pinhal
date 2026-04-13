@@ -755,12 +755,19 @@ async function loadHistory() {
   const ctxHTML = document.getElementById("histChart");
   if (!ctxHTML) return;
 
+  // Libertar a Main Thread para o Browser desenhar a página
+  await new Promise(r => setTimeout(r, 20));
+
+  await ensureChartJs();
+
+  // Libertar novamente para mitigar a compilação inicial da framework
+  await new Promise(r => setTimeout(r, 20));
+
   const ctx2d = ctxHTML.getContext('2d');
   const gradientTemp = ctx2d.createLinearGradient(0, 0, 0, ctxHTML.height || 300);
   gradientTemp.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
   gradientTemp.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
 
-  await ensureChartJs();
   if (chart) chart.destroy();
   chart = new Chart(ctxHTML, {
     type: "bar",
