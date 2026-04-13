@@ -533,14 +533,10 @@ body {
   display: flex; align-items: center; justify-content: center;
 }
 .m-icon svg { width: 20px; height: 20px; }
-.m-icon img { width: 26px; height: 26px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.12)); }
-.icon-blue { background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); }
-.icon-teal { background: rgba(20, 184, 166, 0.1); color: var(--accent-teal); }
-.icon-gray { background: rgba(100, 116, 139, 0.1); color: var(--text-secondary); }
-.icon-purple { background: rgba(139, 92, 246, 0.1); color: var(--accent-purple); }
-.icon-orange { background: rgba(245, 158, 11, 0.1); color: var(--accent-orange); }
-.icon-rain { background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); }
-.icon-yellow { background: rgba(234, 179, 8, 0.1); color: var(--accent-yellow); }
+.m-icon img { width: 30px; height: 30px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.12)); }
+.icon-blue, .icon-teal, .icon-gray, .icon-purple, .icon-orange, .icon-rain, .icon-yellow {
+  background: rgba(100, 116, 139, 0.1);
+}
 
 .m-label { font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); }
 .m-badge { margin-left: auto; background: var(--bg-color); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; }
