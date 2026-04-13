@@ -1151,6 +1151,7 @@ body {
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
+  min-width: 0;
 }
 @media (min-width: 700px) {
   .about-grid {
@@ -1162,6 +1163,11 @@ body {
 }
 .about-card--full {
   grid-column: 1 / -1;
+}
+@media (min-width: 700px) {
+  .about-card--data {
+    grid-row: span 2;
+  }
 }
 .about-section-title {
   display: flex;
@@ -1218,6 +1224,7 @@ body {
 }
 .about-station-img {
   width: 100%;
+  max-width: 320px;
   height: auto;
   border-radius: 8px;
   display: block;
