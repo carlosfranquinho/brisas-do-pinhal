@@ -34,7 +34,7 @@
 
   <link rel="stylesheet" href="styles.css?v=13" />
   <!-- Chart.js e SunCalc carregados sob pedido por app.js -->
-  <script src="app.js?v=21" defer></script>
+  <script src="app.js?v=23" defer></script>
   <!-- app-views.js carregado lazily (só quando o utilizador acede a Histórico ou Clima) -->
 </head>
 
@@ -173,6 +173,10 @@
                   <div class="val-group">
                     <span class="val-label">24h Acum.</span>
                     <div class="mb-value"><span id="rain24">—</span> <span class="m-unit">mm</span></div>
+                  </div>
+                  <div class="val-group rain-rate-group" id="rainRateGroup" hidden>
+                    <span class="val-label">Taxa atual</span>
+                    <div class="mb-value"><span id="rainRate">—</span> <span class="m-unit">mm/h</span></div>
                   </div>
                 </div>
                 <div class="val-divider"></div>

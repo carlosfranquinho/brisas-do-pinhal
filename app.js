@@ -569,6 +569,18 @@ async function loadLive() {
     if (maxLabel) maxLabel.textContent = bucketMax + ' mm';
   }
 
+  // Taxa de pluviosidade — só visível quando está efetivamente a chover
+  const rateGroup = document.getElementById('rainRateGroup');
+  if (rateGroup) {
+    const rate = j.rain_rate_mmph != null ? +j.rain_rate_mmph : 0;
+    if (rate > 0) {
+      setText("#rainRate", fmt(rate, 1));
+      rateGroup.hidden = false;
+    } else {
+      rateGroup.hidden = true;
+    }
+  }
+
   const ts = localTime(j.ts_local ?? j.ts_utc);
   setSunTimes(ts);
 
@@ -672,11 +684,14 @@ async function loadHistory() {
   });
   const allTempsNull = temps.every((v) => v === null);
 
-  // Acumulado 24h: rate (mm/h) × intervalo real entre leituras consecutivas
-  const rain24 = rainRate.reduce((acc, rate, i) => {
-    if (rate == null || i === 0) return acc;
-    const intervalH = (labelDates[i].getTime() - labelDates[i - 1].getTime()) / 3_600_000;
-    return acc + rate * intervalH;
+  // Acumulado 24h: somar incrementos de rain_day_mm, com reset à meia-noite
+  const rain24 = rows.reduce((acc, row, i) => {
+    if (i === 0) return acc;
+    const prev = toNum(rows[i - 1].rain_day_mm);
+    const curr = toNum(row.rain_day_mm);
+    if (prev == null || curr == null) return acc;
+    if (curr >= prev) return acc + (curr - prev); // incremento normal
+    return acc + curr;                             // reset à meia-noite
   }, 0);
   setText("#rain24", fmt(rain24, 1));
 
