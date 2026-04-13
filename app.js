@@ -60,7 +60,7 @@ function iconUrl(name) {
   return ICON_PATHS[name] || ICON_PATHS["unknown"];
 }
 
-const VALID_VIEWS = new Set(['home', 'historico', 'clima']);
+const VALID_VIEWS = new Set(['home', 'historico', 'clima', 'acerca']);
 
 
 /* Now icon state + priorities */

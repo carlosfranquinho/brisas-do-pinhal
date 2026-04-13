@@ -32,9 +32,9 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
   </noscript>
 
-  <link rel="stylesheet" href="styles.css?v=13" />
+  <link rel="stylesheet" href="styles.css?v=14" />
   <!-- Chart.js e SunCalc carregados sob pedido por app.js -->
-  <script src="app.js?v=23" defer></script>
+  <script src="app.js?v=24" defer></script>
   <!-- app-views.js carregado lazily (só quando o utilizador acede a Histórico ou Clima) -->
 </head>
 
@@ -76,6 +76,10 @@
         <a href="#/clima" data-viewlink="clima">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0z"></path></svg>
           Clima Mensal
+        </a>
+        <a href="#/acerca" data-viewlink="acerca">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          Acerca
         </a>
       </nav>
 
@@ -549,6 +553,83 @@
           </div>
         </section>
 
+        <section data-view="acerca" class="view-section" hidden>
+          <div class="page-header" style="margin-bottom: 24px;">
+            <h2 class="page-title">Acerca da Estação</h2>
+            <p class="page-subtitle">Hardware, localização e notas sobre os dados.</p>
+          </div>
+
+          <div class="about-grid">
+
+            <div class="soft-card about-card">
+              <h3 class="about-section-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                Hardware
+              </h3>
+              <dl class="about-dl">
+                <dt>Modelo</dt>
+                <dd>Froggit HP2000</dd>
+                <dt>Fabricante</dt>
+                <dd>Froggit (protocolo Ecowitt)</dd>
+                <dt>Sensores incluídos</dt>
+                <dd>Temperatura e humidade exterior, anemómetro (velocidade e direção), pluviómetro de báscula, barómetro, radiação solar e índice UV</dd>
+                <dt>Transmissão</dt>
+                <dd>Sem fios 915 MHz (sensor externo → consola)</dd>
+                <dt>Envio de dados</dt>
+                <dd>Protocolo Ecowitt via Wi-Fi, a cada 60 segundos</dd>
+              </dl>
+            </div>
+
+            <div class="soft-card about-card">
+              <h3 class="about-section-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Localização
+              </h3>
+              <dl class="about-dl">
+                <dt>Local</dt>
+                <dd>Marinha Grande, Leiria, Portugal</dd>
+                <dt>Enquadramento</dt>
+                <dd>Pinhal do Rei (Pinhal de Leiria) — floresta litoral atlântica</dd>
+                <dt>Coordenadas</dt>
+                <dd>39° 45' N, 8° 56' W</dd>
+                <dt>Altitude</dt>
+                <dd>~50 m</dd>
+                <dt>Referência aeronáutica</dt>
+                <dd>METAR: LPMR (Aeródromo de Marinha Grande, ~8 km)</dd>
+              </dl>
+            </div>
+
+            <div class="soft-card about-card">
+              <h3 class="about-section-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Dados e Arquivo
+              </h3>
+              <dl class="about-dl">
+                <dt>Início do registo local</dt>
+                <dd>20 de abril de 2021</dd>
+                <dt>Período com lacunas</dt>
+                <dd>Maio–agosto 2025 (avaria de servidor); lacunas pontuais em 2023–2024</dd>
+                <dt>Preenchimento de lacunas</dt>
+                <dd>Dias sem dados são complementados com registos de estações Weather Underground vizinhas (IPATAI5, IBARRE4, entre outras), identificados na base de dados pela estação de origem</dd>
+                <dt>Armazenamento</dt>
+                <dd>Base de dados SQLite local; API FastAPI exposta via Cloudflare Tunnel</dd>
+                <dt>Normais climatológicas</dt>
+                <dd>Referência: série histórica do IPMA para a região de Leiria</dd>
+              </dl>
+            </div>
+
+            <div class="soft-card about-card about-card--full">
+              <h3 class="about-section-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Notas
+              </h3>
+              <p class="about-note">Os valores apresentados são medições de uma estação meteorológica pessoal e não têm caráter oficial. A estação não é calibrada periodicamente por entidade certificada. Os dados de temperatura de 1 de janeiro a 7 de março de 2021 provêm da estação IBARRE4 (Weather Underground), com correção estatística de viés aplicada para aproximar os valores às condições locais.</p>
+              <p class="about-note">Este site foi desenvolvido e é mantido por <a href="https://carlos.franquinho.info" target="_blank" rel="noopener">Carlos Franquinho</a>.</p>
+            </div>
+
+          </div>
+        </section>
+
       </div>
     </main>
     
@@ -567,6 +648,10 @@
     <a href="#/clima" data-viewlink="clima">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0z"></path></svg>
       <span>Clima</span>
+    </a>
+    <a href="#/acerca" data-viewlink="acerca">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+      <span>Acerca</span>
     </a>
   </nav>
 

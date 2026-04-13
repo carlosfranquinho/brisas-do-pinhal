@@ -693,19 +693,24 @@ def climate_monthly(station: str = "meteomg"):
     try:
         cur = conn.cursor()
         cur.execute("""
+            WITH primary_days AS (
+              SELECT DISTINCT DATE(ts_local) AS day
+              FROM observations WHERE station_id = ?
+            )
             SELECT
-              DATE(ts_local)                          AS d,
+              DATE(ts_local)                            AS d,
               CAST(strftime('%Y', ts_local) AS INTEGER) AS y,
               CAST(strftime('%m', ts_local) AS INTEGER) AS m,
-              MIN(temp_c)                             AS tmin,
-              MAX(temp_c)                             AS tmax,
-              AVG(temp_c)                             AS tmean,
-              MAX(rain_day_mm)                        AS rain_mm
+              MIN(temp_c)                               AS tmin,
+              MAX(temp_c)                               AS tmax,
+              AVG(temp_c)                               AS tmean,
+              MAX(rain_day_mm)                          AS rain_mm
             FROM observations
             WHERE station_id = ?
+               OR DATE(ts_local) NOT IN (SELECT day FROM primary_days)
             GROUP BY DATE(ts_local)
             ORDER BY d ASC
-        """, (station,))
+        """, (station, station))
         daily = [dict(r) for r in cur.fetchall()]
     finally:
         conn.close()
