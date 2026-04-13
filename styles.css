@@ -1199,3 +1199,23 @@ body {
   text-decoration: none;
 }
 .about-note a:hover { text-decoration: underline; }
+.about-card--photo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px;
+}
+.about-station-img {
+  width: 100%;
+  max-width: 560px;
+  height: auto;
+  border-radius: 10px;
+  display: block;
+}
+.about-img-caption {
+  font-size: 0.8rem;
+  color: var(--text-light);
+  text-align: center;
+  margin: 0;
+}
