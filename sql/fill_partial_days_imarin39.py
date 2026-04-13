@@ -2,10 +2,23 @@
 Preenche dias com menos de THRESHOLD registos locais (station_id='meteomg')
 com dados da própria estação no Wunderground (IMARIN39).
 
-Como IMARIN39 é a mesma estação física, os dados são equivalentes a 'meteomg'
-mas ficam marcados como 'IMARIN39' para rastreabilidade.
+IMARIN39 é a mesma estação física que 'meteomg' — o Ecowitt envia em paralelo
+para o servidor local (a cada 5 min, timestamps exactos em UTC) e para o WU
+(a cada ~5 min, com ~16s de desfasamento, timestamps correctos em UTC).
+Os registos WU ficam marcados como 'IMARIN39' para rastreabilidade.
 
-Só insere timestamps que não existam já na BD (qualquer station_id).
+Estratégia de inserção:
+- Para cada dia parcial, determina o MAX(ts_utc) dos dados locais existentes.
+- Insere apenas registos WU posteriores a esse instante (preenche o "fim" do dia).
+- Não toca nos dados locais existentes nem duplica timestamps.
+- Salta dias que já tenham registos IMARIN39 (NOT IN subquery no get_partial_dates).
+
+Nota sobre timestamps:
+- Os registos 'meteomg' têm ts_utc correcto em UTC (verificado e corrigido).
+- Os registos IMARIN39/WU têm ts_utc correcto em UTC (campo obsTimeUtc da API WU).
+- O ts_local tem sempre o offset explícito (+00:00 inverno / +01:00 verão).
+- Para agrupar por data local usar substr(ts_local, 1, 10), não DATE(ts_local)
+  (SQLite interpreta o offset +01:00 e converte para UTC antes de extrair a data).
 
 Uso:
     python3 sql/fill_partial_days_imarin39.py [--dry-run]

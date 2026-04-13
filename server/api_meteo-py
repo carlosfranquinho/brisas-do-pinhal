@@ -1,3 +1,14 @@
+# Convenções de timestamp na BD (observations):
+#   ts_utc   — UTC com sufixo Z (ex: "2024-07-04T22:59:59Z")
+#   ts_local — hora local Portugal com offset explícito (ex: "2024-07-05T00:59:59+02:00")
+#
+# ATENÇÃO: DATE(ts_local) no SQLite converte o offset para UTC antes de extrair a data,
+# devolvendo a data errada para registos com +01:00/+02:00.
+# Usar sempre substr(ts_local, 1, 10) para obter a data local correcta.
+#
+# Os registos 'meteomg' anteriores a 2026-04-11 tinham ts_utc em hora local (bug do
+# sistema MySQL antigo). Foram corrigidos subtraindo 1h aos registos de verão (+01:00).
+
 from fastapi import FastAPI, Request, Query
 from fastapi.responses import PlainTextResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware

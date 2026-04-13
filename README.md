@@ -112,6 +112,34 @@ sqlite3 /var/lib/meteo/meteo.db < sql/init_schema.sql
 
 Em produção o serviço é gerido pelo systemd (`meteo-api.service`) e exposto via Cloudflare Tunnel em `api.brisas.pinhaldorei.net`.
 
+## Base de dados — notas sobre qualidade e cobertura
+
+### Fontes de dados
+
+A BD SQLite (`observations`) agrega dados de várias fontes, identificadas pelo campo `station_id`:
+
+| station_id | Fonte | Período | Intervalo |
+|---|---|---|---|
+| `meteomg` | Servidor local (Ecowitt → FastAPI) | abr 2021 – presente | 5 min |
+| `IMARIN39` | Mesma estação física via Weather Underground | abr 2021 – ago 2025 | ~5 min (+16s) |
+| `IPATAI5` | Estação WU vizinha (9.3 km) | mar 2023 – mar 2026 | ~5 min |
+| `IBARRE4` | Estação WU vizinha (12.1 km) | jan – mar 2021 | ~5 min |
+| `IBARRE8` | Estação WU vizinha (15.0 km) | mar 2021 – mar 2026 | ~5 min |
+
+Os registos de estações externas só existem em períodos onde não há dados `meteomg` — nunca sobrepõem dados locais (eliminados registos redundantes por bucket de 5 minutos).
+
+### Timestamps
+
+- `ts_utc` — sempre em UTC com sufixo `Z`
+- `ts_local` — hora local Portugal com offset explícito (`+00:00` inverno / `+01:00` verão)
+- Para agrupar por data local usar `substr(ts_local, 1, 10)` — **não** `DATE(ts_local)`, porque o SQLite interpreta o offset `+01:00` e converte para UTC antes de extrair a data
+
+### Cobertura histórica
+
+O sistema antigo (MySQL) armazenava o ts_utc em hora local (bug corrigido em 2026 — 188 768 registos de verão actualizados). A série cobre abr 2021 – presente com ~29 dias parciais (< 1/3 dos registos esperados) em ~1650 dias totais.
+
+Os dados de mai–ago 2025 têm menor densidade porque a estação esteve offline por obras no edifício.
+
 ## Desenvolvimento
 
 Verificações antes de fazer commit:
