@@ -671,6 +671,7 @@ body {
 /* Previsão na sidebar */
 .sidebar-forecast {
   margin-top: auto;
+  padding-top: 24px;
   margin-bottom: 20px;
 }
 .sidebar-forecast-header {
@@ -929,14 +930,15 @@ body {
   box-shadow: var(--shadow-hover);
 }
 .ac-icon {
-  width: 48px; height: 48px;
-  border-radius: 14px;
+  width: 64px; height: 64px;
+  border-radius: 18px;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
-.ac-icon svg { width: 24px; height: 24px; }
-.ac-icon img { width: 34px; height: 34px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.15)); }
-.ac-icon--rose, .ac-icon--teal { background: none; }
+.ac-icon svg { width: 32px; height: 32px; }
+.ac-icon img { width: 44px; height: 44px; }
+.ac-icon--rose { background: rgba(244,63,94,.1); }
+.ac-icon--teal { background: rgba(20,184,166,.1); }
 .ac-body { flex: 1; min-width: 0; }
 .ac-body h3 { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
 .ac-body p  { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; }
