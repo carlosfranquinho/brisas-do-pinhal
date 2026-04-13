@@ -532,17 +532,41 @@ def analysis_temperature():
             FROM observations WHERE temp_c IS NOT NULL
             GROUP BY DATE(ts_local) ORDER BY value DESC LIMIT 10
         """)
-        top_hot = [dict(r) for r in cur.fetchall()]
+        top_max = [dict(r) for r in cur.fetchall()]
 
         cur.execute("""
             SELECT DATE(ts_local) AS date, ROUND(MIN(temp_c), 1) AS value
             FROM observations WHERE temp_c IS NOT NULL
             GROUP BY DATE(ts_local) ORDER BY value ASC LIMIT 10
         """)
-        top_cold = [dict(r) for r in cur.fetchall()]
+        top_min = [dict(r) for r in cur.fetchall()]
+
+        cur.execute("""
+            SELECT DATE(ts_local) AS date,
+                   ROUND((MAX(temp_c) + MIN(temp_c)) / 2.0, 1) AS value
+            FROM observations WHERE temp_c IS NOT NULL
+            GROUP BY DATE(ts_local)
+            HAVING MAX(temp_c) IS NOT NULL AND MIN(temp_c) IS NOT NULL
+            ORDER BY value DESC LIMIT 10
+        """)
+        top_warm_days = [dict(r) for r in cur.fetchall()]
+
+        cur.execute("""
+            SELECT DATE(ts_local) AS date,
+                   ROUND((MAX(temp_c) + MIN(temp_c)) / 2.0, 1) AS value
+            FROM observations WHERE temp_c IS NOT NULL
+            GROUP BY DATE(ts_local)
+            HAVING MAX(temp_c) IS NOT NULL AND MIN(temp_c) IS NOT NULL
+            ORDER BY value ASC LIMIT 10
+        """)
+        top_cold_days = [dict(r) for r in cur.fetchall()]
     finally:
         conn.close()
-    return {"by_year_month": by_year_month, "top_hot": top_hot, "top_cold": top_cold}
+    return {
+        "by_year_month": by_year_month,
+        "top_max": top_max, "top_min": top_min,
+        "top_warm_days": top_warm_days, "top_cold_days": top_cold_days,
+    }
 
 
 @app.get("/history/analysis/precipitation")

@@ -32,7 +32,7 @@ function loadScript(url) {
 }
 const CHARTJS_URL  = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js';
 const SUNCALC_URL  = 'https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.min.js';
-const VIEWS_JS_URL = 'app-views.js?v=3';
+const VIEWS_JS_URL = 'app-views.js?v=4';
 function ensureChartJs()    { return window.Chart   ? Promise.resolve() : loadScript(CHARTJS_URL);  }
 function ensureSunCalc()    { return window.SunCalc  ? Promise.resolve() : loadScript(SUNCALC_URL); }
 function ensureViewsScript(){ return loadScript(VIEWS_JS_URL); }
