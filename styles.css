@@ -1166,6 +1166,11 @@ body {
 .about-card--full {
   grid-column: 1 / -1;
 }
+@media (min-width: 850px) {
+  .about-card--data {
+    grid-row: span 2;
+  }
+}
 
 .about-section-title {
   display: flex;
