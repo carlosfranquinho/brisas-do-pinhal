@@ -46,7 +46,6 @@ function renderClimateTable(months) {
     { label: 'Média máx', key: 'tmax_mean', unit: '°C', dec: 1, hot: true },
     { label: 'Média min', key: 'tmin_mean', unit: '°C', dec: 1, cold: true },
     { label: 'Dias com geada (min<0°)', key: 'frost_days', dec: 1 },
-    { label: 'Dias com gelo (máx<0°)', key: 'ice_days', dec: 1 },
     { label: 'Dias de verão (máx>25°)', key: 'summer_days', dec: 1 },
     { label: 'Dias tropicais (máx>30°)', key: 'tropical_days', dec: 1 },
     { label: 'Noites tropicais (min≥20°)', key: 'tropical_nights', dec: 1 },
