@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -21,15 +22,16 @@
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="Brisas do Pinhal | Estação Meteorológica" />
   <meta name="twitter:description" content="Dados meteorológicos em tempo real da estação amadora Brisas do Pinhal." />
-  
+
   <!-- Fonts: async, não bloqueia render -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" as="style"
-        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-        onload="this.onload=null;this.rel='stylesheet'">
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+    <link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
   </noscript>
 
   <link rel="stylesheet" href="styles.css?v=25" />
@@ -45,7 +47,7 @@
   <div class="ambient-gradient secondary-grad"></div>
 
   <div class="layout-container">
-    
+
     <!-- ══════════════ HEADER / SIDE-NAV (Desktop) ══════════════ -->
     <header class="app-header">
       <a href="#/" class="brand" aria-label="Brisas do Pinhal — página inicial">
@@ -63,22 +65,40 @@
           </div>
         </div>
       </a>
-      
+
       <nav class="main-nav" aria-label="Navegação Principal">
         <a href="#/" data-viewlink="home" class="active">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
           Agora
         </a>
         <a href="#/historico" data-viewlink="historico">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
           Histórico
         </a>
         <a href="#/clima" data-viewlink="clima">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0z"></path></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0z"></path>
+          </svg>
           Clima Mensal
         </a>
         <a href="#/acerca" data-viewlink="acerca">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
           Acerca
         </a>
       </nav>
@@ -100,7 +120,8 @@
       </div>
 
       <div class="sidebar-copyright hidden-mobile">
-        © <a href="https://carlos.franquinho.info" target="_blank" rel="noopener">Carlos Franquinho</a>, <span id="copyrightYear"></span>
+        © <a href="https://carlos.franquinho.info" target="_blank" rel="noopener">Carlos Franquinho</a>, <span
+          id="copyrightYear"></span>
       </div>
     </header>
 
@@ -110,7 +131,7 @@
 
         <!-- ── HOME ── -->
         <section data-view="home" class="view-section">
-          
+
           <div class="hero-dashboard">
             <!-- Coluna Principal (Hero Current) -->
             <div class="hero-primary soft-card">
@@ -119,8 +140,7 @@
               </div>
               <div class="hero-body">
                 <div class="weather-icon-container">
-                  <img id="bm-now-ico" class="now-icon-img"
-                       src="icons/cloudy.svg" alt="condições atuais" />
+                  <img id="bm-now-ico" class="now-icon-img" src="icons/cloudy.svg" alt="condições atuais" />
                 </div>
                 <div class="temp-display">
                   <div class="temp-huge">
@@ -246,7 +266,8 @@
 
             <div class="soft-card metric-box">
               <div class="mb-top">
-                <span class="m-icon icon-teal"><img src="icons/extra/thermometer-raindrop.svg" alt="ponto de orvalho" /></span>
+                <span class="m-icon icon-teal"><img src="icons/extra/thermometer-raindrop.svg"
+                    alt="ponto de orvalho" /></span>
                 <span class="m-label">Pto. Orvalho</span>
               </div>
               <div class="mb-row">
@@ -257,7 +278,8 @@
 
             <div class="soft-card metric-box">
               <div class="mb-top">
-                <span class="m-icon icon-purple" id="pressIcon"><img src="icons/extra/pressure-high.svg" alt="pressão" /></span>
+                <span class="m-icon icon-purple" id="pressIcon"><img src="icons/extra/pressure-high.svg"
+                    alt="pressão" /></span>
                 <span class="m-label">Pressão</span>
               </div>
               <div class="mb-row">
@@ -279,7 +301,8 @@
 
             <div class="soft-card metric-box">
               <div class="mb-top">
-                <span class="m-icon icon-yellow"><img src="icons/extra/thermometer-sun.svg" alt="radiação solar" /></span>
+                <span class="m-icon icon-yellow"><img src="icons/extra/thermometer-sun.svg"
+                    alt="radiação solar" /></span>
                 <span class="m-label">Rad. Solar</span>
               </div>
               <div class="mb-row">
@@ -323,137 +346,167 @@
 
           <!-- Vista principal -->
           <div id="historicoMain">
-          <div class="page-header" style="margin-bottom: 24px;">
-            <h2 class="page-title">Histórico e Recordes</h2>
-            <p class="page-subtitle">Consulte extremos climáticos ou navegue para qualquer dia do arquivo.</p>
-          </div>
+            <div class="page-header" style="margin-bottom: 24px;">
+              <h2 class="page-title">Histórico e Recordes</h2>
+              <p class="page-subtitle">Consulte extremos climáticos ou navegue para qualquer dia do arquivo.</p>
+            </div>
 
-          <!-- All Time Records -->
-          <div id="allTimeRecords" style="margin-bottom: 32px;">
-            <div class="card-header-clean" style="margin-bottom: 16px;">
-              <h2 style="font-size: 1.25rem;">Recordes Absolutos da Estação</h2>
-            </div>
-            <div class="metrics-masonry">
-              <div class="soft-card metric-box" style="background: rgba(244, 63, 94, 0.05); border: 1px solid rgba(244, 63, 94, 0.1);">
-                <div class="mb-top"><span class="m-label" style="color: var(--accent-rose);">Temp. Máxima Abs.</span></div>
-                <div class="mb-value"><span id="recHotV">—</span><span class="m-unit">°C</span></div>
-                <div style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px; font-weight: 600;" id="recHotD">—</div>
+            <!-- All Time Records -->
+            <div id="allTimeRecords" style="margin-bottom: 32px;">
+              <div class="card-header-clean" style="margin-bottom: 16px;">
+                <h2 style="font-size: 1.25rem;">Recordes Absolutos da Estação</h2>
               </div>
-              <div class="soft-card metric-box" style="background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.1);">
-                <div class="mb-top"><span class="m-label" style="color: var(--accent-blue);">Temp. Mínima Abs.</span></div>
-                <div class="mb-value"><span id="recColdV">—</span><span class="m-unit">°C</span></div>
-                <div style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px; font-weight: 600;" id="recColdD">—</div>
-              </div>
-              <div class="soft-card metric-box" style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.1);">
-                <div class="mb-top"><span class="m-label" style="color: #10b981;">Precipitação Recorde</span></div>
-                <div class="mb-value"><span id="recRainV">—</span><span class="m-unit">mm</span></div>
-                <div style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px; font-weight: 600;" id="recRainD">—</div>
-              </div>
-              <div class="soft-card metric-box" style="background: rgba(148, 163, 184, 0.05); border: 1px solid rgba(148, 163, 184, 0.1);">
-                <div class="mb-top"><span class="m-label" style="color: #64748b;">Rajada Recorde</span></div>
-                <div class="mb-value"><span id="recGustV">—</span><span class="m-unit">km/h</span></div>
-                <div style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px; font-weight: 600;" id="recGustD">—</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Arquivo por ano -->
-          <div id="yearsList" style="margin-bottom: 32px;">
-            <div class="card-header-clean" style="margin-bottom: 16px;">
-              <h2 style="font-size: 1.25rem;">Arquivo por Ano</h2>
-            </div>
-            <div id="yearCards" class="year-cards-grid">
-              <div class="year-cards-loading">A carregar anos…</div>
-            </div>
-          </div>
-
-          <!-- Análise Detalhada -->
-          <div style="margin-top: 8px;">
-            <div class="card-header-clean" style="margin-bottom: 16px;">
-              <h2 style="font-size: 1.25rem;">Análise Detalhada</h2>
-            </div>
-            <div class="analise-cards-grid">
-              <a href="#/historico/analise/temperatura" class="analise-card soft-card">
-                <div class="ac-icon ac-icon--rose">
-                  <img src="icons/extra/thermometer-warmer.svg" alt="temperatura" />
+              <div class="metrics-masonry">
+                <div class="soft-card metric-box"
+                  style="background: rgba(244, 63, 94, 0.05); border: 1px solid rgba(244, 63, 94, 0.1);">
+                  <div class="mb-top"><span class="m-label" style="color: var(--accent-rose);">Temp. Máxima Abs.</span>
+                  </div>
+                  <div class="mb-value"><span id="recHotV">—</span><span class="m-unit">°C</span></div>
+                  <div style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px; font-weight: 600;"
+                    id="recHotD">—</div>
                 </div>
-                <div class="ac-body">
-                  <h3>Temperatura</h3>
-                  <p>Médias mensais por ano, extremos históricos, top 10 dias mais quentes e mais frios.</p>
+                <div class="soft-card metric-box"
+                  style="background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.1);">
+                  <div class="mb-top"><span class="m-label" style="color: var(--accent-blue);">Temp. Mínima Abs.</span>
+                  </div>
+                  <div class="mb-value"><span id="recColdV">—</span><span class="m-unit">°C</span></div>
+                  <div style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px; font-weight: 600;"
+                    id="recColdD">—</div>
                 </div>
-                <svg class="ac-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-              </a>
-              <a href="#/historico/analise/precipitacao" class="analise-card soft-card">
-                <div class="ac-icon ac-icon--teal">
-                  <img src="icons/extra/raindrops.svg" alt="precipitação" />
+                <div class="soft-card metric-box"
+                  style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.1);">
+                  <div class="mb-top"><span class="m-label" style="color: #10b981;">Precipitação Recorde</span></div>
+                  <div class="mb-value"><span id="recRainV">—</span><span class="m-unit">mm</span></div>
+                  <div style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px; font-weight: 600;"
+                    id="recRainD">—</div>
                 </div>
-                <div class="ac-body">
-                  <h3>Precipitação</h3>
-                  <p>Totais mensais por ano, top 10 dias mais chuvosos e anos com maior pluviosidade.</p>
+                <div class="soft-card metric-box"
+                  style="background: rgba(148, 163, 184, 0.05); border: 1px solid rgba(148, 163, 184, 0.1);">
+                  <div class="mb-top"><span class="m-label" style="color: #64748b;">Rajada Recorde</span></div>
+                  <div class="mb-value"><span id="recGustV">—</span><span class="m-unit">km/h</span></div>
+                  <div style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px; font-weight: 600;"
+                    id="recGustD">—</div>
                 </div>
-                <svg class="ac-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-              </a>
-            </div>
-          </div>
-
-          <!-- Arquivo Diário -->
-          <div style="margin-top: 32px;">
-            <div class="card-header-clean" style="margin-bottom: 16px;">
-              <h2 style="font-size: 1.25rem;">Arquivo Diário</h2>
-            </div>
-            <div class="soft-card date-picker-card" style="margin-bottom: 24px; text-align: center; padding: 32px 24px;">
-              <p style="color: var(--text-light); font-weight: 700; margin-bottom: 16px; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase;">Aceder ao Arquivo Diário</p>
-              <div style="display: inline-flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; background: var(--bg-color); padding: 8px; border-radius: 16px; border: 1px solid var(--glass-border);">
-                <input type="date" id="historyDateInput" style="padding: 14px 20px; border: none; border-radius: 12px; font-family: inherit; font-size: 1rem; color: var(--text-primary); background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.05); outline: none; cursor: pointer;">
-                <button id="historyBtn" style="background: var(--accent); color: white; border: none; padding: 14px 28px; border-radius: 12px; cursor: pointer; font-weight: 700; font-family: inherit; font-size: 1rem; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
-                  Consultar Data
-                </button>
               </div>
             </div>
 
-            <div id="historyLoading" style="display: none; text-align: center; padding: 40px; color: var(--text-light);">A procurar nos arquivos...</div>
-            <div id="historyError" style="display: none; text-align: center; padding: 40px; color: var(--accent-rose); font-weight: bold; background: white; border-radius: 16px;"></div>
+            <!-- Arquivo por ano -->
+            <div id="yearsList" style="margin-bottom: 32px;">
+              <div class="card-header-clean" style="margin-bottom: 16px;">
+                <h2 style="font-size: 1.25rem;">Arquivo por Ano</h2>
+              </div>
+              <div id="yearCards" class="year-cards-grid">
+                <div class="year-cards-loading">A carregar anos…</div>
+              </div>
+            </div>
 
-            <div id="historyContent" style="display: none; flex-direction: column; gap: 24px;">
-              <!-- Cartões de Resumo do Dia -->
-              <div class="metrics-masonry" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));">
-                <div class="soft-card metric-box">
-                  <div class="mb-top"><span class="m-label" style="color: var(--accent-rose);">Máxima Diária</span></div>
-                  <div class="mb-value"><span id="hTmax">—</span> <span class="m-unit">°C</span></div>
-                </div>
-                <div class="soft-card metric-box">
-                  <div class="mb-top"><span class="m-label" style="color: var(--accent-blue);">Mínima Diária</span></div>
-                  <div class="mb-value"><span id="hTmin">—</span> <span class="m-unit">°C</span></div>
-                </div>
-                <div class="soft-card metric-box">
-                  <div class="mb-top"><span class="m-label" style="color: var(--text-primary);">Média Diária</span></div>
-                  <div class="mb-value"><span id="hTmean">—</span> <span class="m-unit">°C</span></div>
-                </div>
-                <div class="soft-card metric-box">
-                  <div class="mb-top"><span class="m-label" style="color: var(--accent-teal);">Total de Chuva</span></div>
-                  <div class="mb-value"><span id="hRain">—</span> <span class="m-unit">mm</span></div>
-                </div>
-                <div class="soft-card metric-box">
-                  <div class="mb-top"><span class="m-label">Rajada Máxima</span></div>
-                  <div class="mb-value"><span id="hGust">—</span> <span class="m-unit">km/h</span></div>
+            <!-- Análise Detalhada -->
+            <div style="margin-top: 8px;">
+              <div class="card-header-clean" style="margin-bottom: 16px;">
+                <h2 style="font-size: 1.25rem;">Análise Detalhada</h2>
+              </div>
+              <div class="analise-cards-grid">
+                <a href="#/historico/analise/temperatura" class="analise-card soft-card">
+                  <div class="ac-icon ac-icon--rose">
+                    <img src="icons/extra/thermometer-warmer.svg" alt="temperatura" />
+                  </div>
+                  <div class="ac-body">
+                    <h3>Temperatura</h3>
+                    <p>Médias mensais por ano, extremos históricos, top 10 dias mais quentes e mais frios.</p>
+                  </div>
+                  <svg class="ac-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                </a>
+                <a href="#/historico/analise/precipitacao" class="analise-card soft-card">
+                  <div class="ac-icon ac-icon--teal">
+                    <img src="icons/extra/raindrops.svg" alt="precipitação" />
+                  </div>
+                  <div class="ac-body">
+                    <h3>Precipitação</h3>
+                    <p>Totais mensais por ano, top 10 dias mais chuvosos e anos com maior pluviosidade.</p>
+                  </div>
+                  <svg class="ac-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+
+            <!-- Arquivo Diário -->
+            <div style="margin-top: 32px;">
+              <div class="card-header-clean" style="margin-bottom: 16px;">
+                <h2 style="font-size: 1.25rem;">Arquivo Diário</h2>
+              </div>
+              <div class="soft-card date-picker-card"
+                style="margin-bottom: 24px; text-align: center; padding: 32px 24px;">
+                <p
+                  style="color: var(--text-light); font-weight: 700; margin-bottom: 16px; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase;">
+                  Aceder ao Arquivo Diário</p>
+                <div
+                  style="display: inline-flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; background: var(--bg-color); padding: 8px; border-radius: 16px; border: 1px solid var(--glass-border);">
+                  <input type="date" id="historyDateInput"
+                    style="padding: 14px 20px; border: none; border-radius: 12px; font-family: inherit; font-size: 1rem; color: var(--text-primary); background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.05); outline: none; cursor: pointer;">
+                  <button id="historyBtn"
+                    style="background: var(--accent); color: white; border: none; padding: 14px 28px; border-radius: 12px; cursor: pointer; font-weight: 700; font-family: inherit; font-size: 1rem; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
+                    Consultar Data
+                  </button>
                 </div>
               </div>
 
-              <!-- Gráfico Intradiário -->
-              <div class="soft-card">
-                <div class="card-header-clean">
-                  <h2>Evolução no Dia</h2>
+              <div id="historyLoading"
+                style="display: none; text-align: center; padding: 40px; color: var(--text-light);">A procurar nos
+                arquivos...</div>
+              <div id="historyError"
+                style="display: none; text-align: center; padding: 40px; color: var(--accent-rose); font-weight: bold; background: white; border-radius: 16px;">
+              </div>
+
+              <div id="historyContent" style="display: none; flex-direction: column; gap: 24px;">
+                <!-- Cartões de Resumo do Dia -->
+                <div class="metrics-masonry" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));">
+                  <div class="soft-card metric-box">
+                    <div class="mb-top"><span class="m-label" style="color: var(--accent-rose);">Máxima Diária</span>
+                    </div>
+                    <div class="mb-value"><span id="hTmax">—</span> <span class="m-unit">°C</span></div>
+                  </div>
+                  <div class="soft-card metric-box">
+                    <div class="mb-top"><span class="m-label" style="color: var(--accent-blue);">Mínima Diária</span>
+                    </div>
+                    <div class="mb-value"><span id="hTmin">—</span> <span class="m-unit">°C</span></div>
+                  </div>
+                  <div class="soft-card metric-box">
+                    <div class="mb-top"><span class="m-label" style="color: var(--text-primary);">Média Diária</span>
+                    </div>
+                    <div class="mb-value"><span id="hTmean">—</span> <span class="m-unit">°C</span></div>
+                  </div>
+                  <div class="soft-card metric-box">
+                    <div class="mb-top"><span class="m-label" style="color: var(--accent-teal);">Total de Chuva</span>
+                    </div>
+                    <div class="mb-value"><span id="hRain">—</span> <span class="m-unit">mm</span></div>
+                  </div>
+                  <div class="soft-card metric-box">
+                    <div class="mb-top"><span class="m-label">Rajada Máxima</span></div>
+                    <div class="mb-value"><span id="hGust">—</span> <span class="m-unit">km/h</span></div>
+                  </div>
                 </div>
-                <div class="chart-container" style="height: 350px; position: relative; width: 100%;">
-                  <div class="chart-scroll-wrapper">
-                    <div class="chart-scroll-inner">
-                      <canvas id="historyDailyChart"></canvas>
+
+                <!-- Gráfico Intradiário -->
+                <div class="soft-card">
+                  <div class="card-header-clean">
+                    <h2>Evolução no Dia</h2>
+                  </div>
+                  <div class="chart-container" style="height: 350px; position: relative; width: 100%;">
+                    <div class="chart-scroll-wrapper">
+                      <div class="chart-scroll-inner">
+                        <canvas id="historyDailyChart"></canvas>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
           </div><!-- /historicoMain -->
 
@@ -461,7 +514,10 @@
           <div id="yearDetail" hidden>
             <div class="year-detail-nav">
               <a href="#/historico" class="back-link">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                  stroke-linejoin="round" width="18" height="18">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
                 Histórico
               </a>
               <h2 id="yearDetailTitle" class="year-detail-title">—</h2>
@@ -495,7 +551,10 @@
           <div id="analiseDetail" hidden>
             <div class="year-detail-nav">
               <a href="#/historico" class="back-link">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                  stroke-linejoin="round" width="18" height="18">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
                 Histórico
               </a>
               <h2 id="analiseTitle" class="year-detail-title">—</h2>
@@ -545,7 +604,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="soft-card table-card">
             <div class="table-wrapper custom-scroll">
               <table id="climateTable" class="clean-table"></table>
@@ -563,7 +622,11 @@
 
             <div class="soft-card about-card">
               <h3 class="about-section-title">
-                <div class="ast-icon c-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+                <div class="ast-icon c-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                    <rect x="2" y="3" width="20" height="14" rx="2" />
+                    <path d="M8 21h8M12 17v4" />
+                  </svg></div>
                 Hardware
               </h3>
               <dl class="about-dl">
@@ -572,7 +635,8 @@
                 <dt>Fabricante</dt>
                 <dd>Froggit (protocolo Ecowitt)</dd>
                 <dt>Sensores incluídos</dt>
-                <dd>Temperatura e humidade exterior, anemómetro (velocidade e direção), pluviómetro de báscula, barómetro, radiação solar e índice UV</dd>
+                <dd>Temperatura e humidade exterior, anemómetro (velocidade e direção), pluviómetro de báscula,
+                  barómetro, radiação solar e índice UV</dd>
                 <dt>Transmissão</dt>
                 <dd>Sem fios 915 MHz (sensor externo → consola)</dd>
                 <dt>Envio de dados</dt>
@@ -582,7 +646,11 @@
 
             <div class="soft-card about-card">
               <h3 class="about-section-title">
-                <div class="ast-icon c-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+                <div class="ast-icon c-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg></div>
                 Localização
               </h3>
               <dl class="about-dl">
@@ -595,26 +663,34 @@
                 <dt>Altitude</dt>
                 <dd>~50 m</dd>
                 <dt>Referência aeronáutica</dt>
-                <dd>METAR: LPMR (Base Aérea de Monte Real, ~12 km)</dd>
+                <dd>METAR: LPMR (Base Aérea de Monte Real, ~10 km)</dd>
               </dl>
             </div>
 
             <div class="soft-card about-card about-card--data">
               <h3 class="about-section-title">
-                <div class="ast-icon c-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+                <div class="ast-icon c-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                  </svg></div>
                 Dados e Arquivo
               </h3>
               <dl class="about-dl">
                 <dt>Início do registo local</dt>
                 <dd>20 de abril de 2021</dd>
                 <dt>Cobertura</dt>
-                <dd>Série contínua desde abril de 2021, com cerca de 29 dias parciais em ~1650 dias totais. Os períodos de maio a agosto de 2025 têm menor densidade de registos por a estação ter estado offline durante obras no edifício.</dd>
+                <dd>Série contínua desde abril de 2021, com cerca de 29 dias parciais em ~1650 dias totais. Os períodos
+                  de maio a agosto de 2025 têm menor densidade de registos por a estação ter estado offline durante
+                  obras no edifício.</dd>
                 <dt>Preenchimento de lacunas</dt>
-                <dd>Dias sem dados locais são complementados com registos da mesma estação via Weather Underground (IMARIN39) ou de estações vizinhas (IPATAI5, IBARRE4, entre outras), identificados na base de dados pela estação de origem.</dd>
+                <dd>Dias sem dados locais são complementados com registos da mesma estação via Weather Underground
+                  (IMARIN39) ou de estações vizinhas (IPATAI5, IBARRE4, entre outras), identificados na base de dados
+                  pela estação de origem.</dd>
                 <dt>Armazenamento</dt>
                 <dd>Base de dados SQLite local; API FastAPI exposta via Cloudflare Tunnel</dd>
                 <dt>Dados em tempo real — fallback</dt>
-                <dd>Quando a estação local está offline, os dados em tempo real são obtidos automaticamente da estação IMARIN131 (Weather Underground), localizada a cerca de 900 m.</dd>
+                <dd>Quando a estação local está offline, os dados em tempo real são obtidos automaticamente da estação
+                  IMARIN131 (Weather Underground), localizada a cerca de 750 m.</dd>
               </dl>
             </div>
 
@@ -629,12 +705,17 @@
 
             <div class="soft-card about-card">
               <h3 class="about-section-title">
-                <div class="ast-icon c-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+                <div class="ast-icon c-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                    <polyline points="16 18 22 12 16 6" />
+                    <polyline points="8 6 2 12 8 18" />
+                  </svg></div>
                 Créditos
               </h3>
               <dl class="about-dl">
                 <dt>Ícones meteorológicos</dt>
-                <dd><a href="https://bas.dev/work/meteocons" target="_blank" rel="noopener">Meteocons</a> por Bas Milius — licença MIT</dd>
+                <dd><a href="https://bas.dev/work/meteocons" target="_blank" rel="noopener">Meteocons</a> por Bas Milius
+                  — licença MIT</dd>
                 <dt>Previsão</dt>
                 <dd>IPMA — Instituto Português do Mar e da Atmosfera</dd>
                 <dt>METAR</dt>
@@ -644,13 +725,22 @@
               </dl>
             </div>
 
-            <div class="soft-card about-card about-card--full">
+            <div class="soft-card about-card">
               <h3 class="about-section-title">
-                <div class="ast-icon c-rose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+                <div class="ast-icon c-rose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg></div>
                 Notas
               </h3>
-              <p class="about-note">Os valores apresentados são medições de uma estação meteorológica pessoal e não têm caráter oficial. A estação não é calibrada periodicamente por entidade certificada. Os dados de janeiro a março de 2021 provêm maioritariamente de estações Weather Underground vizinhas, com correção estatística de viés de temperatura aplicada para aproximar os valores às condições locais.</p>
-              <p class="about-note">Este site foi desenvolvido e é mantido por <a href="https://carlos.franquinho.info" target="_blank" rel="noopener">Carlos Franquinho</a>.</p>
+              <p class="about-note">Os valores apresentados são medições de uma estação meteorológica pessoal e não têm
+                caráter oficial. A estação não é calibrada periodicamente por entidade certificada. Os dados de janeiro
+                a março de 2021 provêm maioritariamente de estações Weather Underground vizinhas, com correção
+                estatística de viés de temperatura aplicada para aproximar os valores às condições locais.</p>
+              <p class="about-note">Este site foi desenvolvido e é mantido por <a href="https://carlos.franquinho.info"
+                  target="_blank" rel="noopener">Carlos Franquinho</a>.</p>
             </div>
 
           </div>
@@ -658,25 +748,43 @@
 
       </div>
     </main>
-    
+
   </div>
 
   <!-- Bottom tab bar (mobile only) -->
   <nav class="bottom-tab-bar" aria-label="Navegação">
     <a href="#/" data-viewlink="home" class="active">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
       <span>Agora</span>
     </a>
     <a href="#/historico" data-viewlink="historico">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="16" y1="2" x2="16" y2="6"></line>
+        <line x1="8" y1="2" x2="8" y2="6"></line>
+        <line x1="3" y1="10" x2="21" y2="10"></line>
+      </svg>
       <span>Histórico</span>
     </a>
     <a href="#/clima" data-viewlink="clima">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0z"></path></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+        <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0z"></path>
+      </svg>
       <span>Clima</span>
     </a>
     <a href="#/acerca" data-viewlink="acerca">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
       <span>Acerca</span>
     </a>
   </nav>
@@ -697,4 +805,5 @@
     }, 500);
   </script>
 </body>
+
 </html>
