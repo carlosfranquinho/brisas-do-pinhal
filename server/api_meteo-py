@@ -696,6 +696,22 @@ def analysis_precipitation():
         """)
         top_years = [dict(r) for r in cur.fetchall()]
 
+        # Top 10 meses mais chuvosos
+        cur.execute("""
+            SELECT year, month, ROUND(SUM(max_day), 1) AS total
+            FROM (
+                SELECT
+                    CAST(strftime('%Y', ts_local) AS INTEGER) AS year,
+                    CAST(strftime('%m', ts_local) AS INTEGER) AS month,
+                    MAX(rain_day_mm) AS max_day
+                FROM observations
+                WHERE rain_day_mm IS NOT NULL
+                GROUP BY substr(ts_local, 1, 10)
+            )
+            GROUP BY year, month ORDER BY total DESC LIMIT 10
+        """)
+        top_months = [dict(r) for r in cur.fetchall()]
+
         # Top 10 intensidades de precipitação (rain rate mm/h)
         cur.execute("""
             SELECT ts_local AS date, ROUND(rain_rate_mmph, 1) AS value
@@ -710,6 +726,7 @@ def analysis_precipitation():
         "by_year_month": by_year_month,
         "top_rain": top_rain,
         "top_years": top_years,
+        "top_months": top_months,
         "top_rate": top_rate,
     }
 

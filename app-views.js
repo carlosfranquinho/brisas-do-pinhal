@@ -525,7 +525,7 @@ function renderAnaliseTop10(d, isTemp) {
       makeTable('Top 10 — Dias mais quentes',    d.top_warm_days, '°C', 'is-hot') +
       makeTable('Top 10 — Dias mais frios',      d.top_cold_days, '°C', 'is-cold');
   } else {
-    el.className = 'analise-top10-grid analise-top10-grid--3';
+    el.className = 'analise-top10-grid analise-top10-grid--4';
     const rateRows = (d.top_rate || []).map(r => {
       let label = r.date ?? '—';
       try {
@@ -534,8 +534,13 @@ function renderAnaliseTop10(d, isTemp) {
       } catch(_) {}
       return { date: label, value: r.value };
     });
+    const monthRows = (d.top_months || []).map(r => ({
+      date: `${MONTH_FULL[r.month - 1]} ${r.year}`,
+      value: r.total,
+    }));
     el.innerHTML =
       makeTable('Top 10 — Dias mais chuvosos',   d.top_rain,  ' mm',   'is-teal') +
+      makeTable('Top 10 — Meses mais chuvosos',  monthRows,   ' mm',   'is-teal') +
       makeTable('Top 10 — Anos mais chuvosos',   d.top_years.map(r => ({ date: String(r.year), value: r.total })), ' mm', 'is-teal') +
       makeTable('Top 10 — Intensidade de chuva', rateRows, ' mm/h', 'is-teal');
   }
