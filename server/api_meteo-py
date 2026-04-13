@@ -241,7 +241,7 @@ async def ecowitt_report(request: Request):
                 SELECT MIN(temp_c) AS tmin, MAX(temp_c) AS tmax
                 FROM observations
                 WHERE station_id = ?
-                  AND DATE(ts_local) = DATE(?)
+                  AND substr(ts_local, 1, 10) = substr(?, 1, 10)
             """, ("meteomg", ts_local_str))
             row = cur.fetchone()
             prev_min = float(row["tmin"]) if row and row["tmin"] is not None else None
@@ -283,7 +283,7 @@ async def ecowitt_report(request: Request):
                 SELECT ts_local
                 FROM observations
                 WHERE station_id = ?
-                  AND DATE(ts_local) = DATE(?)
+                  AND substr(ts_local, 1, 10) = substr(?, 1, 10)
                   AND temp_c IS NOT NULL
                 ORDER BY temp_c DESC, ts_local DESC
                 LIMIT 1
@@ -296,7 +296,7 @@ async def ecowitt_report(request: Request):
                 SELECT ts_local
                 FROM observations
                 WHERE station_id = ?
-                  AND DATE(ts_local) = DATE(?)
+                  AND substr(ts_local, 1, 10) = substr(?, 1, 10)
                   AND temp_c IS NOT NULL
                 ORDER BY temp_c ASC, ts_local ASC
                 LIMIT 1
@@ -488,7 +488,7 @@ def history_daily(date: str = Query(..., description="Date in YYYY-MM-DD format"
         cur.execute("""
             SELECT ts_local, temp_c, rh_pct, wind_kmh, gust_kmh, wind_dir_deg, pressure_hpa, rain_rate_mmph, rain_day_mm, solar_wm2, uv_index
             FROM observations
-            WHERE DATE(ts_local) = ?
+            WHERE substr(ts_local, 1, 10) = ?
             ORDER BY ts_local ASC
         """, (date,))
         series = [dict(r) for r in cur.fetchall()]
@@ -500,7 +500,7 @@ def history_daily(date: str = Query(..., description="Date in YYYY-MM-DD format"
                 MAX(gust_kmh) as max_gust, MAX(rain_day_mm) as total_rain,
                 MIN(pressure_hpa) as min_press, MAX(pressure_hpa) as max_press
             FROM observations
-            WHERE DATE(ts_local) = ?
+            WHERE substr(ts_local, 1, 10) = ?
         """, (date,))
         stats_row = cur.fetchone()
         stats = dict(stats_row) if stats_row else {}
@@ -519,16 +519,16 @@ def history_records():
     try:
         cur = conn.cursor()
         
-        cur.execute("SELECT DATE(ts_local) as d, temp_c as v FROM observations WHERE temp_c IS NOT NULL ORDER BY temp_c DESC LIMIT 1")
+        cur.execute("SELECT substr(ts_local, 1, 10) as d, temp_c as v FROM observations WHERE temp_c IS NOT NULL ORDER BY temp_c DESC LIMIT 1")
         h_day = cur.fetchone()
         
-        cur.execute("SELECT DATE(ts_local) as d, temp_c as v FROM observations WHERE temp_c IS NOT NULL ORDER BY temp_c ASC LIMIT 1")
+        cur.execute("SELECT substr(ts_local, 1, 10) as d, temp_c as v FROM observations WHERE temp_c IS NOT NULL ORDER BY temp_c ASC LIMIT 1")
         c_day = cur.fetchone()
 
-        cur.execute("SELECT DATE(ts_local) as d, rain_day_mm as v FROM observations WHERE rain_day_mm IS NOT NULL ORDER BY rain_day_mm DESC LIMIT 1")
+        cur.execute("SELECT substr(ts_local, 1, 10) as d, rain_day_mm as v FROM observations WHERE rain_day_mm IS NOT NULL ORDER BY rain_day_mm DESC LIMIT 1")
         r_day = cur.fetchone()
 
-        cur.execute("SELECT DATE(ts_local) as d, gust_kmh as v FROM observations WHERE gust_kmh IS NOT NULL ORDER BY gust_kmh DESC LIMIT 1")
+        cur.execute("SELECT substr(ts_local, 1, 10) as d, gust_kmh as v FROM observations WHERE gust_kmh IS NOT NULL ORDER BY gust_kmh DESC LIMIT 1")
         g_day = cur.fetchone()
 
         return {
@@ -548,7 +548,7 @@ def history_years():
         cur.execute("""
             SELECT
                 CAST(strftime('%Y', ts_local) AS INTEGER) AS year,
-                COUNT(DISTINCT DATE(ts_local))            AS days_with_data,
+                COUNT(DISTINCT substr(ts_local, 1, 10))            AS days_with_data,
                 COUNT(DISTINCT strftime('%m', ts_local))  AS months_with_data,
                 ROUND(MIN(temp_c), 1) AS temp_min,
                 ROUND(MAX(temp_c), 1) AS temp_max,
@@ -571,7 +571,7 @@ def history_years():
                        MAX(rain_day_mm) AS max_day
                 FROM observations
                 WHERE rain_day_mm IS NOT NULL
-                GROUP BY DATE(ts_local)
+                GROUP BY substr(ts_local, 1, 10)
             )
             GROUP BY year
         """)
@@ -604,34 +604,34 @@ def analysis_temperature():
         by_year_month = [dict(r) for r in cur.fetchall()]
 
         cur.execute("""
-            SELECT DATE(ts_local) AS date, ROUND(MAX(temp_c), 1) AS value
+            SELECT substr(ts_local, 1, 10) AS date, ROUND(MAX(temp_c), 1) AS value
             FROM observations WHERE temp_c IS NOT NULL
-            GROUP BY DATE(ts_local) ORDER BY value DESC LIMIT 10
+            GROUP BY substr(ts_local, 1, 10) ORDER BY value DESC LIMIT 10
         """)
         top_max = [dict(r) for r in cur.fetchall()]
 
         cur.execute("""
-            SELECT DATE(ts_local) AS date, ROUND(MIN(temp_c), 1) AS value
+            SELECT substr(ts_local, 1, 10) AS date, ROUND(MIN(temp_c), 1) AS value
             FROM observations WHERE temp_c IS NOT NULL
-            GROUP BY DATE(ts_local) ORDER BY value ASC LIMIT 10
+            GROUP BY substr(ts_local, 1, 10) ORDER BY value ASC LIMIT 10
         """)
         top_min = [dict(r) for r in cur.fetchall()]
 
         cur.execute("""
-            SELECT DATE(ts_local) AS date,
+            SELECT substr(ts_local, 1, 10) AS date,
                    ROUND((MAX(temp_c) + MIN(temp_c)) / 2.0, 1) AS value
             FROM observations WHERE temp_c IS NOT NULL
-            GROUP BY DATE(ts_local)
+            GROUP BY substr(ts_local, 1, 10)
             HAVING MAX(temp_c) IS NOT NULL AND MIN(temp_c) IS NOT NULL
             ORDER BY value DESC LIMIT 10
         """)
         top_warm_days = [dict(r) for r in cur.fetchall()]
 
         cur.execute("""
-            SELECT DATE(ts_local) AS date,
+            SELECT substr(ts_local, 1, 10) AS date,
                    ROUND((MAX(temp_c) + MIN(temp_c)) / 2.0, 1) AS value
             FROM observations WHERE temp_c IS NOT NULL
-            GROUP BY DATE(ts_local)
+            GROUP BY substr(ts_local, 1, 10)
             HAVING MAX(temp_c) IS NOT NULL AND MIN(temp_c) IS NOT NULL
             ORDER BY value ASC LIMIT 10
         """)
@@ -659,16 +659,16 @@ def analysis_precipitation():
                     MAX(rain_day_mm) AS max_day
                 FROM observations
                 WHERE rain_day_mm IS NOT NULL
-                GROUP BY DATE(ts_local)
+                GROUP BY substr(ts_local, 1, 10)
             )
             GROUP BY year, month ORDER BY year, month
         """)
         by_year_month = [dict(r) for r in cur.fetchall()]
 
         cur.execute("""
-            SELECT DATE(ts_local) AS date, ROUND(MAX(rain_day_mm), 1) AS value
+            SELECT substr(ts_local, 1, 10) AS date, ROUND(MAX(rain_day_mm), 1) AS value
             FROM observations WHERE rain_day_mm IS NOT NULL
-            GROUP BY DATE(ts_local) ORDER BY value DESC LIMIT 10
+            GROUP BY substr(ts_local, 1, 10) ORDER BY value DESC LIMIT 10
         """)
         top_rain = [dict(r) for r in cur.fetchall()]
 
@@ -679,7 +679,7 @@ def analysis_precipitation():
                 SELECT CAST(strftime('%Y', ts_local) AS INTEGER) AS year,
                        MAX(rain_day_mm) AS max_day
                 FROM observations WHERE rain_day_mm IS NOT NULL
-                GROUP BY DATE(ts_local)
+                GROUP BY substr(ts_local, 1, 10)
             )
             GROUP BY year ORDER BY total DESC LIMIT 10
         """)
@@ -717,7 +717,7 @@ def history_year(year: int):
                 ROUND(MAX(temp_c), 1) AS temp_max,
                 ROUND(AVG(temp_c), 1) AS temp_avg,
                 ROUND(MAX(gust_kmh), 1) AS gust_max,
-                COUNT(DISTINCT DATE(ts_local)) AS days_with_data
+                COUNT(DISTINCT substr(ts_local, 1, 10)) AS days_with_data
             FROM observations
             WHERE strftime('%Y', ts_local) = ? AND temp_c IS NOT NULL
         """, (yr,))
@@ -726,7 +726,7 @@ def history_year(year: int):
         cur.execute("""
             SELECT ROUND(SUM(max_day), 1) AS rain_total
             FROM (
-                SELECT DATE(ts_local) AS d, MAX(rain_day_mm) AS max_day
+                SELECT substr(ts_local, 1, 10) AS d, MAX(rain_day_mm) AS max_day
                 FROM observations
                 WHERE strftime('%Y', ts_local) = ? AND rain_day_mm IS NOT NULL
                 GROUP BY d
@@ -736,20 +736,20 @@ def history_year(year: int):
         summary["rain_total"] = dict(rr)["rain_total"] if rr else None
 
         # Datas dos extremos
-        cur.execute("SELECT DATE(ts_local) AS d FROM observations WHERE strftime('%Y', ts_local) = ? AND temp_c IS NOT NULL ORDER BY temp_c DESC LIMIT 1", (yr,))
+        cur.execute("SELECT substr(ts_local, 1, 10) AS d FROM observations WHERE strftime('%Y', ts_local) = ? AND temp_c IS NOT NULL ORDER BY temp_c DESC LIMIT 1", (yr,))
         r = cur.fetchone(); summary["temp_max_date"] = r["d"] if r else None
 
-        cur.execute("SELECT DATE(ts_local) AS d FROM observations WHERE strftime('%Y', ts_local) = ? AND temp_c IS NOT NULL ORDER BY temp_c ASC LIMIT 1", (yr,))
+        cur.execute("SELECT substr(ts_local, 1, 10) AS d FROM observations WHERE strftime('%Y', ts_local) = ? AND temp_c IS NOT NULL ORDER BY temp_c ASC LIMIT 1", (yr,))
         r = cur.fetchone(); summary["temp_min_date"] = r["d"] if r else None
 
-        cur.execute("SELECT DATE(ts_local) AS d FROM observations WHERE strftime('%Y', ts_local) = ? AND gust_kmh IS NOT NULL ORDER BY gust_kmh DESC LIMIT 1", (yr,))
+        cur.execute("SELECT substr(ts_local, 1, 10) AS d FROM observations WHERE strftime('%Y', ts_local) = ? AND gust_kmh IS NOT NULL ORDER BY gust_kmh DESC LIMIT 1", (yr,))
         r = cur.fetchone(); summary["gust_max_date"] = r["d"] if r else None
 
         # Detalhe mensal — temperatura
         cur.execute("""
             SELECT
                 CAST(strftime('%m', ts_local) AS INTEGER) AS month,
-                COUNT(DISTINCT DATE(ts_local)) AS days_with_data,
+                COUNT(DISTINCT substr(ts_local, 1, 10)) AS days_with_data,
                 ROUND(MIN(temp_c), 1) AS temp_min,
                 ROUND(MAX(temp_c), 1) AS temp_max,
                 ROUND(AVG(temp_c), 1) AS temp_avg,
@@ -770,7 +770,7 @@ def history_year(year: int):
                        MAX(rain_day_mm) AS max_day
                 FROM observations
                 WHERE strftime('%Y', ts_local) = ? AND rain_day_mm IS NOT NULL
-                GROUP BY DATE(ts_local)
+                GROUP BY substr(ts_local, 1, 10)
             )
             GROUP BY month ORDER BY month
         """, (yr,))
@@ -794,11 +794,11 @@ def climate_monthly(station: str = "meteomg"):
         cur = conn.cursor()
         cur.execute("""
             WITH primary_days AS (
-              SELECT DISTINCT DATE(ts_local) AS day
+              SELECT DISTINCT substr(ts_local, 1, 10) AS day
               FROM observations WHERE station_id = ?
             )
             SELECT
-              DATE(ts_local)                            AS d,
+              substr(ts_local, 1, 10)                   AS d,
               CAST(strftime('%Y', ts_local) AS INTEGER) AS y,
               CAST(strftime('%m', ts_local) AS INTEGER) AS m,
               MIN(temp_c)                               AS tmin,
@@ -807,8 +807,8 @@ def climate_monthly(station: str = "meteomg"):
               MAX(rain_day_mm)                          AS rain_mm
             FROM observations
             WHERE station_id = ?
-               OR DATE(ts_local) NOT IN (SELECT day FROM primary_days)
-            GROUP BY DATE(ts_local)
+               OR substr(ts_local, 1, 10) NOT IN (SELECT day FROM primary_days)
+            GROUP BY substr(ts_local, 1, 10)
             ORDER BY d ASC
         """, (station, station))
         daily = [dict(r) for r in cur.fetchall()]
