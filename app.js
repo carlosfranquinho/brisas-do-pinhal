@@ -42,22 +42,21 @@ function ensureViewsScript(){ return loadScript(VIEWS_JS_URL); }
 
 /* Icons */
 const ICON_PATHS = {
-  "clear-day": "icons/clear-day.svg",
-  "clear-night": "icons/clear-night.svg",
-  "partly-cloudy-day": "icons/partly-cloudy-day.svg",
+  "clear-day":           "icons/clear-day.svg",
+  "clear-night":         "icons/clear-night.svg",
+  "partly-cloudy-day":   "icons/partly-cloudy-day.svg",
   "partly-cloudy-night": "icons/partly-cloudy-night.svg",
-  cloudy: "icons/cloudy.svg",
-  overcast: "icons/cloudy.svg",
-  drizzle: "icons/drizzle.png",
-  rain: "icons/rain.svg",
-  "heavy-rain": "icons/heavy-rain.svg",
-  thunder: "icons/thunder.svg",
-  snow: "icons/snow.svg",
-  sleet: "icons/rain.svg",
-  "freezing-rain": "icons/freezing-rain.png",
-  fog: "icons/fog.svg",
-  wind: "icons/wind.png",
-  unknown: "icons/cloudy.svg",
+  cloudy:                "icons/cloudy.svg",
+  overcast:              "icons/overcast.svg",
+  drizzle:               "icons/drizzle.svg",
+  rain:                  "icons/rain.svg",
+  "heavy-rain":          "icons/heavy-rain.svg",
+  thunder:               "icons/thunder.svg",
+  snow:                  "icons/snow.svg",
+  sleet:                 "icons/sleet.svg",
+  "freezing-rain":       "icons/freezing-rain.svg",
+  fog:                   "icons/fog.svg",
+  unknown:               "icons/unknown.svg",
 };
 function iconUrl(name) {
   return ICON_PATHS[name] || ICON_PATHS["unknown"];

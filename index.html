@@ -34,7 +34,7 @@
 
   <link rel="stylesheet" href="styles.css?v=16" />
   <!-- Chart.js e SunCalc carregados sob pedido por app.js -->
-  <script src="app.js?v=26" defer></script>
+  <script src="app.js?v=27" defer></script>
   <!-- app-views.js carregado lazily (só quando o utilizador acede a Histórico ou Clima) -->
 </head>
 
@@ -613,6 +613,8 @@
                 <dd>Dias sem dados locais são complementados com registos da mesma estação via Weather Underground (IMARIN39) ou de estações vizinhas (IPATAI5, IBARRE4, entre outras), identificados na base de dados pela estação de origem.</dd>
                 <dt>Armazenamento</dt>
                 <dd>Base de dados SQLite local; API FastAPI exposta via Cloudflare Tunnel</dd>
+                <dt>Dados em tempo real — fallback</dt>
+                <dd>Quando a estação local está offline, os dados em tempo real são obtidos automaticamente da estação IMARIN131 (Weather Underground), localizada a cerca de 900 m.</dd>
                 <dt>Normais climatológicas</dt>
                 <dd>Série 1991–2020 da estação de Alcobaça — Estação de Fruticultura Vieira Natividade (IPMA)</dd>
               </dl>
