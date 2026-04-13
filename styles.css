@@ -432,7 +432,7 @@ body {
 }
 .now-icon-img {
   width: 100%; height: 100%;
-  filter: drop-shadow(0 12px 24px rgba(0,0,0,0.1));
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.18)) drop-shadow(0 1px 3px rgba(0,0,0,0.12));
 }
 
 .temp-display {
@@ -686,7 +686,7 @@ body {
   border: 1px solid rgba(0,0,0,0.04);
 }
 .forecast-list .d { font-weight: 700; color: var(--text-secondary); width: 52px; text-transform: capitalize; font-size: 0.85rem; }
-.forecast-list .ic img { width: 32px; height: 32px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.08)); }
+.forecast-list .ic img { width: 32px; height: 32px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.18)) drop-shadow(0 1px 2px rgba(0,0,0,0.10)); }
 .forecast-list .t { font-weight: 800; display: flex; gap: 10px; font-size: 0.9rem; }
 .forecast-list .hi { color: var(--accent-rose); }
 .forecast-list .lo { color: var(--accent-blue); }
