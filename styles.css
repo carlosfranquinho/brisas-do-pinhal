@@ -131,19 +131,27 @@ body {
 
 .brand {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 48px;
+  text-align: center;
+  gap: 12px;
+  margin-bottom: 40px;
   text-decoration: none;
   color: inherit;
 }
 @media (max-width: 992px) {
-  .brand { margin-bottom: 0; }
+  .brand {
+    flex-direction: row;
+    align-items: center;
+    text-align: left;
+    gap: 12px;
+    margin-bottom: 0;
+  }
 }
 
 .brand-icon-wrapper {
-  width: 58px;
-  height: 58px;
+  width: 116px;
+  height: 116px;
   flex-shrink: 0;
 }
 @media (max-width: 992px) {
