@@ -36,9 +36,16 @@ CACHE_DIR = os.path.dirname(LIVE_FILE)
 os.makedirs(LOG_DIR,   exist_ok=True)
 os.makedirs(CACHE_DIR, exist_ok=True)
 
-PAYLOAD_LOG   = os.path.join(LOG_DIR, "payloads.log")
+PAYLOAD_LOG    = os.path.join(LOG_DIR, "payloads.log")
 DATA_STALE_SEC = 360        # > 6 minutos = stale
 METAR_TTL_S    = 15 * 60
+
+# Fallback WU quando a estação local está offline
+WU_API_KEY      = "d799d63dde864ec899d63dde864ec8db"
+WU_FALLBACK_ID  = "IMARIN131"
+WU_FALLBACK_TTL = 300       # segundos entre chamadas à API WU
+
+_wu_fallback_cache: dict = {"data": None, "ts": 0.0}  # cache em memória
 
 
 def get_db() -> sqlite3.Connection:
@@ -365,21 +372,90 @@ def latest_observation():
     return JSONResponse(content={"error": "No data found"}, status_code=404)
 
 
+def _fetch_wu_fallback() -> dict | None:
+    """Vai buscar condições atuais da estação WU de fallback. Usa cache de WU_FALLBACK_TTL s."""
+    now = time.time()
+    if _wu_fallback_cache["data"] and now - _wu_fallback_cache["ts"] < WU_FALLBACK_TTL:
+        return _wu_fallback_cache["data"]
+
+    import urllib.request, urllib.error
+    url = (
+        f"https://api.weather.com/v2/pws/observations/current"
+        f"?stationId={WU_FALLBACK_ID}&format=json&units=m"
+        f"&apiKey={WU_API_KEY}&numericPrecision=decimal"
+    )
+    try:
+        with urllib.request.urlopen(urllib.request.Request(url), timeout=8) as r:
+            raw = json.loads(r.read().decode())
+        obs = raw.get("observations", [None])[0]
+        if not obs:
+            return None
+        tz     = ZoneInfo("Europe/Lisbon")
+        ts_str = obs.get("obsTimeUtc", "")
+        try:
+            dt_utc   = datetime.strptime(ts_str, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+            ts_utc_s = dt_utc.isoformat().replace("+00:00", "Z")
+            ts_loc_s = dt_utc.astimezone(tz).isoformat()
+        except Exception:
+            ts_utc_s = ts_loc_s = ts_str
+
+        m = obs.get("metric", {})
+        data = {
+            "v": 1,
+            "station": WU_FALLBACK_ID,
+            "fallback": True,
+            "ts_utc":   ts_utc_s,
+            "ts_local": ts_loc_s,
+            "stale":    False,
+            "temp_c":         m.get("temp"),
+            "temp_max_c":     None,
+            "temp_min_c":     None,
+            "temp_max_time":  None,
+            "temp_min_time":  None,
+            "apparent_c":     m.get("heatIndex"),
+            "rh_pct":         obs.get("humidity"),
+            "dewpoint_c":     m.get("dewpt"),
+            "wind_kmh":       m.get("windSpeed"),
+            "gust_kmh":       m.get("windGust"),
+            "wind_dir_deg":   obs.get("winddir"),
+            "pressure_hpa":   m.get("pressure"),
+            "rain_rate_mmph": m.get("precipRate"),
+            "rain_day_mm":    m.get("precipTotal"),
+            "solar_wm2":      obs.get("solarRadiation"),
+            "uv_index":       obs.get("uv"),
+        }
+        _wu_fallback_cache["data"] = data
+        _wu_fallback_cache["ts"]   = now
+        return data
+    except Exception:
+        return None
+
+
 @app.get("/live")
 async def get_live():
-    if not os.path.exists(LIVE_FILE):
-        return JSONResponse(
-            status_code=503,
-            content={"v": 1, "error": "no_live_data", "message": "Live JSON not ready"}
-        )
+    # 1) tentar dados locais
+    local_ok = False
+    if os.path.exists(LIVE_FILE):
+        with open(LIVE_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        ts_utc = datetime.fromisoformat(data["ts_utc"].replace("Z", "+00:00"))
+        age_s  = (datetime.now(timezone.utc) - ts_utc).total_seconds()
+        data["age_s"] = round(age_s, 1)
+        data["stale"] = age_s > DATA_STALE_SEC
+        local_ok = not data["stale"]
 
-    with open(LIVE_FILE, "r", encoding="utf-8") as f:
-        data = json.load(f)
-
-    ts_utc = datetime.fromisoformat(data["ts_utc"].replace("Z", "+00:00"))
-    age_s = (datetime.now(timezone.utc) - ts_utc).total_seconds()
-    data["age_s"] = round(age_s, 1)
-    data["stale"] = age_s > DATA_STALE_SEC
+    # 2) se estação local offline → fallback WU
+    if not local_ok:
+        fallback = await asyncio.to_thread(_fetch_wu_fallback)
+        if fallback:
+            fallback["age_s"] = 0
+            return JSONResponse(content=fallback, headers={"Cache-Control": "no-store"})
+        # WU também falhou → devolver dados locais stale (se existirem) ou 503
+        if not os.path.exists(LIVE_FILE):
+            return JSONResponse(
+                status_code=503,
+                content={"v": 1, "error": "no_live_data", "message": "Live JSON not ready"}
+            )
 
     return JSONResponse(content=data, headers={"Cache-Control": "no-store"})
 
