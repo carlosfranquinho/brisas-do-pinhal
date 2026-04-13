@@ -32,9 +32,9 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
   </noscript>
 
-  <link rel="stylesheet" href="styles.css?v=17" />
+  <link rel="stylesheet" href="styles.css?v=18" />
   <!-- Chart.js e SunCalc carregados sob pedido por app.js -->
-  <script src="app.js?v=27" defer></script>
+  <script src="app.js?v=28" defer></script>
   <!-- app-views.js carregado lazily (só quando o utilizador acede a Histórico ou Clima) -->
 </head>
 
@@ -141,7 +141,7 @@
             <div class="hero-side">
               <div class="soft-card sun-card">
                 <div class="card-icon sunrise-bg">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83M12 14a2 2 0 100-4 2 2 0 000 4z"/></svg>
+                  <img src="icons/extra/sunrise.svg" alt="nascer do sol" />
                 </div>
                 <div class="sun-info">
                   <span class="lbl">Nascer do Sol</span>
@@ -150,7 +150,7 @@
               </div>
               <div class="soft-card sun-card">
                 <div class="card-icon sunset-bg">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 18a5 5 0 00-10 0M12 2v7M4.22 10.22l1.42 1.42M19.78 10.22l-1.42 1.42M2 22h20M16 2v4M8 2v4"/></svg>
+                  <img src="icons/extra/sunset.svg" alt="pôr do sol" />
                 </div>
                 <div class="sun-info">
                   <span class="lbl">Pôr do Sol</span>
@@ -165,7 +165,7 @@
 
             <div class="soft-card metric-box rain-card">
               <div class="mb-top">
-                <span class="m-icon icon-rain"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path><line x1="8" y1="13" x2="8" y2="21"></line><line x1="12" y1="15" x2="12" y2="23"></line><line x1="16" y1="13" x2="16" y2="21"></line></svg></span>
+                <span class="m-icon icon-rain"><img src="icons/extra/raindrops.svg" alt="precipitação" /></span>
                 <span class="m-label">Precipitação</span>
               </div>
               <div class="mb-split rain-split">
@@ -196,7 +196,7 @@
 
             <div class="soft-card metric-box wind-card">
               <div class="mb-top">
-                <span class="m-icon icon-gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"></path></svg></span>
+                <span class="m-icon icon-gray"><img src="icons/wind.svg" alt="vento" /></span>
                 <span class="m-label">Vento & Rajada</span>
                 <span class="m-badge" id="winddir">—</span>
               </div>
@@ -235,7 +235,7 @@
 
             <div class="soft-card metric-box">
               <div class="mb-top">
-                <span class="m-icon icon-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg></span>
+                <span class="m-icon icon-blue"><img src="icons/extra/humidity.svg" alt="humidade" /></span>
                 <span class="m-label">Humidade</span>
               </div>
               <div class="mb-row">
@@ -246,7 +246,7 @@
 
             <div class="soft-card metric-box">
               <div class="mb-top">
-                <span class="m-icon icon-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22a8 8 0 0 0 8-8c0-5.5-8-12-8-12S4 8.5 4 14a8 8 0 0 0 8 8z"></path><circle cx="12" cy="14" r="3"></circle></svg></span>
+                <span class="m-icon icon-teal"><img src="icons/extra/thermometer-raindrop.svg" alt="ponto de orvalho" /></span>
                 <span class="m-label">Pto. Orvalho</span>
               </div>
               <div class="mb-row">
@@ -257,7 +257,7 @@
 
             <div class="soft-card metric-box">
               <div class="mb-top">
-                <span class="m-icon icon-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4l3 3"></path></svg></span>
+                <span class="m-icon icon-purple" id="pressIcon"><img src="icons/extra/pressure-high.svg" alt="pressão" /></span>
                 <span class="m-label">Pressão</span>
               </div>
               <div class="mb-row">
@@ -268,7 +268,7 @@
 
             <div class="soft-card metric-box">
               <div class="mb-top">
-                <span class="m-icon icon-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg></span>
+                <span class="m-icon icon-orange"><img src="icons/extra/uv-index.svg" alt="índice UV" /></span>
                 <span class="m-label">Índice UV</span>
               </div>
               <div class="mb-row">
@@ -279,7 +279,7 @@
 
             <div class="soft-card metric-box">
               <div class="mb-top">
-                <span class="m-icon icon-yellow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></span>
+                <span class="m-icon icon-yellow"><img src="icons/extra/thermometer-sun.svg" alt="radiação solar" /></span>
                 <span class="m-label">Rad. Solar</span>
               </div>
               <div class="mb-row">

@@ -496,6 +496,7 @@ body {
   display: flex; align-items: center; justify-content: center;
 }
 .card-icon svg { width: 24px; height: 24px; stroke-width: 2.5; }
+.card-icon img { width: 32px; height: 32px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.12)); }
 .sunrise-bg { background: rgba(245, 158, 11, 0.1); color: var(--accent-orange); }
 .sunset-bg { background: rgba(99, 102, 241, 0.1); color: var(--accent-indigo); }
 
@@ -532,6 +533,7 @@ body {
   display: flex; align-items: center; justify-content: center;
 }
 .m-icon svg { width: 20px; height: 20px; }
+.m-icon img { width: 26px; height: 26px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.12)); }
 .icon-blue { background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); }
 .icon-teal { background: rgba(20, 184, 166, 0.1); color: var(--accent-teal); }
 .icon-gray { background: rgba(100, 116, 139, 0.1); color: var(--text-secondary); }

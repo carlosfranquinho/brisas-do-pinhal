@@ -591,6 +591,13 @@ async function loadLive() {
   setText("#rh", fmt(j.rh_pct, 0) + "%");
   setText("#dew", fmt(j.dewpoint_c, 1) + "°");
   setText("#press", fmt(j.pressure_hpa, 0));
+  if (j.pressure_hpa != null) {
+    const pressImg = document.querySelector("#pressIcon img");
+    if (pressImg) {
+      const trend = trendRef ? j.pressure_hpa - (trendRef.press ?? j.pressure_hpa) : 0;
+      pressImg.src = trend < -0.3 ? "icons/extra/pressure-low.svg" : "icons/extra/pressure-high.svg";
+    }
+  }
   setText("#uv", fmt(j.uv_index, 1));
   setText("#solar", fmt(j.solar_wm2, 0));
 
