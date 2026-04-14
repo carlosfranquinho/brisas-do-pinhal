@@ -546,7 +546,7 @@ function renderAnaliseTop10(d, isTemp) {
       makeTable('Top 10 — Dias mais frios',      d.top_cold_days, '°C', 'is-cold') +
       normalsNote;
   } else {
-    el.className = 'analise-top10-grid analise-top10-grid--3';
+    el.className = 'analise-top10-grid';
 
     const rateRows = (d.top_rate || []).map(r => {
       let label = r.date ?? '—';
