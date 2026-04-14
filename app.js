@@ -665,6 +665,7 @@ async function loadLive() {
       if (rateLabel) rateLabel.textContent = "Taxa atual";
       if (rateUnit)  rateUnit.textContent  = " mm/h";
       setText("#rainRate", fmt(rate, 1));
+      rateGroup.dataset.mode = "rate";
       // atualiza lastRainTs com a observação atual
       if (j.ts_local) lastRainTs = j.ts_local;
       rateGroup.hidden = false;
@@ -672,6 +673,7 @@ async function loadLive() {
       if (rateLabel) rateLabel.textContent = "Última precipitação";
       if (rateUnit)  rateUnit.textContent  = "";
       setText("#rainRate", formatLastRain(lastRainTs));
+      rateGroup.dataset.mode = "last";
       rateGroup.hidden = false;
     } else {
       rateGroup.hidden = true;

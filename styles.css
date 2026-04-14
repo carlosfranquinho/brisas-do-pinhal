@@ -595,6 +595,13 @@ body {
 .rain-split { align-items: center; }
 .rain-vals { display: flex; flex-direction: column; gap: 16px; }
 
+/* Quando mostra a última chuva, o valor é texto discreto (não o display grande) */
+#rainRateGroup[data-mode="last"] .mb-value {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
 .bucket-wrapper {
   display: flex;
   flex-direction: column;
