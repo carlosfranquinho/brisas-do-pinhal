@@ -22,8 +22,7 @@ const ANALISE_PALETTE = [
 const NORMALS_RAIN = [112.6, 81.7, 74.1, 83.2, 61.8, 18.8, 7.5, 12.7, 38.1, 102.5, 127.8, 104.4];
 const NORMALS_TEMP = [9.7, 10.4, 12.7, 14.0, 16.3, 18.9, 20.5, 20.9, 19.4, 16.7, 12.5, 10.6];
 const NORMALS_TMAX = [15.3, 16.3, 18.5, 19.7, 22.1, 24.6, 26.1, 27.0, 25.9, 22.9, 18.2, 16.1];
-const NORMAL_LINE      = { borderColor: 'rgba(100,116,139,0.55)', backgroundColor: 'transparent', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, pointHoverRadius: 4, tension: 0.3, spanGaps: false };
-const NORMAL_LINE_TMAX = { borderColor: 'rgba(244,63,94,0.40)',  backgroundColor: 'transparent', borderWidth: 1.5, borderDash: [4, 3], pointRadius: 0, pointHoverRadius: 4, tension: 0.3, spanGaps: false };
+const NORMAL_LINE  = { borderColor: 'rgba(100,116,139,0.55)', backgroundColor: 'transparent', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, pointHoverRadius: 4, tension: 0.3, spanGaps: false };
 
 /* Event listener do arquivo diário (agora que loadHistoryDaily está definida) */
 document.getElementById('historyBtn')?.addEventListener('click', loadHistoryDaily);
@@ -331,8 +330,7 @@ async function renderYearChart(months) {
           borderColor: 'rgba(15,23,42,0.70)', backgroundColor: 'transparent',
           borderWidth: 2, borderDash: [4, 4], pointRadius: 2, tension: 0.3, yAxisID: 'yTemp', order: 1,
         },
-        { type: 'line', label: 'Normal Tméd.', data: NORMALS_TEMP, ...NORMAL_LINE,      yAxisID: 'yTemp', order: 0 },
-        { type: 'line', label: 'Normal Tmax',  data: NORMALS_TMAX, ...NORMAL_LINE_TMAX, yAxisID: 'yTemp', order: 0 },
+        { type: 'line', label: 'Normal Temp.', data: NORMALS_TEMP, ...NORMAL_LINE, yAxisID: 'yTemp', order: 0 },
         {
           type: 'bar', label: 'Normal Prec. (mm)', data: NORMALS_RAIN,
           backgroundColor: 'rgba(15,23,42,0.35)', borderColor: 'rgba(15,23,42,0.0)',
@@ -429,8 +427,7 @@ async function renderAnaliseChart(d, isTemp) {
       grouped: false, barPercentage: 1.0, categoryPercentage: 0.95, order: 2,
     });
   } else {
-    datasets.push({ type: 'line', label: 'Normal média', data: NORMALS_TEMP, ...NORMAL_LINE });
-    datasets.push({ type: 'line', label: 'Normal Tmax',  data: NORMALS_TMAX, ...NORMAL_LINE_TMAX });
+    datasets.push({ type: 'line', label: 'Normal', data: NORMALS_TEMP, ...NORMAL_LINE });
   }
 
   const unit = isTemp ? '°C' : ' mm';
