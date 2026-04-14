@@ -21,6 +21,7 @@ const ANALISE_PALETTE = [
 
 const NORMALS_RAIN = [112.6, 81.7, 74.1, 83.2, 61.8, 18.8, 7.5, 12.7, 38.1, 102.5, 127.8, 104.4];
 const NORMALS_TEMP = [9.7, 10.4, 12.7, 14.0, 16.3, 18.9, 20.5, 20.9, 19.4, 16.7, 12.5, 10.6];
+const NORMALS_TMAX = [15.3, 16.3, 18.5, 19.7, 22.1, 24.6, 26.1, 27.0, 25.9, 22.9, 18.2, 16.1];
 const NORMAL_LINE  = { borderColor: 'rgba(100,116,139,0.55)', backgroundColor: 'transparent', borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, pointHoverRadius: 4, tension: 0.3, spanGaps: false };
 
 /* Event listener do arquivo diário (agora que loadHistoryDaily está definida) */
@@ -528,15 +529,22 @@ function renderAnaliseTop10(d, isTemp) {
 
     const heatRows = (d.heat_waves || []).map(w => ({
       date:  fmtStreak(w),
-      value: w.peak_tmax != null ? `${w.days} dias · pico ${w.peak_tmax}°C` : `${w.days} dias`,
+      value: w.peak_tmax != null ? `${w.days} d · pico ${w.peak_tmax}°C` : `${w.days} d`,
     }));
+
+    // Subtítulo com as normais de Tmax usadas como referência
+    const MABBR = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    const normalsNote = `<p class="heat-normals-note">Normais de Tmax (referência +5°C): ${
+      NORMALS_TMAX.map((v, i) => `${MABBR[i]} ${v}°`).join(' · ')
+    }</p>`;
 
     el.innerHTML =
       makeTable('Top 10 — Temperaturas máximas', d.top_max,       '°C', 'is-hot')  +
       makeTable('Top 10 — Temperaturas mínimas', d.top_min,       '°C', 'is-cold') +
       makeTable('Top 10 — Dias mais quentes',    d.top_warm_days, '°C', 'is-hot')  +
       makeTable('Top 10 — Dias mais frios',      d.top_cold_days, '°C', 'is-cold') +
-      makeTable('Ondas de calor — Tmax ≥ 35 °C (mín. 3 dias)', heatRows, '', 'is-hot');
+      makeTable('Ondas de calor — Tmax &gt; normal +5 °C', heatRows, '', 'is-hot') +
+      normalsNote;
   } else {
     el.className = 'analise-top10-grid analise-top10-grid--3';
 

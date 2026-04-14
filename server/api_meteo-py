@@ -51,6 +51,9 @@ PAYLOAD_LOG    = os.path.join(LOG_DIR, "payloads.log")
 DATA_STALE_SEC = 360        # > 6 minutos = stale
 METAR_TTL_S    = 15 * 60
 
+# Normais climatológicas mensais (Jan–Dez) — mesma origem das normais de Tmean
+NORMALS_TMAX = [15.3, 16.3, 18.5, 19.7, 22.1, 24.6, 26.1, 27.0, 25.9, 22.9, 18.2, 16.1]
+
 # Fallback WU quando a estação local está offline
 WU_API_KEY      = "d799d63dde864ec899d63dde864ec8db"
 WU_FALLBACK_ID  = "IMARIN131"
@@ -716,7 +719,9 @@ def analysis_temperature():
         """)
         top_cold_days = [dict(r) for r in cur.fetchall()]
 
-        # Ondas de calor: ≥3 dias consecutivos com Tmax ≥ 35 °C
+        # Ondas de calor (adaptação IPMA): dias consecutivos com Tmax > normal mensal + 5 °C
+        # Sem mínimo de dias — mostra todos os períodos, ordenados por duração
+        HEAT_ANOMALY = 5.0
         cur.execute("""
             SELECT substr(ts_local, 1, 10) AS date,
                    ROUND(MAX(temp_c), 1) AS tmax
@@ -727,16 +732,35 @@ def analysis_temperature():
         """)
         daily_tmax = [(r["date"], r["tmax"]) for r in cur.fetchall()]
 
-        HEAT_THRESHOLD = 35.0
-        heat_waves = _find_streaks(
-            daily_tmax,
-            lambda v: v is not None and v >= HEAT_THRESHOLD,
-            extra_agg=lambda vs: round(max(vs), 1),
-            min_len=3,
-        )
-        for s in heat_waves:
-            if "extra" in s:
-                s["peak_tmax"] = s.pop("extra")
+        heat_waves = []
+        hw_start = hw_end = None
+        hw_len = hw_peak = 0
+        prev_d = None
+        for date_str, tmax in daily_tmax:
+            cur_d  = datetime.strptime(date_str, "%Y-%m-%d").date()
+            normal = NORMALS_TMAX[int(date_str[5:7]) - 1]
+            is_hw  = tmax is not None and tmax > normal + HEAT_ANOMALY
+
+            if prev_d is not None and (cur_d - prev_d) > timedelta(days=1):
+                if hw_start is not None:
+                    heat_waves.append({"start": hw_start, "end": hw_end, "days": hw_len, "peak_tmax": hw_peak})
+                hw_start = hw_end = None; hw_len = 0; hw_peak = 0
+
+            if is_hw:
+                if hw_start is None: hw_start = date_str
+                hw_end  = date_str
+                hw_len += 1
+                hw_peak = tmax if hw_peak == 0 else max(hw_peak, tmax)
+            else:
+                if hw_start is not None:
+                    heat_waves.append({"start": hw_start, "end": hw_end, "days": hw_len, "peak_tmax": hw_peak})
+                hw_start = hw_end = None; hw_len = 0; hw_peak = 0
+            prev_d = cur_d
+        if hw_start is not None:
+            heat_waves.append({"start": hw_start, "end": hw_end, "days": hw_len, "peak_tmax": hw_peak})
+
+        heat_waves.sort(key=lambda x: x["days"], reverse=True)
+        heat_waves = heat_waves[:10]
     finally:
         conn.close()
     return {

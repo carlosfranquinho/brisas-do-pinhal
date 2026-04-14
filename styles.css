@@ -1004,6 +1004,13 @@ body {
 .top10-val.is-cold   { color: var(--accent-blue); }
 .top10-val.is-teal   { color: var(--accent-teal); }
 .top10-val.is-orange { color: var(--accent-orange); }
+.heat-normals-note {
+  grid-column: 1 / -1;
+  font-size: 0.78rem;
+  color: var(--text-light);
+  padding: 4px 2px 0;
+  letter-spacing: 0.01em;
+}
 
 /* ── EMPTY STATES & CLIMA TABLE ── */
 .empty-state-card {
