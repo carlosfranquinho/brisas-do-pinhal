@@ -540,10 +540,10 @@ function renderAnaliseTop10(d, isTemp) {
 
     el.innerHTML =
       makeTable('Top 10 — Temperaturas máximas', d.top_max,       '°C', 'is-hot')  +
-      makeTable('Top 10 — Temperaturas mínimas', d.top_min,       '°C', 'is-cold') +
       makeTable('Top 10 — Dias mais quentes',    d.top_warm_days, '°C', 'is-hot')  +
-      makeTable('Top 10 — Dias mais frios',      d.top_cold_days, '°C', 'is-cold') +
       makeTable('Ondas de calor — Tmax &gt; normal +5 °C', heatRows, '', 'is-hot') +
+      makeTable('Top 10 — Temperaturas mínimas', d.top_min,       '°C', 'is-cold') +
+      makeTable('Top 10 — Dias mais frios',      d.top_cold_days, '°C', 'is-cold') +
       normalsNote;
   } else {
     el.className = 'analise-top10-grid analise-top10-grid--3';
