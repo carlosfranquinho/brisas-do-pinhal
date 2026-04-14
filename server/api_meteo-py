@@ -365,6 +365,24 @@ async def ecowitt_report(request: Request):
     return PlainTextResponse("Success. Update done\n")
 
 
+@app.get("/last-rain")
+def last_rain():
+    conn = get_db()
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT ts_local FROM observations
+            WHERE rain_rate_mmph > 0
+            ORDER BY ts_local DESC
+            LIMIT 1
+        """)
+        row = cur.fetchone()
+    finally:
+        conn.close()
+    ts = dict(row)["ts_local"] if row else None
+    return JSONResponse(content={"ts_local": ts}, headers={"Cache-Control": "no-store"})
+
+
 @app.get("/latest")
 def latest_observation():
     conn = get_db()

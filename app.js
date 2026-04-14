@@ -149,11 +149,38 @@ function pauseLive() {
 
 /* ciclo da home */
 let homeBooted = false;
+let lastRainTs = null; // timestamp da última vez que choveu (ts_local)
+function formatLastRain(tsLocal) {
+  // tsLocal: "YYYY-MM-DD HH:MM:SS"
+  const dStr    = tsLocal.slice(0, 10);  // "YYYY-MM-DD"
+  const timeStr = tsLocal.slice(11, 16); // "HH:MM"
+  const now     = new Date();
+  const pad     = n => String(n).padStart(2, "0");
+  const todayStr     = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+  const yest         = new Date(now); yest.setDate(yest.getDate() - 1);
+  const yesterdayStr = `${yest.getFullYear()}-${pad(yest.getMonth()+1)}-${pad(yest.getDate())}`;
+  if (dStr === todayStr)     return `hoje às ${timeStr}`;
+  if (dStr === yesterdayStr) return `ontem às ${timeStr}`;
+  return `${dStr.slice(8, 10)}/${dStr.slice(5, 7)} às ${timeStr}`;
+}
+
+async function loadLastRain() {
+  try {
+    const r = await fetch(`${API_BASE}/last-rain`, { cache: "no-store" });
+    if (!r.ok) return;
+    const data = await r.json();
+    if (data.ts_local) lastRainTs = data.ts_local;
+  } catch (e) {
+    console.warn("loadLastRain falhou:", e);
+  }
+}
+
 async function startHome() {
   // arranca sempre o live; se já houver timer, renova-o
   if (!homeBooted) {
     homeBooted = true;
     try {
+      await loadLastRain();          // timestamp da última chuva
       await loadLive();              // mete valores no DOM
       await loadMetarTGFTP();        // ícone atual via METAR
       await loadForecast();          // previsão 4 dias
@@ -623,12 +650,23 @@ async function loadLive() {
     if (maxLabel) maxLabel.textContent = bucketMax + ' mm';
   }
 
-  // Taxa de pluviosidade — só visível quando está efetivamente a chover
+  // Taxa de pluviosidade — quando chove mostra taxa atual; senão mostra última precipitação
   const rateGroup = document.getElementById('rainRateGroup');
   if (rateGroup) {
     const rate = j.rain_rate_mmph != null ? +j.rain_rate_mmph : 0;
+    const rateLabel = document.getElementById('rainRateLabel');
+    const rateUnit  = document.getElementById('rainRateUnit');
     if (rate > 0) {
+      if (rateLabel) rateLabel.textContent = "Taxa atual";
+      if (rateUnit)  rateUnit.textContent  = " mm/h";
       setText("#rainRate", fmt(rate, 1));
+      // atualiza lastRainTs com a observação atual
+      if (j.ts_local) lastRainTs = j.ts_local;
+      rateGroup.hidden = false;
+    } else if (lastRainTs) {
+      if (rateLabel) rateLabel.textContent = "Última precipitação";
+      if (rateUnit)  rateUnit.textContent  = "";
+      setText("#rainRate", formatLastRain(lastRainTs));
       rateGroup.hidden = false;
     } else {
       rateGroup.hidden = true;
