@@ -279,23 +279,17 @@ const $ = (sel) => document.querySelector(sel);
 const fmt = (n, d = 0) => (n == null || isNaN(n) ? "—" : Number(n).toFixed(d));
 const degToDir = (deg) => {
   if (deg == null) return "—";
+  const dirs = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSO","SO","OSO","O","ONO","NO","NNO"];
+  return dirs[Math.round((((deg % 360) + 360) % 360) / 22.5) % 16];
+};
+
+const degToDirFull = (deg) => {
+  if (deg == null) return "—";
   const dirs = [
-    "N",
-    "NNE",
-    "NE",
-    "ENE",
-    "E",
-    "ESE",
-    "SE",
-    "SSE",
-    "S",
-    "SSO",
-    "SO",
-    "OSO",
-    "O",
-    "ONO",
-    "NO",
-    "NNO",
+    "Norte", "Norte-Nordeste", "Nordeste", "Este-Nordeste",
+    "Este",  "Este-Sudeste",   "Sudeste",  "Sul-Sudeste",
+    "Sul",   "Sul-Sudoeste",   "Sudoeste", "Oeste-Sudoeste",
+    "Oeste", "Oeste-Noroeste", "Noroeste", "Norte-Noroeste",
   ];
   return dirs[Math.round((((deg % 360) + 360) % 360) / 22.5) % 16];
 };
@@ -614,7 +608,7 @@ async function loadLive() {
   setText("#temp", fmt(j.temp_c, 1));
   setText("#apparent", fmt(j.apparent_c ?? j.temp_c, 1));
   setText("#wind", fmt(j.wind_kmh, 0));
-  setText("#winddir", degToDir(j.wind_dir_deg));
+  setText("#winddir", degToDirFull(j.wind_dir_deg));
   const arrow = document.getElementById("windArrowContainer");
   if (arrow && j.wind_dir_deg !== null) {
     arrow.style.transform = `rotate(${j.wind_dir_deg}deg)`;
