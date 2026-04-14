@@ -500,7 +500,7 @@ async function renderAnaliseCumul(d) {
 function renderAnaliseTop10(d, isTemp) {
   const el = document.getElementById('analiseTop10');
 
-  const makeTable = (title, rows, unit, accentClass) => {
+  const makeTable = (title, rows, unit, accentClass, cardClass = '') => {
     const trs = rows.map((r, i) => `
       <tr>
         <td class="top10-rank">${i + 1}</td>
@@ -508,7 +508,7 @@ function renderAnaliseTop10(d, isTemp) {
         <td class="top10-val ${accentClass}">${r.value != null ? r.value + unit : '—'}</td>
       </tr>`).join('');
     return `
-      <div class="soft-card top10-card">
+      <div class="soft-card top10-card${cardClass ? ' ' + cardClass : ''}">
         <div class="card-header-clean" style="margin-bottom: 16px;">
           <h2 style="font-size: 1rem;">${title}</h2>
         </div>
@@ -525,7 +525,7 @@ function renderAnaliseTop10(d, isTemp) {
   const fmtStreak = s => s.start === s.end ? fmtD(s.start) : `${fmtD(s.start)} – ${fmtD(s.end)}`;
 
   if (isTemp) {
-    el.className = 'analise-top10-grid analise-top10-grid--3';
+    el.className = 'analise-top10-grid';
 
     const heatRows = (d.heat_waves || []).map(w => ({
       date:  fmtStreak(w),
@@ -541,7 +541,7 @@ function renderAnaliseTop10(d, isTemp) {
     el.innerHTML =
       makeTable('Top 10 — Temperaturas máximas', d.top_max,       '°C', 'is-hot')  +
       makeTable('Top 10 — Dias mais quentes',    d.top_warm_days, '°C', 'is-hot')  +
-      makeTable('Ondas de calor — Tmax &gt; normal +5 °C', heatRows, '', 'is-hot') +
+      makeTable('Ondas de calor — Tmax &gt; normal +5 °C', heatRows, '', 'is-hot', 'top10-card--span') +
       makeTable('Top 10 — Temperaturas mínimas', d.top_min,       '°C', 'is-cold') +
       makeTable('Top 10 — Dias mais frios',      d.top_cold_days, '°C', 'is-cold') +
       normalsNote;

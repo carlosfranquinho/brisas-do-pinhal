@@ -985,6 +985,7 @@ body {
   .analise-top10-grid--4 { grid-template-columns: 1fr; }
 }
 .top10-card { padding: 24px; }
+.top10-card--span { grid-column: 1 / -1; }
 .top10-table {
   width: 100%;
   border-collapse: collapse;
