@@ -1000,9 +1000,10 @@ body {
 .top10-rank { font-weight: 700; color: var(--text-light); width: 28px; }
 .top10-date { color: var(--text-secondary); font-weight: 500; }
 .top10-val  { font-weight: 800; text-align: right; }
-.top10-val.is-hot  { color: var(--accent-rose); }
-.top10-val.is-cold { color: var(--accent-blue); }
-.top10-val.is-teal { color: var(--accent-teal); }
+.top10-val.is-hot    { color: var(--accent-rose); }
+.top10-val.is-cold   { color: var(--accent-blue); }
+.top10-val.is-teal   { color: var(--accent-teal); }
+.top10-val.is-orange { color: var(--accent-orange); }
 
 /* ── EMPTY STATES & CLIMA TABLE ── */
 .empty-state-card {

@@ -18,7 +18,7 @@ import math
 import os
 import sqlite3
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from zoneinfo import ZoneInfo
 from collections import defaultdict
 
@@ -73,6 +73,56 @@ def cache_path(icao: str) -> str:
 
 # -------------------- Helpers --------------------
 def f_to_c(f): return round((f - 32) * 5.0 / 9.0, 1)
+
+
+def _find_streaks(daily_rows, predicate, extra_agg=None, min_len=1, top_n=10):
+    """Encontra períodos consecutivos onde predicate(value) é True.
+    daily_rows: lista de (date_str "YYYY-MM-DD", value)
+    extra_agg: função(values_list) -> extra, para acumular um valor extra durante o período
+    Retorna lista de {"start", "end", "days"[, "extra"]} ordenada por dias desc.
+    """
+    streaks = []
+    start = current_end = None
+    length = 0
+    extras = []
+    prev_d = None
+
+    for date_str, value in daily_rows:
+        cur_d = datetime.strptime(date_str, "%Y-%m-%d").date()
+        # quebra de streak se houver gap nos dados
+        if prev_d is not None and (cur_d - prev_d) > timedelta(days=1):
+            if start is not None and length >= min_len:
+                e = extra_agg(extras) if extra_agg else None
+                streaks.append({"start": start, "end": current_end, "days": length,
+                                 **({} if e is None else {"extra": e})})
+            start = current_end = None
+            length = 0
+            extras = []
+
+        if predicate(value):
+            if start is None:
+                start = date_str
+            current_end = date_str
+            length += 1
+            if extra_agg is not None:
+                extras.append(value)
+        else:
+            if start is not None and length >= min_len:
+                e = extra_agg(extras) if extra_agg else None
+                streaks.append({"start": start, "end": current_end, "days": length,
+                                 **({} if e is None else {"extra": e})})
+            start = current_end = None
+            length = 0
+            extras = []
+        prev_d = cur_d
+
+    if start is not None and length >= min_len:
+        e = extra_agg(extras) if extra_agg else None
+        streaks.append({"start": start, "end": current_end, "days": length,
+                         **({} if e is None else {"extra": e})})
+
+    streaks.sort(key=lambda x: x["days"], reverse=True)
+    return streaks[:top_n]
 def mph_to_kmh(mph): return round(mph * 1.60934, 1)
 def in_to_mm(inches): return round(inches * 25.4, 2)
 def inHg_to_hPa(inhg): return round(inhg * 33.8639, 1)
@@ -665,12 +715,35 @@ def analysis_temperature():
             ORDER BY value ASC LIMIT 10
         """)
         top_cold_days = [dict(r) for r in cur.fetchall()]
+
+        # Ondas de calor: ≥3 dias consecutivos com Tmax ≥ 35 °C
+        cur.execute("""
+            SELECT substr(ts_local, 1, 10) AS date,
+                   ROUND(MAX(temp_c), 1) AS tmax
+            FROM observations
+            WHERE temp_c IS NOT NULL
+            GROUP BY substr(ts_local, 1, 10)
+            ORDER BY date
+        """)
+        daily_tmax = [(r["date"], r["tmax"]) for r in cur.fetchall()]
+
+        HEAT_THRESHOLD = 35.0
+        heat_waves = _find_streaks(
+            daily_tmax,
+            lambda v: v is not None and v >= HEAT_THRESHOLD,
+            extra_agg=lambda vs: round(max(vs), 1),
+            min_len=3,
+        )
+        for s in heat_waves:
+            if "extra" in s:
+                s["peak_tmax"] = s.pop("extra")
     finally:
         conn.close()
     return {
         "by_year_month": by_year_month,
         "top_max": top_max, "top_min": top_min,
         "top_warm_days": top_warm_days, "top_cold_days": top_cold_days,
+        "heat_waves": heat_waves,
     }
 
 
@@ -738,6 +811,27 @@ def analysis_precipitation():
             ORDER BY rain_rate_mmph DESC LIMIT 10
         """)
         top_rate = [dict(r) for r in cur.fetchall()]
+
+        # Streaks: dias consecutivos secos / chuvosos
+        cur.execute("""
+            SELECT substr(ts_local, 1, 10) AS date,
+                   ROUND(MAX(rain_day_mm), 1) AS rain
+            FROM observations
+            WHERE rain_day_mm IS NOT NULL
+            GROUP BY substr(ts_local, 1, 10)
+            ORDER BY date
+        """)
+        daily_rain = [(r["date"], r["rain"] or 0.0) for r in cur.fetchall()]
+
+        DRY_THRESHOLD  = 1.0  # mm — limiar dia seco (norma OMM)
+        WET_THRESHOLD  = 1.0  # mm — limiar dia chuvoso
+        dry_streaks = _find_streaks(daily_rain, lambda v: v < DRY_THRESHOLD)
+        wet_streaks = _find_streaks(daily_rain, lambda v: v >= WET_THRESHOLD,
+                                    extra_agg=lambda vs: round(sum(vs), 1))
+        # renomear "extra" → "total_mm" para wet_streaks
+        for s in wet_streaks:
+            if "extra" in s:
+                s["total_mm"] = s.pop("extra")
     finally:
         conn.close()
     return {
@@ -746,6 +840,8 @@ def analysis_precipitation():
         "top_years": top_years,
         "top_months": top_months,
         "top_rate": top_rate,
+        "dry_streaks": dry_streaks,
+        "wet_streaks": wet_streaks,
     }
 
 
