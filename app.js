@@ -318,9 +318,9 @@ function iconNameFromMetarRaw(raw, isDaytime) {
   if (!raw) return "unknown";
   const r = " " + raw + " ";
   if (/\+TSRA|TSRA|VCTS|CB/.test(r)) return "thunder";
-  if (/\+RA/.test(r)) return "heavy-rain";
+  if (/\+RA|GR/.test(r)) return "heavy-rain";  // GR=granizo → heavy-rain (não snow)
   if (/FZRA|FZDZ/.test(r)) return "freezing-rain";
-  if (/SN|SG|PL|GR/.test(r)) return "snow";
+  if (/SN|SG|PL/.test(r)) return "snow";
   if (/RA|SHRA/.test(r)) return "rain";
   if (/DZ/.test(r)) return "drizzle";
   if (/FG|BR|HZ/.test(r)) return "fog";
@@ -336,6 +336,11 @@ async function loadMetarTGFTP() {
     const r = await fetch(METAR_URL, { cache: "no-store" });
     const j = await r.json();
     if (!j.ok) return;
+    // Rejeitar respostas que não sejam da estação correta (proteção contra dados errados do NOAA)
+    if (!j.raw || !j.raw.trimStart().startsWith("LPMR")) {
+      console.warn("METAR: raw inesperado (estação errada ou dados corrompidos):", j.raw?.slice(0, 40));
+      return;
+    }
 
     const sunrise = $("#sunrise")?.textContent || "06:00";
     const sunset = $("#sunset")?.textContent || "21:00";
