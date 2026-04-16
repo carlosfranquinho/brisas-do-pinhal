@@ -673,7 +673,26 @@ body {
   margin-bottom: var(--gap);
 }
 @media (max-width: 500px) {
-  .row-metrics-6 { grid-template-columns: repeat(2, 1fr); }
+  .row-metrics-6 { 
+    grid-template-columns: repeat(2, minmax(0, 1fr)); 
+    gap: 12px;
+  }
+  .metric-box {
+    padding: 16px;
+  }
+  .mb-top {
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .m-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+  }
+  .m-icon img { width: 22px; height: 22px; }
+  .m-icon svg { width: 18px; height: 18px; }
+  .m-label { font-size: 0.75rem; white-space: normal; line-height: 1.2; word-break: break-word; }
+  .mb-value { font-size: 1.5rem; }
+  .val-group .mb-value { font-size: 1.2rem; }
 }
 
 /* ── CHARTS ── */
