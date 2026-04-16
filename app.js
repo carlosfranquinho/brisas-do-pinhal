@@ -243,7 +243,7 @@ function setNowIcon(name, source, priority) {
 // ── TENDÊNCIAS ──────────────────────────────────────────────────
 // trendRef: snapshot do ponto mais próximo de 30 min atrás (do histórico)
 let trendRef = null;
-const TREND_THRESHOLDS = { rh: 1.0, dew: 0.3, press: 0.3, uv: 0.2, solar: 10 };
+const TREND_THRESHOLDS = { rh: 1.0, dew: 0.3, press: 0.3, uv: 0.2, solar: 10, pm25: 2 };
 
 function setTrendArrow(id, trend) {
   const el = document.getElementById(id);
@@ -268,6 +268,7 @@ function updateTrends(j) {
   setTrendArrow('trend-press', calc('press', j.pressure_hpa));
   setTrendArrow('trend-uv',    calc('uv',    j.uv_index));
   setTrendArrow('trend-solar', calc('solar', j.solar_wm2));
+  setTrendArrow('trend-pm25',  calc('pm25',  j.pm25_ugm3));
 }
 
 // Gráfico 24h (home)
@@ -295,6 +296,14 @@ const degToDirFull = (deg) => {
 };
 
 const localTime = (iso) => new Date(iso);
+
+function aqClass(pm25) {
+  if (pm25 == null) return ['', ''];
+  if (pm25 <= 12)  return ['aq-good',     'Boa'];
+  if (pm25 <= 35)  return ['aq-moderate', 'Moderada'];
+  if (pm25 <= 55)  return ['aq-poor',     'Degradada'];
+  return                  ['aq-bad',      'Má'];
+}
 
 function setText(sel, text) {
   const el = $(sel);
@@ -672,6 +681,16 @@ async function loadLive() {
     } else {
       rateGroup.hidden = true;
     }
+  }
+
+  // Qualidade do ar
+  if (j.pm25_ugm3 != null) {
+    setText("#pm25", fmt(j.pm25_ugm3, 1));
+    const [cls, label] = aqClass(j.pm25_ugm3);
+    const badge = document.getElementById('aqQuality');
+    if (badge) { badge.className = `aq-quality-badge ${cls}`; badge.textContent = label; }
+    const vocEl = document.getElementById('aqVoc');
+    if (vocEl) vocEl.textContent = j.voc_index != null ? `VOC: ${j.voc_index}` : '';
   }
 
   const ts = localTime(j.ts_local ?? j.ts_utc);

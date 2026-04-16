@@ -25,4 +25,14 @@ CREATE TABLE IF NOT EXISTS observations (
 CREATE INDEX IF NOT EXISTS idx_station_ts ON observations (station_id, ts_local);
 CREATE INDEX IF NOT EXISTS idx_ts_utc     ON observations (ts_utc);
 
+CREATE TABLE IF NOT EXISTS aq_readings (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  ts_local   TEXT NOT NULL,
+  ts_utc     TEXT NOT NULL,
+  pm25_ugm3  REAL    DEFAULT NULL,
+  voc_index  INTEGER DEFAULT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_aq_ts ON aq_readings (ts_local);
+
 PRAGMA journal_mode=WAL;

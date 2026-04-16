@@ -50,6 +50,8 @@ os.makedirs(CACHE_DIR, exist_ok=True)
 PAYLOAD_LOG    = os.path.join(LOG_DIR, "payloads.log")
 DATA_STALE_SEC = 360        # > 6 minutos = stale
 METAR_TTL_S    = 15 * 60
+AQ_LIVE_FILE   = os.environ.get("AQ_LIVE_FILE", "/var/lib/meteo/aq_live.json")
+AQ_STALE_SEC   = 1800       # 30 minutos
 
 # Normais climatológicas mensais (Jan–Dez) — mesma origem das normais de Tmean
 NORMALS_TMAX = [15.3, 16.3, 18.5, 19.7, 22.1, 24.6, 26.1, 27.0, 25.9, 22.9, 18.2, 16.1]
@@ -436,6 +438,51 @@ def last_rain():
     return JSONResponse(content={"ts_local": ts}, headers={"Cache-Control": "no-store"})
 
 
+@app.post("/api/aq")
+async def receive_aq(request: Request):
+    """Recebe leituras de qualidade do ar do Home Assistant (IKEA VINDSTYRKA)."""
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse(status_code=400, content={"error": "invalid_json"})
+
+    pm25 = body.get("pm25")   # float μg/m³
+    voc  = body.get("voc")    # int 1–500
+
+    now_utc   = datetime.now(timezone.utc)
+    now_local = now_utc.astimezone(ZoneInfo("Europe/Lisbon"))
+    ts_utc    = now_utc.strftime("%Y-%m-%dT%H:%M:%SZ")
+    tz_offset = now_local.strftime("%z")          # e.g. "+0100"
+    ts_local  = now_local.strftime("%Y-%m-%dT%H:%M:%S") + tz_offset[:3] + ":" + tz_offset[3:]
+
+    # Guardar em aq_live.json (atomic write)
+    payload = {"ts_utc": ts_utc, "ts_local": ts_local, "pm25_ugm3": pm25, "voc_index": voc}
+    try:
+        tmp = AQ_LIVE_FILE + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(payload, f)
+        os.replace(tmp, AQ_LIVE_FILE)
+    except Exception as e:
+        with open(os.path.join(LOG_DIR, "live_errors.log"), "a", encoding="utf-8") as f:
+            f.write(f"{ts_utc} AQ_LIVE_FAIL {e}\n")
+
+    # Guardar na BD
+    conn = get_db()
+    try:
+        conn.execute(
+            "INSERT INTO aq_readings (ts_local, ts_utc, pm25_ugm3, voc_index) VALUES (?,?,?,?)",
+            (ts_local, ts_utc, pm25, voc)
+        )
+        conn.commit()
+    except Exception as e:
+        with open(os.path.join(LOG_DIR, "db_errors.log"), "a", encoding="utf-8") as f:
+            f.write(f"{ts_utc} AQ_DB_FAIL {e}\n")
+    finally:
+        conn.close()
+
+    return PlainTextResponse("OK\n")
+
+
 @app.get("/latest")
 def latest_observation():
     conn = get_db()
@@ -513,6 +560,23 @@ def _fetch_wu_fallback() -> dict | None:
         return None
 
 
+def _enrich_with_aq(data: dict) -> dict:
+    """Injeta pm25_ugm3 e voc_index no dict de resposta se aq_live.json for recente."""
+    if not os.path.exists(AQ_LIVE_FILE):
+        return data
+    try:
+        with open(AQ_LIVE_FILE, "r", encoding="utf-8") as f:
+            aq = json.load(f)
+        aq_age = (datetime.now(timezone.utc) -
+                  datetime.fromisoformat(aq["ts_utc"].replace("Z", "+00:00"))).total_seconds()
+        if aq_age < AQ_STALE_SEC:
+            data["pm25_ugm3"] = aq.get("pm25_ugm3")
+            data["voc_index"]  = aq.get("voc_index")
+    except Exception:
+        pass
+    return data
+
+
 @app.get("/live")
 async def get_live():
     # 1) tentar dados locais
@@ -531,7 +595,7 @@ async def get_live():
         fallback = await asyncio.to_thread(_fetch_wu_fallback)
         if fallback:
             fallback["age_s"] = 0
-            return JSONResponse(content=fallback, headers={"Cache-Control": "no-store"})
+            return JSONResponse(content=_enrich_with_aq(fallback), headers={"Cache-Control": "no-store"})
         # WU também falhou → devolver dados locais stale (se existirem) ou 503
         if not os.path.exists(LIVE_FILE):
             return JSONResponse(
@@ -539,7 +603,7 @@ async def get_live():
                 content={"v": 1, "error": "no_live_data", "message": "Live JSON not ready"}
             )
 
-    return JSONResponse(content=data, headers={"Cache-Control": "no-store"})
+    return JSONResponse(content=_enrich_with_aq(data), headers={"Cache-Control": "no-store"})
 
 
 @app.get("/history")
