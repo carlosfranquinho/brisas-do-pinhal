@@ -24,12 +24,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Inject secrets
-        env:
-          WU_API_KEY: ${{ secrets.WU_API_KEY }}
-        run: |
-          sed -i "s/__WU_API_KEY__/${WU_API_KEY}/g" app.js
-
       - name: Setup Pages
         uses: actions/configure-pages@v5
 

@@ -12,3 +12,4 @@ server/recover_wunderground*.log
 sql/fill_gaps_wunderground.py
 sql/fix_ibarre4_temp_bias.py
 sql/fix_ibarre4_temp_bias_daynight.py
+.wrangler/

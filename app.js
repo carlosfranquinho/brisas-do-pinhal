@@ -7,9 +7,8 @@ const IPMA_GLOBAL_ID = 1100900;
 const IPMA_FORECAST = `https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/${IPMA_GLOBAL_ID}.json`;
 const PUSH_MS = 120000;
 const MAX_LIVE_MS = 30 * 60 * 1000; // 30 min → pausa automática
-const WU_KEY     = "__WU_API_KEY__";
 const WU_STATION = "IMARIN131";
-const WU_URL     = `https://api.weather.com/v2/pws/observations/current?stationId=${WU_STATION}&format=json&units=m&apiKey=${WU_KEY}&numericPrecision=decimal`;
+const WU_PROXY_URL = "https://wu-proxy.carlos-franquinho.workers.dev";
 const CSSVARS = getComputedStyle(document.documentElement);
 const ACCENT = (CSSVARS.getPropertyValue("--accent") || "#3b82f6").trim();
 const ACCENT2 = (CSSVARS.getPropertyValue("--accent-2") || "#94a3b8").trim();
@@ -546,34 +545,33 @@ function appendLivePointToChart(j) {
   chart.update("none");
 }
 
-/* WU fallback — usado quando o PC/API está completamente offline */
+/* Fallback WU via proxy serverless — usado quando o PC/API está offline */
 async function loadLiveFromWU() {
-  const r = await fetch(WU_URL, { cache: "no-store", mode: "cors" });
-  if (!r.ok) throw new Error("WU " + r.status);
+  const r = await fetch(WU_PROXY_URL, { cache: "no-store", mode: "cors" });
+  if (!r.ok) throw new Error("WU proxy " + r.status);
   const d = await r.json();
   const obs = d?.observations?.[0];
   if (!obs) throw new Error("WU sem dados");
   const m = obs.metric ?? {};
-  // Mapear campos WU → formato da nossa API
   return {
     fallback: true,
     station:  WU_STATION,
     ts_local: obs.obsTimeLocal,
     ts_utc:   obs.obsTimeUtc,
-    temp_c:          m.temp          ?? null,
-    temp_max_c:      m.tempHigh      ?? null,
-    temp_min_c:      m.tempLow       ?? null,
-    rh_pct:          obs.humidity    ?? null,
-    dewpoint_c:      m.dewpt         ?? null,
-    wind_kmh:        m.windSpeed     ?? null,
-    gust_kmh:        m.windGust      ?? null,
-    wind_dir_deg:    obs.winddir     ?? null,
-    pressure_hpa:    m.pressure      ?? null,
-    rain_rate_mmph:  m.precipRate    ?? null,
-    rain_day_mm:     m.precipTotal   ?? null,
+    temp_c:          m.temp             ?? null,
+    temp_max_c:      m.tempHigh         ?? null,
+    temp_min_c:      m.tempLow          ?? null,
+    rh_pct:          obs.humidity       ?? null,
+    dewpoint_c:      m.dewpt            ?? null,
+    wind_kmh:        m.windSpeed        ?? null,
+    gust_kmh:        m.windGust         ?? null,
+    wind_dir_deg:    obs.winddir        ?? null,
+    pressure_hpa:    m.pressure         ?? null,
+    rain_rate_mmph:  m.precipRate       ?? null,
+    rain_day_mm:     m.precipTotal      ?? null,
     solar_wm2:       obs.solarRadiation ?? null,
-    uv_index:        obs.uv          ?? null,
-    apparent_c:      m.heatIndex     ?? m.windChill ?? m.temp ?? null,
+    uv_index:        obs.uv             ?? null,
+    apparent_c:      m.heatIndex ?? m.windChill ?? m.temp ?? null,
     stale: false,
   };
 }
@@ -590,14 +588,13 @@ async function loadLive() {
     if (!r.ok) throw new Error("live " + r.status);
     j = await r.json();
   } catch (apiErr) {
-    // PC/tunnel offline — tentar WU diretamente do browser
     try {
       j = await loadLiveFromWU();
     } catch (wuErr) {
-      console.warn("WU fallback falhou:", wuErr);
+      console.warn("WU proxy falhou:", wuErr);
       const flag = $("#staleFlag");
       if (flag) { flag.textContent = "Estação offline — sem dados disponíveis"; flag.className = "stale"; }
-      throw apiErr; // propaga para o caller (startHome) ignorar e tentar novamente
+      throw apiErr;
     }
   }
 

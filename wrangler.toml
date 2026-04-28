@@ -1,0 +1,9 @@
+name = "wu-proxy"
+main = "workers/wu-proxy.js"
+compatibility_date = "2024-09-23"
+
+[vars]
+WU_STATION = "IMARIN131"
+
+# A chave WU_API_KEY é um secret — nunca vai neste ficheiro.
+# Para definir: wrangler secret put WU_API_KEY

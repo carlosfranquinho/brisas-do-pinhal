@@ -2,3 +2,4 @@ DB_PATH=/var/lib/meteo/meteo.db
 LOG_DIR=/home/carlos/meteo_logs
 LIVE_FILE=/var/lib/meteo/live.json
 AQ_LIVE_FILE=/var/lib/meteo/aq_live.json
+WU_API_KEY=SUBSTITUIR_PELA_CHAVE_REAL
